@@ -75,7 +75,7 @@ def cargar_archivo_env():
             clave = clave.strip()
             valor = valor.strip().strip('"').strip("'")
             if clave and valor:
-                os.environ.setdefault(clave, valor)
+                os.environ[clave] = valor
 
 
 cargar_archivo_env()
@@ -134,9 +134,12 @@ def archivo_imagen_valido(nombre_archivo):
 
 def enviar_correo_recuperacion(destinatario, codigo):
     """
-    Envía el código de recuperación por Gmail (SMTP) si las variables de entorno
-    CORREO_APP y CLAVE_CORREO_APP están configuradas. Si no, lo muestra en consola.
+    Envía el código de recuperación por Gmail (SMTP) leyendo el archivo .env.
+    Si no está configurado o falla el envío, muestra el código en la consola.
     """
+    # Recargamos .env por si el usuario lo editó sin reiniciar el servidor
+    cargar_archivo_env()
+
     correo_remitente = os.environ.get("CORREO_APP", "").strip()
     clave_aplicacion = os.environ.get("CLAVE_CORREO_APP", "").replace(" ", "").strip()
 
@@ -146,7 +149,7 @@ def enviar_correo_recuperacion(destinatario, codigo):
 
     mensaje = EmailMessage()
     mensaje["Subject"] = "Código de recuperación de contraseña - CanchaApp"
-    mensaje["From"] = correo_remitente
+    mensaje["From"] = f"CanchaApp <{correo_remitente}>"
     mensaje["To"] = destinatario
     mensaje.set_content(
         f"Hola,\n\n"
@@ -160,6 +163,7 @@ def enviar_correo_recuperacion(destinatario, codigo):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as servidor:
             servidor.login(correo_remitente, clave_aplicacion)
             servidor.send_message(mensaje)
+        print(f"[CanchaApp] Correo de recuperación enviado correctamente a {destinatario}")
         return True
     except Exception as error:
         print(f"[CanchaApp - Error SMTP] No se pudo enviar el correo: {error}")
@@ -272,6 +276,8 @@ def olvide_contrasena():
             fecha_expira = (datetime.now() + timedelta(minutes=15)).isoformat()
             guardar_codigo_recuperacion(usuario["id"], codigo, fecha_expira)
             enviar_correo_recuperacion(correo, codigo)
+        else:
+            print(f"[CanchaApp] Recuperación ignorada: el correo '{correo}' no está registrado en usuarios.")
 
         # Recordamos el correo solo para facilitar el siguiente paso en el formulario
         session["correo_recuperacion"] = correo
