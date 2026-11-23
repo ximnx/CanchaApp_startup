@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block titulo %}Equipos - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <h1 class="titulo-seccion">Equipos registrados</h1>
+        <p class="descripcion-seccion">
+            Crea tu propio equipo de fútbol masculino, femenino o mixto y conoce otros equipos de la comunidad.
+        </p>
+
+        <!-- Formulario para crear un nuevo equipo (solo jugadores con sesión iniciada) -->
+        {% if session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
+        <div class="caja-panel" style="margin-bottom: 30px;">
+            <h2>⚽ Crear un nuevo equipo</h2>
+            <p class="texto-izquierda">
+                Capitán del equipo: <strong>{{ session.get("usuario_nombre") }}</strong>
+            </p>
+
+            <form method="POST" action="/equipos/crear">
+                <div class="cuadricula-dos">
+                    <div class="campo-formulario">
+                        <label for="nombre">Nombre del equipo</label>
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre"
+                            placeholder="Ej: Los Titanes FC"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria" required>
+                            {% for cat in categorias %}
+                                <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="tipo_futbol">Tipo de fútbol</label>
+                        <select id="tipo_futbol" name="tipo_futbol" required>
+                            {% for tipo in tipos_futbol %}
+                                <option value="{{ tipo }}">{{ tipo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="descripcion">Descripción del equipo</label>
+                        <textarea
+                            id="descripcion"
+                            name="descripcion"
+                            rows="2"
+                            placeholder="Ej: Jugamos los fines de semana en Bogotá, nivel recreativo."
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="boton boton-principal">
+                    Guardar equipo
+                </button>
+            </form>
+        </div>
+        {% elif not session.get("usuario_id") %}
+        <div class="caja-aviso" style="margin-bottom: 30px;">
+            <h3>¿Quieres crear tu propio equipo?</h3>
+            <p>Inicia sesión con una cuenta de jugador para registrar tu equipo y luego buscar rivales.</p>
+            <div style="margin-top: 14px;">
+                <a href="/login" class="boton boton-principal">Iniciar sesión</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Filtros sencillos por categoría -->
+        <div class="barra-filtros">
+            <a href="/equipos" class="filtro {% if not categoria_seleccionada %}filtro-activo{% endif %}">
+                Todas las categorías
+            </a>
+            {% for cat in categorias %}
+                <a href="/equipos?categoria={{ cat }}" class="filtro {% if categoria_seleccionada == cat %}filtro-activo{% endif %}">
+                    {{ cat }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Listado de equipos registrados -->
+        {% if equipos %}
+            <div class="cuadricula">
+                {% for equipo in equipos %}
+                <article class="tarjeta-equipo">
+                    <div class="insignias-equipo">
+                        <span class="insignia-futbol">{{ equipo.tipo_futbol }}</span>
+                        <span class="insignia-categoria">{{ equipo.categoria }}</span>
+                        {% if session.get("usuario_id") == equipo.capitan_id %}
+                            <span class="insignia-propia">Tu equipo</span>
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ equipo.nombre }}</h3>
+                    <p class="dato-extra">
+                        <strong>Capitán:</strong> {{ equipo.nombre_capitan }}
+                    </p>
+                    <p class="descripcion-equipo">{{ equipo.descripcion }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="caja-panel centrado">
+                <h3>Aún no hay equipos registrados en esta categoría</h3>
+                <p class="texto-vacio">
+                    ¡Sé el primero en crear un equipo para empezar a organizar partidos!
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

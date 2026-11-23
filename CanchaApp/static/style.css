@@ -1,0 +1,990 @@
+/* ==============================================
+   HOJA DE ESTILOS DE CANCHAAPP
+   Colores principales:
+   - Verde oscuro: #163A2B
+   - Verde:        #29965A
+   - Verde claro:  #E5F5E9
+   - Blanco:       #FFFFFF
+   - Gris claro:   #F5F5F5
+   ============================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #F5F5F5;
+    color: #163A2B;
+    line-height: 1.6;
+    /* Mantiene el pie de página siempre abajo incluso en páginas cortas */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.contenedor {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.centrado {
+    text-align: center;
+}
+
+/* ---------------- MENÚ DE NAVEGACIÓN ---------------- */
+.encabezado {
+    background-color: #163A2B;
+    padding: 15px 0;
+}
+
+.barra-navegacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.logo {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.menu a {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    padding-bottom: 3px;
+}
+
+.menu a:hover,
+.menu a.activo {
+    color: #E5F5E9;
+    border-bottom: 2px solid #29965A;
+}
+
+.boton-menu {
+    background-color: #29965A;
+    padding: 8px 16px !important;
+    border-radius: 8px;
+    border-bottom: none !important;
+}
+
+.boton-menu:hover {
+    background-color: #227D4B;
+}
+
+.saludo-usuario {
+    color: #E5F5E9;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.enlace-perfil {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #E5F5E9 !important;
+}
+
+.avatar-menu {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #29965A;
+}
+
+.avatar-menu-inicial {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #29965A;
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* ---------------- PERFIL DE USUARIO ---------------- */
+.tarjeta-perfil {
+    max-width: 520px;
+}
+
+.cabecera-perfil {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.foto-perfil-grande {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #29965A;
+    margin-bottom: 12px;
+}
+
+.avatar-grande-inicial {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #163A2B;
+    color: #FFFFFF;
+    font-size: 46px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto;
+    border: 4px solid #29965A;
+}
+
+.correo-perfil {
+    color: #4A5D54;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.boton-salir {
+    background-color: #E5F5E9;
+    color: #163A2B !important;
+    padding: 7px 14px !important;
+    border-radius: 8px;
+    border-bottom: none !important;
+}
+
+.boton-salir:hover {
+    background-color: #FFFFFF;
+}
+
+/* ---------------- MENSAJES FLASH (ALERTAS) ---------------- */
+.zona-mensajes {
+    margin-top: 16px;
+}
+
+.alerta {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.alerta-exito {
+    background-color: #E5F5E9;
+    color: #163A2B;
+    border: 1px solid #29965A;
+}
+
+.alerta-error {
+    background-color: #FDECEA;
+    color: #8A1F11;
+    border: 1px solid #D9534F;
+}
+
+/* ---------------- PORTADA Y BOTONES ---------------- */
+.portada {
+    background-color: #163A2B;
+    color: #FFFFFF;
+    padding: 68px 0;
+    text-align: center;
+}
+
+.contenido-portada {
+    max-width: 750px;
+}
+
+.etiqueta {
+    display: inline-block;
+    background-color: #29965A;
+    color: #FFFFFF;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+.portada h1 {
+    font-size: 46px;
+    margin-bottom: 14px;
+}
+
+.frase {
+    font-size: 21px;
+    color: #E5F5E9;
+    font-style: italic;
+    margin-bottom: 14px;
+}
+
+.subtitulo {
+    font-size: 16px;
+    color: #FFFFFF;
+    margin-bottom: 28px;
+}
+
+.botones-portada {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.boton {
+    display: inline-block;
+    padding: 11px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+}
+
+.boton-principal {
+    background-color: #29965A;
+    color: #FFFFFF;
+}
+
+.boton-principal:hover {
+    background-color: #227D4B;
+}
+
+.boton-secundario {
+    background-color: #E5F5E9;
+    color: #163A2B;
+}
+
+.boton-secundario:hover {
+    background-color: #FFFFFF;
+}
+
+.boton-peligro {
+    background-color: #D9534F;
+    color: #FFFFFF;
+}
+
+.boton-peligro:hover {
+    background-color: #B53B37;
+}
+
+.boton-ancho {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.boton-pequeno {
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+/* ---------------- SECCIONES Y CUADRÍCULAS ---------------- */
+.seccion-clara {
+    background-color: #FFFFFF;
+    padding: 50px 0;
+}
+
+.seccion-gris {
+    background-color: #F5F5F5;
+    padding: 46px 0;
+}
+
+.titulo-seccion {
+    text-align: center;
+    font-size: 30px;
+    color: #163A2B;
+    margin-bottom: 10px;
+}
+
+.titulo-subseccion {
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: #163A2B;
+}
+
+.descripcion-seccion {
+    text-align: center;
+    color: #4A5D54;
+    margin-bottom: 30px;
+}
+
+.cuadricula {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 22px;
+}
+
+.cuadricula-dos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* ---------------- BANNER DE JUGADOR, PANELES Y AVISOS ---------------- */
+.banner-usuario {
+    background-color: #E5F5E9;
+    padding: 24px 0;
+    border-bottom: 1px solid #CBE7D3;
+}
+
+.contenido-banner-usuario {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.acciones-banner {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.etiqueta-rol {
+    display: inline-block;
+    background-color: #163A2B;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+}
+
+.panel-encabezado,
+.caja-panel {
+    background-color: #FFFFFF;
+    padding: 26px;
+    border-radius: 14px;
+    border: 1px solid #E2E8E4;
+    box-shadow: 0 2px 8px rgba(22, 58, 43, 0.06);
+}
+
+.panel-encabezado {
+    margin-bottom: 24px;
+}
+
+.panel-encabezado h1 {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.caja-panel h2 {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.caja-panel h3 {
+    margin-bottom: 8px;
+    color: #163A2B;
+}
+
+.caja-info {
+    background-color: #E5F5E9;
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.caja-info h3 {
+    color: #163A2B;
+    margin-bottom: 8px;
+}
+
+.caja-aviso {
+    background-color: #E5F5E9;
+    padding: 32px 24px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.caja-aviso h2,
+.caja-aviso h3 {
+    margin-bottom: 10px;
+}
+
+.texto-izquierda {
+    color: #4A5D54;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 18px;
+}
+
+.texto-vacio {
+    color: #4A5D54;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* ---------------- FORMULARIOS ---------------- */
+.tarjeta-formulario {
+    background-color: #FFFFFF;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 32px;
+    border-radius: 14px;
+    border: 1px solid #E2E8E4;
+    box-shadow: 0 2px 10px rgba(22, 58, 43, 0.07);
+}
+
+.tarjeta-formulario h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.texto-ayuda {
+    text-align: center;
+    color: #4A5D54;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.campo-formulario {
+    margin-bottom: 16px;
+}
+
+.campo-formulario label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #CCCCCC;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background-color: #FFFFFF;
+}
+
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+    outline: none;
+    border-color: #29965A;
+}
+
+.nota-campo {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #4A5D54;
+}
+
+.enlace-inferior {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.enlace-inferior a {
+    color: #29965A;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.enlace-inferior a:hover {
+    text-decoration: underline;
+}
+
+/* ---------------- FILTROS Y TARJETAS DE CANCHAS ---------------- */
+.barra-filtros {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.filtro {
+    background-color: #FFFFFF;
+    color: #163A2B;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #CBE7D3;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.filtro:hover,
+.filtro-activo {
+    background-color: #29965A;
+    color: #FFFFFF;
+    border-color: #29965A;
+}
+
+.tarjeta-cancha {
+    background-color: #FFFFFF;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #E2E8E4;
+    box-shadow: 0 2px 8px rgba(22, 58, 43, 0.06);
+}
+
+.imagen-cancha {
+    width: 100%;
+    height: 195px;
+    object-fit: cover;
+    display: block;
+}
+
+.contenido-tarjeta {
+    padding: 20px;
+}
+
+.insignia-futbol {
+    display: inline-block;
+    background-color: #E5F5E9;
+    color: #163A2B;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.contenido-tarjeta h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #163A2B;
+}
+
+.direccion {
+    font-size: 14px;
+    color: #4A5D54;
+    margin-bottom: 10px;
+}
+
+.precio {
+    font-size: 20px;
+    font-weight: bold;
+    color: #29965A;
+}
+
+.precio span {
+    font-size: 14px;
+    font-weight: normal;
+    color: #4A5D54;
+}
+
+/* ---------------- DETALLE DE CANCHA, HORARIOS Y RESERVAS ---------------- */
+.enlace-volver {
+    display: inline-block;
+    color: #163A2B;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+.enlace-volver:hover {
+    color: #29965A;
+}
+
+.detalle-cancha {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 24px;
+    background-color: #FFFFFF;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #E2E8E4;
+    box-shadow: 0 2px 8px rgba(22, 58, 43, 0.06);
+}
+
+.imagen-detalle {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+    max-height: 360px;
+    object-fit: cover;
+    display: block;
+}
+
+.info-detalle {
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info-detalle h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.dato-extra {
+    margin-top: 6px;
+    font-size: 15px;
+    color: #4A5D54;
+}
+
+.lista-horarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.tarjeta-horario {
+    background-color: #F5F5F5;
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.horario-libre {
+    cursor: pointer;
+}
+
+.horario-libre:hover {
+    border-color: #29965A;
+    background-color: #E5F5E9;
+}
+
+.horario-ocupado {
+    opacity: 0.7;
+}
+
+.etiqueta-disponible {
+    background-color: #E5F5E9;
+    color: #163A2B;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.etiqueta-ocupado {
+    background-color: #FDECEA;
+    color: #8A1F11;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.formulario-reserva,
+.formulario-horario {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.formulario-horario {
+    background-color: #F5F5F5;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.formulario-reserva .campo-formulario,
+.formulario-horario .campo-formulario {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 170px;
+}
+
+.lista-reservas {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tarjeta-reserva {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8E4;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.tarjeta-reserva-admin {
+    background-color: #F5F5F5;
+}
+
+.enlace-titulo {
+    color: #163A2B;
+    text-decoration: none;
+}
+
+.enlace-titulo:hover {
+    color: #29965A;
+}
+
+.acciones-reserva {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.botones-accion {
+    display: flex;
+    gap: 8px;
+}
+
+.badge-estado {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.estado-pendiente {
+    background-color: #FFF4D6;
+    color: #8A5A00;
+}
+
+.estado-confirmada,
+.estado-aceptada {
+    background-color: #E5F5E9;
+    color: #163A2B;
+}
+
+.estado-rechazada {
+    background-color: #FDECEA;
+    color: #8A1F11;
+}
+
+/* ---------------- PANEL ADMIN: CANCHAS Y CHIPS ---------------- */
+.tarjeta-admin-cancha {
+    margin-bottom: 22px;
+}
+
+.encabezado-admin-cancha {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.miniatura-cancha {
+    width: 150px;
+    height: 105px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.chips-horarios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chip-horario {
+    background-color: #E5F5E9;
+    color: #163A2B;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.boton-x {
+    background: none;
+    border: none;
+    color: #8A1F11;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ---------------- EQUIPOS Y BUSCAR RIVALES ---------------- */
+.tarjeta-equipo {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8E4;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(22, 58, 43, 0.06);
+}
+
+.tarjeta-equipo h3 {
+    font-size: 21px;
+    color: #163A2B;
+    margin-bottom: 6px;
+}
+
+.insignias-equipo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.insignias-equipo .insignia-futbol {
+    margin-bottom: 0;
+}
+
+.insignia-categoria {
+    display: inline-block;
+    background-color: #163A2B;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.insignia-propia {
+    display: inline-block;
+    background-color: #29965A;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.descripcion-equipo {
+    margin-top: 12px;
+    color: #4A5D54;
+    font-size: 15px;
+}
+
+.tarjeta-partido {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.zona-accion-partido {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #EFEFEF;
+}
+
+.form-quiero-jugar select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #CCCCCC;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.etiqueta-propia-suave {
+    display: inline-block;
+    background-color: #E5F5E9;
+    color: #163A2B;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+.aviso-confirmado {
+    background-color: #E5F5E9;
+    color: #163A2B;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* ---------------- PIE DE PÁGINA ---------------- */
+.pie-pagina {
+    background-color: #163A2B;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.pie-pequeno {
+    font-size: 14px;
+    color: #E5F5E9;
+    margin-top: 6px;
+}
+
+/* ---------------- DISEÑO PARA CELULARES ---------------- */
+@media (max-width: 768px) {
+    .barra-navegacion {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .menu {
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .portada {
+        padding: 46px 0;
+    }
+
+    .portada h1 {
+        font-size: 34px;
+    }
+
+    .frase {
+        font-size: 18px;
+    }
+
+    .cuadricula,
+    .cuadricula-dos,
+    .detalle-cancha {
+        grid-template-columns: 1fr;
+    }
+
+    .tarjeta-formulario,
+    .panel-encabezado,
+    .caja-panel {
+        padding: 20px;
+    }
+
+    .acciones-reserva {
+        align-items: flex-start;
+    }
+
+    .formulario-reserva button,
+    .formulario-horario button {
+        width: 100%;
+    }
+
+    .miniatura-cancha {
+        width: 100%;
+        height: 160px;
+    }
+}

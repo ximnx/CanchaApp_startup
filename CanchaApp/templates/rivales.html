@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block titulo %}Buscar rival - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <h1 class="titulo-seccion">Buscar equipo rival</h1>
+        <p class="descripcion-seccion">
+            Publica cuándo quiere jugar tu equipo o presiona "Quiero jugar" para retar a otro equipo.
+        </p>
+
+        <!-- Solicitudes recibidas para los partidos publicados por el jugador -->
+        {% if solicitudes_recibidas %}
+        <div class="caja-panel" style="margin-bottom: 26px;">
+            <h2>📥 Solicitudes recibidas para tus partidos</h2>
+            <p class="texto-izquierda">
+                Otros equipos quieren jugar contra ti. Puedes aceptar o rechazar cada solicitud.
+            </p>
+
+            <div class="lista-reservas">
+                {% for sol in solicitudes_recibidas %}
+                <div class="tarjeta-reserva tarjeta-reserva-admin">
+                    <div class="datos-reserva">
+                        <h3>{{ sol.equipo_retador }} quiere jugar contra {{ sol.mi_equipo }}</h3>
+                        <p class="dato-extra">
+                            <strong>Capitán retador:</strong> {{ sol.capitan_retador }}
+                            &nbsp;|&nbsp; {{ sol.tipo_futbol_retador }} ({{ sol.categoria_retador }})
+                        </p>
+                        <p class="dato-extra">
+                            <strong>Partido:</strong> 📅 {{ sol.fecha }} — 🕒 {{ sol.hora }} &nbsp;|&nbsp; 📍 {{ sol.lugar }}
+                        </p>
+                    </div>
+
+                    <div class="acciones-reserva">
+                        <span class="badge-estado estado-{{ sol.estado }}">
+                            {{ sol.estado | capitalize }}
+                        </span>
+
+                        {% if sol.estado == "pendiente" %}
+                        <div class="botones-accion">
+                            <form method="POST" action="/rivales/solicitud/{{ sol.id }}">
+                                <input type="hidden" name="accion" value="aceptar">
+                                <button type="submit" class="boton boton-principal boton-pequeno">
+                                    Aceptar
+                                </button>
+                            </form>
+                            <form method="POST" action="/rivales/solicitud/{{ sol.id }}">
+                                <input type="hidden" name="accion" value="rechazar">
+                                <button type="submit" class="boton boton-peligro boton-pequeno">
+                                    Rechazar
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Solicitudes que el jugador envió a otros equipos -->
+        {% if solicitudes_enviadas %}
+        <div class="caja-panel" style="margin-bottom: 26px;">
+            <h2>📤 Mis solicitudes enviadas</h2>
+            <div class="lista-reservas" style="margin-top: 12px;">
+                {% for sol in solicitudes_enviadas %}
+                <div class="tarjeta-reserva">
+                    <div class="datos-reserva">
+                        <strong>{{ sol.mi_equipo }} → {{ sol.equipo_publicador }}</strong>
+                        <p class="dato-extra">
+                            📅 {{ sol.fecha }} — 🕒 {{ sol.hora }} &nbsp;|&nbsp; 📍 {{ sol.lugar }}
+                        </p>
+                    </div>
+                    <span class="badge-estado estado-{{ sol.estado }}">
+                        {{ sol.estado | capitalize }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulario para publicar que un equipo busca rival -->
+        {% if session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
+            {% if mis_equipos %}
+            <div class="caja-panel" style="margin-bottom: 30px;">
+                <h2>📣 Publicar que buscamos rival</h2>
+                <p class="texto-izquierda">
+                    Ejemplo: "Los Titanes buscan rival para fútbol 5, el sábado a las 18:00".
+                </p>
+
+                <form method="POST" action="/rivales/publicar">
+                    <div class="cuadricula-dos">
+                        <div class="campo-formulario">
+                            <label for="equipo_id">Tu equipo</label>
+                            <select id="equipo_id" name="equipo_id" required>
+                                {% for eq in mis_equipos %}
+                                    <option value="{{ eq.id }}">
+                                        {{ eq.nombre }} ({{ eq.tipo_futbol }} - {{ eq.categoria }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="lugar">Lugar o cancha</label>
+                            <input
+                                type="text"
+                                id="lugar"
+                                name="lugar"
+                                placeholder="Ej: Cancha El Golazo, Bogotá"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="fecha">Fecha del partido</label>
+                            <input
+                                type="date"
+                                id="fecha"
+                                name="fecha"
+                                min="{{ fecha_hoy }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="hora">Hora</label>
+                            <select id="hora" name="hora" required>
+                                {% for hora in horas_disponibles %}
+                                    <option value="{{ hora }}">{{ hora }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="descripcion">Descripción del partido</label>
+                        <textarea
+                            id="descripcion"
+                            name="descripcion"
+                            rows="2"
+                            placeholder="Ej: Buscamos rival de nivel amistoso, dividimos el valor de la cancha."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="boton boton-principal">
+                        Publicar búsqueda de rival
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="caja-aviso" style="margin-bottom: 30px;">
+                <h3>Primero crea tu equipo</h3>
+                <p>Para publicar un partido o presionar "Quiero jugar", necesitas tener al menos un equipo registrado.</p>
+                <div style="margin-top: 14px;">
+                    <a href="/equipos" class="boton boton-principal">Ir a crear mi equipo</a>
+                </div>
+            </div>
+            {% endif %}
+        {% elif not session.get("usuario_id") %}
+            <div class="caja-aviso" style="margin-bottom: 30px;">
+                <h3>¿Buscas con quién jugar?</h3>
+                <p>Inicia sesión como jugador para publicar partidos o retar a los equipos de abajo.</p>
+                <div style="margin-top: 14px;">
+                    <a href="/login" class="boton boton-principal">Iniciar sesión</a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Filtros por tipo de fútbol y categoría -->
+        <div class="barra-filtros">
+            <a href="/rivales" class="filtro {% if not tipo_seleccionado and not categoria_seleccionada %}filtro-activo{% endif %}">
+                Todos
+            </a>
+            {% for tipo in tipos_futbol %}
+                <a href="/rivales?tipo={{ tipo }}" class="filtro {% if tipo_seleccionado == tipo %}filtro-activo{% endif %}">
+                    {{ tipo }}
+                </a>
+            {% endfor %}
+            {% for cat in categorias %}
+                <a href="/rivales?categoria={{ cat }}" class="filtro {% if categoria_seleccionada == cat %}filtro-activo{% endif %}">
+                    {{ cat }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Publicaciones de equipos buscando rival -->
+        {% if partidos_vista %}
+            <div class="cuadricula">
+                {% for item in partidos_vista %}
+                {% set p = item.partido %}
+                <article class="tarjeta-equipo tarjeta-partido">
+                    <div class="insignias-equipo">
+                        <span class="insignia-futbol">{{ p.tipo_futbol }}</span>
+                        <span class="insignia-categoria">{{ p.categoria }}</span>
+                        {% if item.rival_aceptado %}
+                            <span class="insignia-propia">Rival confirmado</span>
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ p.nombre_equipo }} busca rival</h3>
+                    <p class="dato-extra"><strong>📅 Fecha:</strong> {{ p.fecha }} &nbsp;|&nbsp; <strong>🕒 Hora:</strong> {{ p.hora }}</p>
+                    <p class="dato-extra"><strong>📍 Lugar:</strong> {{ p.lugar }}</p>
+                    <p class="dato-extra"><strong>Capitán:</strong> {{ p.nombre_capitan }}</p>
+                    <p class="descripcion-equipo">{{ p.descripcion }}</p>
+
+                    <div class="zona-accion-partido">
+                        {% if item.rival_aceptado %}
+                            <p class="aviso-confirmado">
+                                ✅ Partido acordado contra <strong>{{ item.rival_aceptado }}</strong>
+                            </p>
+                        {% elif session.get("usuario_id") == p.capitan_id %}
+                            <span class="etiqueta-propia-suave">Esta es tu publicación</span>
+                        {% elif session.get("usuario_id") and session.get("tipo_usuario") == "jugador" and mis_equipos %}
+                            <form method="POST" action="/rivales/solicitar/{{ p.id }}" class="form-quiero-jugar">
+                                <select name="equipo_id" required>
+                                    {% for eq in mis_equipos %}
+                                        <option value="{{ eq.id }}">{{ eq.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="boton boton-principal boton-ancho">
+                                    Quiero jugar
+                                </button>
+                            </form>
+                        {% elif session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
+                            <a href="/equipos" class="boton boton-secundario boton-ancho">
+                                Crea un equipo para jugar
+                            </a>
+                        {% elif not session.get("usuario_id") %}
+                            <a href="/login" class="boton boton-principal boton-ancho">
+                                Inicia sesión para jugar
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="caja-panel centrado">
+                <h3>No hay publicaciones de partidos todavía</h3>
+                <p class="texto-vacio">
+                    Cuando los equipos publiquen que buscan rival, aparecerán aquí para que puedas retarlos.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

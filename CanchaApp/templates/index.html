@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block titulo %}CanchaApp - Reserva canchas y encuentra rivales{% endblock %}
+
+{% block contenido %}
+
+    <!-- Si un jugador tiene sesión iniciada, le mostramos un saludo personalizado -->
+    {% if session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
+    <section class="banner-usuario">
+        <div class="contenedor contenido-banner-usuario">
+            <div>
+                <span class="etiqueta-rol">Perfil: Jugador</span>
+                <h2>¡Bienvenido a la cancha, {{ session.get("usuario_nombre") }}!</h2>
+                <p>Desde aquí puedes explorar las canchas sintéticas registradas y revisar sus horarios.</p>
+            </div>
+            <div class="acciones-banner">
+                <a href="/canchas" class="boton boton-principal">Ver canchas</a>
+                <a href="/mis_reservas" class="boton boton-secundario">Mis reservas</a>
+                <a href="/rivales" class="boton boton-secundario">Buscar rival</a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Sección principal (portada) -->
+    <section class="portada">
+        <div class="contenedor contenido-portada">
+            <span class="etiqueta">Fútbol masculino, femenino y mixto en Colombia</span>
+            <h1>CanchaApp</h1>
+            <p class="frase">
+                "El fútbol se disfruta mejor cuando tienes la cancha lista y un buen rival esperando."
+            </p>
+            <p class="subtitulo">
+                Encuentra canchas sintéticas disponibles, organiza tus reservas y conecta con otros equipos para jugar.
+            </p>
+
+            <div class="botones-portada">
+                <a href="/canchas" class="boton boton-principal">Buscar canchas</a>
+                <a href="/rivales" class="boton boton-secundario">Encontrar rivales</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección: Cómo funciona CanchaApp -->
+    <section id="como-funciona" class="seccion-clara">
+        <div class="contenedor">
+            <h2 class="titulo-seccion">¿Qué puedes hacer en CanchaApp?</h2>
+
+            <div class="cuadricula">
+                <div class="caja-info">
+                    <h3>1. Explora canchas</h3>
+                    <p>Consulta canchas sintéticas de fútbol 5, 7 u 11 con su ubicación, precio por hora y horarios.</p>
+                </div>
+
+                <div class="caja-info">
+                    <h3>2. Reserva fácil</h3>
+                    <p>Elige la fecha y la hora disponible que mejor le sirva a tu grupo sin perder tiempo llamando.</p>
+                </div>
+
+                <div class="caja-info">
+                    <h3>3. Encuentra rival</h3>
+                    <p>Crea tu equipo y publica cuándo quieres jugar para que otros equipos te reten a un partido.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección: Canchas destacadas (ahora vienen directo de SQLite) -->
+    <section id="canchas-destacadas" class="seccion-gris">
+        <div class="contenedor">
+            <h2 class="titulo-seccion">Canchas destacadas</h2>
+            <p class="descripcion-seccion">
+                Algunas de las canchas sintéticas registradas en nuestra plataforma.
+            </p>
+
+            <div class="cuadricula">
+                {% for cancha in canchas %}
+                <article class="tarjeta-cancha">
+                    <img
+                        src="{{ url_for('static', filename=cancha.imagen) }}"
+                        alt="{{ cancha.nombre }}"
+                        class="imagen-cancha"
+                    >
+
+                    <div class="contenido-tarjeta">
+                        <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
+                        <h3>{{ cancha.nombre }}</h3>
+                        <p class="direccion">📍 {{ cancha.direccion }}</p>
+                        <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
+                        <a href="/cancha/{{ cancha.id }}" class="boton boton-principal boton-ancho">
+                            Ver detalles
+                        </a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+
+            <div class="centrado" style="margin-top: 30px;">
+                <a href="/canchas" class="boton boton-secundario">Ver listado completo de canchas</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Llamado a la acción -->
+    {% if not session.get("usuario_id") %}
+    <section class="seccion-clara">
+        <div class="contenedor caja-aviso">
+            <h2>¿Listo para saltar a la cancha?</h2>
+            <p>
+                Crea tu cuenta gratis como jugador o administrador de cancha para comenzar.
+            </p>
+            <div class="botones-portada" style="margin-top: 18px;">
+                <a href="/registro" class="boton boton-principal">Crear cuenta</a>
+                <a href="/login" class="boton boton-secundario">Ya tengo cuenta</a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+{% endblock %}

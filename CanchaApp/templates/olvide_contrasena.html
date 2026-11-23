@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block titulo %}Recuperar contraseña - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <div class="tarjeta-formulario">
+            <h1>Recuperar contraseña</h1>
+            <p class="texto-ayuda">
+                Escribe el correo con el que te registraste y te enviaremos un código de 6 dígitos.
+            </p>
+
+            <form method="POST" action="/olvide_contrasena">
+                <div class="campo-formulario">
+                    <label for="correo">Correo electrónico</label>
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="Ej: laura@correo.com"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="boton boton-principal boton-ancho">
+                    Enviar código
+                </button>
+            </form>
+
+            <p class="enlace-inferior">
+                ¿Ya tienes un código? <a href="/restablecer_contrasena">Ingrésalo aquí</a>
+            </p>
+            <p class="enlace-inferior">
+                <a href="/login">← Volver a iniciar sesión</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

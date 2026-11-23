@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block titulo %}Panel de Administrador - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <div class="panel-encabezado">
+            <span class="etiqueta-rol">Perfil: Administrador de canchas</span>
+            <h1>Panel de Administración</h1>
+            <p>
+                Bienvenido, <strong>{{ session.get("usuario_nombre") }}</strong>.
+                Aquí puedes registrar tus canchas, gestionar horarios y aprobar o rechazar reservas.
+            </p>
+        </div>
+
+        <!-- Sección de solicitudes de reserva recibidas -->
+        <div class="caja-panel" style="margin-bottom: 28px;">
+            <h2>📋 Solicitudes de reserva recibidas</h2>
+            <p class="texto-izquierda">
+                Revisa las reservas pedidas por los jugadores para tus canchas. No es posible confirmar dos reservas en el mismo horario.
+            </p>
+
+            {% if reservas_recibidas %}
+                <div class="lista-reservas">
+                    {% for reserva in reservas_recibidas %}
+                    <div class="tarjeta-reserva tarjeta-reserva-admin">
+                        <div class="datos-reserva">
+                            <h3>{{ reserva.nombre_cancha }}</h3>
+                            <p class="dato-extra">
+                                <strong>Jugador:</strong> {{ reserva.nombre_jugador }} ({{ reserva.correo_jugador }})
+                            </p>
+                            <p class="dato-extra">
+                                <strong>Turno:</strong> 📅 {{ reserva.fecha }} — 🕒 {{ reserva.hora }} (1 hora)
+                                &nbsp;|&nbsp; <strong>Precio:</strong> {{ reserva.precio_cancha | precio_cop }}
+                            </p>
+                        </div>
+
+                        <div class="acciones-reserva">
+                            <span class="badge-estado estado-{{ reserva.estado }}">
+                                {{ reserva.estado | capitalize }}
+                            </span>
+
+                            {% if reserva.estado == "pendiente" %}
+                                <div class="botones-accion">
+                                    <form method="POST" action="/administrador/reserva/{{ reserva.id }}">
+                                        <input type="hidden" name="accion" value="confirmar">
+                                        <button type="submit" class="boton boton-principal boton-pequeno">
+                                            Confirmar
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="/administrador/reserva/{{ reserva.id }}">
+                                        <input type="hidden" name="accion" value="rechazar">
+                                        <button type="submit" class="boton boton-peligro boton-pequeno">
+                                            Rechazar
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="texto-vacio">
+                    Todavía no has recibido solicitudes de reserva para tus canchas.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Formulario para registrar una nueva cancha -->
+        <div class="caja-panel" style="margin-bottom: 28px;">
+            <h2>🏟️ Registrar nueva cancha</h2>
+            <p class="texto-izquierda">
+                Completa los datos de tu cancha sintética. Solo tú podrás modificarla.
+            </p>
+
+            <form method="POST" action="/administrador/agregar_cancha" enctype="multipart/form-data">
+                <div class="cuadricula-dos">
+                    <div class="campo-formulario">
+                        <label for="nombre">Nombre de la cancha</label>
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre"
+                            placeholder="Ej: Sintética Los Campeones"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="direccion">Dirección</label>
+                        <input
+                            type="text"
+                            id="direccion"
+                            name="direccion"
+                            placeholder="Ej: Carrera 15 # 80-20, Bogotá"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="precio">Precio por hora (en pesos, sin puntos)</label>
+                        <input
+                            type="number"
+                            id="precio"
+                            name="precio"
+                            min="1000"
+                            step="1000"
+                            placeholder="Ej: 100000"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="tipo_futbol">Tipo de fútbol</label>
+                        <select id="tipo_futbol" name="tipo_futbol" required>
+                            {% for tipo in tipos_futbol %}
+                                <option value="{{ tipo }}">{{ tipo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="imagen_predeterminada">Fotografía predeterminada</label>
+                        <select id="imagen_predeterminada" name="imagen_predeterminada">
+                            <option value="imagenes/cancha1.jpg">Cancha sintética de día</option>
+                            <option value="imagenes/cancha2.jpg">Cancha sintética iluminada de noche</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="foto">O sube tu propia foto (opcional)</label>
+                        <input type="file" id="foto" name="foto" accept=".jpg,.jpeg,.png,.webp">
+                    </div>
+                </div>
+
+                <button type="submit" class="boton boton-principal">
+                    Guardar cancha
+                </button>
+            </form>
+        </div>
+
+        <!-- Listado de las canchas del administrador y sus horarios -->
+        <h2 class="titulo-subseccion">Mis canchas y horarios disponibles</h2>
+
+        {% if canchas_con_horarios %}
+            {% for item in canchas_con_horarios %}
+            <div class="caja-panel tarjeta-admin-cancha">
+                <div class="encabezado-admin-cancha">
+                    <img
+                        src="{{ url_for('static', filename=item.cancha.imagen) }}"
+                        alt="{{ item.cancha.nombre }}"
+                        class="miniatura-cancha"
+                    >
+                    <div>
+                        <span class="insignia-futbol">{{ item.cancha.tipo_futbol }}</span>
+                        <h3>{{ item.cancha.nombre }}</h3>
+                        <p class="direccion">📍 {{ item.cancha.direccion }}</p>
+                        <p class="precio">{{ item.cancha.precio | precio_cop }} <span>/ hora</span></p>
+                    </div>
+                </div>
+
+                <!-- Formulario para agregar un nuevo horario a esta cancha -->
+                <form method="POST" action="/administrador/agregar_horario" class="formulario-horario">
+                    <input type="hidden" name="cancha_id" value="{{ item.cancha.id }}">
+
+                    <div class="campo-formulario">
+                        <label>Fecha</label>
+                        <input type="date" name="fecha" min="{{ fecha_hoy }}" required>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label>Hora (turno de 1 hora)</label>
+                        <select name="hora" required>
+                            {% for hora in horas_disponibles %}
+                                <option value="{{ hora }}">{{ hora }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="boton boton-principal">
+                        + Agregar horario
+                    </button>
+                </form>
+
+                <!-- Horarios ya cargados para esta cancha -->
+                <div class="zona-horarios-admin">
+                    <strong>Horarios registrados ({{ item.horarios | length }}):</strong>
+
+                    {% if item.horarios %}
+                        <div class="chips-horarios">
+                            {% for horario in item.horarios %}
+                            <div class="chip-horario">
+                                <span>📅 {{ horario.fecha }} — 🕒 {{ horario.hora }}</span>
+                                <form method="POST" action="/administrador/eliminar_horario/{{ horario.id }}">
+                                    <button type="submit" class="boton-x" title="Eliminar horario">✕</button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="texto-vacio">Aún no has agregado horarios para esta cancha.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="caja-panel">
+                <p class="texto-vacio">
+                    Todavía no tienes canchas registradas. Usa el formulario de arriba para crear tu primera cancha.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

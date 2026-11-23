@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mi perfil - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <div class="tarjeta-formulario tarjeta-perfil">
+            <div class="cabecera-perfil">
+                {% if usuario.foto %}
+                    <img
+                        src="{{ url_for('static', filename=usuario.foto) }}"
+                        alt="Foto de {{ usuario.nombre }}"
+                        class="foto-perfil-grande"
+                    >
+                {% else %}
+                    <div class="avatar-grande-inicial">
+                        {{ usuario.nombre[0] | upper }}
+                    </div>
+                {% endif %}
+
+                <h1>{{ usuario.nombre }}</h1>
+                <p class="correo-perfil">{{ usuario.correo }}</p>
+                <span class="etiqueta-rol">
+                    {% if usuario.tipo_usuario == "administrador" %}
+                        Administrador de canchas
+                    {% else %}
+                        Jugador
+                    {% endif %}
+                </span>
+            </div>
+
+            <form method="POST" action="/perfil" enctype="multipart/form-data">
+                <div class="campo-formulario">
+                    <label for="nombre">Nombre completo</label>
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        value="{{ usuario.nombre }}"
+                        minlength="2"
+                        required
+                    >
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="foto">Cambiar foto de perfil (JPG, PNG o WEBP)</label>
+                    <input
+                        type="file"
+                        id="foto"
+                        name="foto"
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+                    <small class="nota-campo">
+                        Si no seleccionas una foto nueva, se conservará la actual.
+                    </small>
+                </div>
+
+                <button type="submit" class="boton boton-principal boton-ancho">
+                    Guardar cambios
+                </button>
+            </form>
+
+            {% if usuario.foto %}
+            <form method="POST" action="/perfil/quitar_foto" style="margin-top: 12px;">
+                <button type="submit" class="boton boton-secundario boton-ancho">
+                    Quitar foto de perfil
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

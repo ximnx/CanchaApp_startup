@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block titulo %}Iniciar sesión - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <div class="tarjeta-formulario">
+            <h1>Iniciar sesión</h1>
+            <p class="texto-ayuda">
+                Ingresa con tu correo y contraseña para acceder a CanchaApp.
+            </p>
+
+            <form method="POST" action="/login">
+                <div class="campo-formulario">
+                    <label for="correo">Correo electrónico</label>
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="Ej: laura@correo.com"
+                        required
+                    >
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="contrasena">Contraseña</label>
+                    <input
+                        type="password"
+                        id="contrasena"
+                        name="contrasena"
+                        placeholder="Escribe tu contraseña"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="boton boton-principal boton-ancho">
+                    Ingresar
+                </button>
+            </form>
+
+            <p class="enlace-inferior">
+                <a href="/olvide_contrasena">¿Olvidaste tu contraseña?</a>
+            </p>
+
+            <p class="enlace-inferior">
+                ¿Aún no tienes cuenta? <a href="/registro">Regístrate gratis</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

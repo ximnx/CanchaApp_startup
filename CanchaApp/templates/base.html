@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}CanchaApp{% endblock %}</title>
+    <!-- Conectamos el archivo de estilos CSS desde la carpeta static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Menú de navegación compartido por todas las páginas -->
+    <header class="encabezado">
+        <div class="contenedor barra-navegacion">
+            <a href="/" class="logo">⚽ CanchaApp</a>
+
+            <nav class="menu">
+                <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
+                <a href="/canchas" class="{% if request.path.startswith('/cancha') %}activo{% endif %}">Canchas</a>
+                <a href="/equipos" class="{% if request.path.startswith('/equipos') %}activo{% endif %}">Equipos</a>
+                <a href="/rivales" class="{% if request.path.startswith('/rivales') %}activo{% endif %}">Buscar rival</a>
+
+                <!-- Si el usuario ya inició sesión, mostramos su nombre y opciones -->
+                {% if session.get("usuario_id") %}
+                    {% if session.get("tipo_usuario") == "administrador" %}
+                        <a href="/administrador" class="{% if request.path.startswith('/administrador') %}activo{% endif %}">Panel Admin</a>
+                    {% else %}
+                        <a href="/mis_reservas" class="{% if request.path == '/mis_reservas' %}activo{% endif %}">Mis reservas</a>
+                    {% endif %}
+
+                    <a href="/perfil" class="enlace-perfil {% if request.path == '/perfil' %}activo{% endif %}">
+                        {% if session.get("usuario_foto") %}
+                            <img
+                                src="{{ url_for('static', filename=session.get('usuario_foto')) }}"
+                                alt="Mi foto"
+                                class="avatar-menu"
+                            >
+                        {% else %}
+                            <span class="avatar-menu-inicial">
+                                {{ session.get("usuario_nombre", "U")[0] | upper }}
+                            </span>
+                        {% endif %}
+                        <span>{{ session.get("usuario_nombre") }}</span>
+                    </a>
+                    <a href="/cerrar_sesion" class="boton-salir">Cerrar sesión</a>
+                {% else %}
+                    <!-- Si es un visitante sin sesión iniciada -->
+                    <a href="/login" class="{% if request.path == '/login' %}activo{% endif %}">Iniciar sesión</a>
+                    <a href="/registro" class="boton-menu">Registrarse</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mensajes flash de confirmación o error enviados desde Flask -->
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            <div class="contenedor zona-mensajes">
+                {% for categoria, mensaje in mensajes %}
+                    <div class="alerta alerta-{{ categoria }}">
+                        {{ mensaje }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Aquí se inserta el contenido propio de cada página -->
+    <main>
+        {% block contenido %}{% endblock %}
+    </main>
+
+    <!-- Pie de página compartido -->
+    <footer class="pie-pagina">
+        <div class="contenedor">
+            <p><strong>CanchaApp</strong> — Proyecto universitario de Ingeniería de Sistemas</p>
+            <p class="pie-pequeno">Hecho con Python, Flask, SQLite, HTML y CSS</p>
+        </div>
+    </footer>
+
+</body>
+</html>

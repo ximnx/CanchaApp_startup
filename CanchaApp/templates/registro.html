@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block titulo %}Registro - CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <div class="tarjeta-formulario">
+            <h1>Crear una cuenta</h1>
+            <p class="texto-ayuda">
+                Regístrate como jugador o como administrador de canchas sintéticas.
+            </p>
+
+            <!-- method="POST" envía los datos de forma segura en el cuerpo de la petición -->
+            <form method="POST" action="/registro">
+                <div class="campo-formulario">
+                    <label for="nombre">Nombre completo</label>
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ej: Laura Gómez"
+                        required
+                    >
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="correo">Correo electrónico</label>
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="Ej: laura@correo.com"
+                        required
+                    >
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="contrasena">Contraseña</label>
+                    <input
+                        type="password"
+                        id="contrasena"
+                        name="contrasena"
+                        placeholder="Mínimo 6 caracteres"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="tipo_usuario">Tipo de usuario</label>
+                    <select id="tipo_usuario" name="tipo_usuario" onchange="mostrarCodigoAdmin()" required>
+                        <option value="jugador">Jugador (reservar canchas, crear equipo y buscar rivales)</option>
+                        <option value="administrador">Administrador de cancha (requiere código de autorización)</option>
+                    </select>
+                </div>
+
+                <!-- Este campo solo aparece cuando el usuario elige "Administrador de cancha" -->
+                <div class="campo-formulario" id="bloque-codigo-admin" style="display: none;">
+                    <label for="codigo_admin">Código de administrador</label>
+                    <input
+                        type="password"
+                        id="codigo_admin"
+                        name="codigo_admin"
+                        placeholder="Ingresa el código entregado por los dueños"
+                    >
+                    <small class="nota-campo">
+                        Este código lo entregan únicamente los dueños de CanchaApp.
+                    </small>
+                </div>
+
+                <button type="submit" class="boton boton-principal boton-ancho">
+                    Registrarme
+                </button>
+            </form>
+
+            <p class="enlace-inferior">
+                ¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript sencillo para mostrar u ocultar el campo del código de administrador -->
+<script>
+    function mostrarCodigoAdmin() {
+        var selector = document.getElementById("tipo_usuario");
+        var bloque = document.getElementById("bloque-codigo-admin");
+        var campoCodigo = document.getElementById("codigo_admin");
+
+        if (selector.value === "administrador") {
+            bloque.style.display = "block";
+            campoCodigo.required = true;
+        } else {
+            bloque.style.display = "none";
+            campoCodigo.required = false;
+            campoCodigo.value = "";
+        }
+    }
+</script>
+{% endblock %}

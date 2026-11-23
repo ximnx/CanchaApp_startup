@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ cancha.nombre }} - Reservar en CanchaApp{% endblock %}
+
+{% block contenido %}
+<section class="seccion-gris">
+    <div class="contenedor">
+        <a href="/canchas" class="enlace-volver">← Volver al listado de canchas</a>
+
+        <!-- Tarjeta con toda la información de la cancha seleccionada -->
+        <div class="detalle-cancha">
+            <img
+                src="{{ url_for('static', filename=cancha.imagen) }}"
+                alt="{{ cancha.nombre }}"
+                class="imagen-detalle"
+            >
+
+            <div class="info-detalle">
+                <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
+                <h1>{{ cancha.nombre }}</h1>
+                <p class="direccion">📍 {{ cancha.direccion }}</p>
+                <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
+                <p class="dato-extra">
+                    <strong>Administrador:</strong> {{ cancha.nombre_administrador }}
+                </p>
+                <p class="dato-extra">
+                    <strong>Duración por turno:</strong> 1 hora
+                </p>
+            </div>
+        </div>
+
+        <!-- Listado visual de horarios de esta cancha -->
+        <div class="caja-panel" style="margin-top: 28px;">
+            <h2>1. Horarios de esta cancha</h2>
+            <p class="texto-izquierda">
+                Revisa qué turnos están disponibles. Puedes hacer clic en un horario disponible para seleccionarlo en el formulario.
+            </p>
+
+            {% if horarios %}
+                <div class="lista-horarios">
+                    {% for horario in horarios %}
+                    <div
+                        class="tarjeta-horario {% if horario.ocupado %}horario-ocupado{% else %}horario-libre{% endif %}"
+                        {% if not horario.ocupado %}
+                        onclick="seleccionarHorario('{{ horario.fecha }}', '{{ horario.hora }}')"
+                        {% endif %}
+                    >
+                        <div>
+                            <strong>📅 {{ horario.fecha }}</strong>
+                            <p>🕒 {{ horario.hora }} (1 hora)</p>
+                        </div>
+
+                        {% if horario.ocupado %}
+                            <span class="etiqueta-ocupado">{{ horario.texto_estado }}</span>
+                        {% else %}
+                            <span class="etiqueta-disponible">{{ horario.texto_estado }}</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="texto-vacio">
+                    Esta cancha no tiene horarios próximos disponibles por el momento.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Formulario para solicitar la reserva -->
+        <div class="caja-panel" style="margin-top: 24px;">
+            <h2>2. Solicitar reserva</h2>
+
+            {% if not session.get("usuario_id") %}
+                <p class="texto-izquierda">
+                    Debes iniciar sesión con una cuenta de jugador para poder reservar esta cancha.
+                </p>
+                <a href="/login" class="boton boton-principal">Iniciar sesión para reservar</a>
+
+            {% elif session.get("tipo_usuario") != "jugador" %}
+                <p class="texto-izquierda">
+                    Estás conectado como administrador. Para solicitar una reserva, ingresa con una cuenta de jugador.
+                </p>
+
+            {% elif not fechas_disponibles %}
+                <p class="texto-vacio">
+                    No hay turnos disponibles para reservar en este momento.
+                </p>
+
+            {% else %}
+                <p class="texto-izquierda">
+                    Elige la fecha y la hora disponible y presiona el botón para enviar tu solicitud al administrador.
+                </p>
+
+                <form method="POST" action="/reservar" class="formulario-reserva">
+                    <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
+
+                    <div class="campo-formulario">
+                        <label for="fecha">Fecha</label>
+                        <select id="fecha" name="fecha" required>
+                            {% for fecha in fechas_disponibles %}
+                                <option value="{{ fecha }}">{{ fecha }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="hora">Hora disponible (1 hora)</label>
+                        <select id="hora" name="hora" required>
+                            {% for hora in horas_en_cancha %}
+                                <option value="{{ hora }}">{{ hora }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="boton boton-principal">
+                        Reservar cancha
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Pequeño JavaScript opcional para llenar fecha y hora al hacer clic en una tarjeta -->
+<script>
+    function seleccionarHorario(fecha, hora) {
+        var campoFecha = document.getElementById("fecha");
+        var campoHora = document.getElementById("hora");
+        if (campoFecha && campoHora) {
+            campoFecha.value = fecha;
+            campoHora.value = hora;
+            campoFecha.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }
+</script>
+{% endblock %}
