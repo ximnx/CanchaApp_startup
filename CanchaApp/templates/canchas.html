@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block titulo %}Canchas disponibles - CanchaApp{% endblock %}
+{% block titulo %}Canchas disponibles - Ready Match{% endblock %}
 
 {% block contenido %}
 <section class="seccion-gris">
     <div class="contenedor">
         <h1 class="titulo-seccion">Canchas sintéticas disponibles</h1>
         <p class="descripcion-seccion">
-            Elige una cancha para consultar sus horarios disponibles y sus características.
+            Selecciona una cancha para consultar sus características, precios y horarios disponibles.
         </p>
 
-        <!-- Filtros sencillos por tipo de fútbol -->
+        <!-- Filtros por tipo de fútbol -->
         <div class="barra-filtros">
             <a href="/canchas" class="filtro {% if not tipo_seleccionado %}filtro-activo{% endif %}">
                 Todas
@@ -26,16 +26,18 @@
             <div class="cuadricula">
                 {% for cancha in canchas %}
                 <article class="tarjeta-cancha">
-                    <img
-                        src="{{ url_for('static', filename=cancha.imagen) }}"
-                        alt="{{ cancha.nombre }}"
-                        class="imagen-cancha"
-                    >
+                    <div class="marco-imagen-cancha">
+                        <img
+                            src="{{ url_for('static', filename=cancha.imagen) }}"
+                            alt="{{ cancha.nombre }}"
+                            class="imagen-cancha"
+                        >
+                        <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
+                    </div>
 
                     <div class="contenido-tarjeta">
-                        <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
                         <h3>{{ cancha.nombre }}</h3>
-                        <p class="direccion">📍 {{ cancha.direccion }}</p>
+                        <p class="direccion">{{ cancha.direccion }}</p>
                         <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
                         <a href="/cancha/{{ cancha.id }}" class="boton boton-principal boton-ancho">
                             Ver detalles y horarios
@@ -47,9 +49,9 @@
         {% else %}
             <div class="caja-aviso">
                 <h2>No encontramos canchas con ese filtro</h2>
-                <p>Prueba viendo todas las canchas o registra una nueva desde una cuenta de administrador.</p>
-                <div style="margin-top: 16px;">
-                    <a href="/canchas" class="boton boton-principal">Ver todas las canchas</a>
+                <p>Prueba consultando todas las modalidades disponibles.</p>
+                <div style="margin-top: 18px;">
+                    <a href="/canchas" class="boton boton-naranja">Ver todas las canchas</a>
                 </div>
             </div>
         {% endif %}

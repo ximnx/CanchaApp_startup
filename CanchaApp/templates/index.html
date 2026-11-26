@@ -1,105 +1,222 @@
 {% extends "base.html" %}
 
-{% block titulo %}CanchaApp - Reserva canchas y encuentra rivales{% endblock %}
+{% block titulo %}Ready Match - Reserva canchas y encuentra rivales{% endblock %}
 
 {% block contenido %}
 
-    <!-- Si un jugador tiene sesión iniciada, le mostramos un saludo personalizado -->
     {% if session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
     <section class="banner-usuario">
         <div class="contenedor contenido-banner-usuario">
             <div>
-                <span class="etiqueta-rol">Perfil: Jugador</span>
-                <h2>¡Bienvenido a la cancha, {{ session.get("usuario_nombre") }}!</h2>
-                <p>Desde aquí puedes explorar las canchas sintéticas registradas y revisar sus horarios.</p>
+                <span class="etiqueta-rol">Jugador</span>
+                <h2>Bienvenido, {{ session.get("usuario_nombre") }}</h2>
+                <p>Explora canchas disponibles, revisa el estado de tus reservas y encuentra rivales para tu equipo.</p>
             </div>
             <div class="acciones-banner">
                 <a href="/canchas" class="boton boton-principal">Ver canchas</a>
                 <a href="/mis_reservas" class="boton boton-secundario">Mis reservas</a>
-                <a href="/rivales" class="boton boton-secundario">Buscar rival</a>
+                <a href="/rivales" class="boton boton-naranja">Buscar rival</a>
             </div>
         </div>
     </section>
     {% endif %}
 
-    <!-- Sección principal (portada) -->
+    <!-- Portada principal -->
     <section class="portada">
         <div class="contenedor contenido-portada">
             <span class="etiqueta">Fútbol masculino, femenino y mixto en Colombia</span>
-            <h1>CanchaApp</h1>
+            <img
+                src="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}"
+                alt="Ready Match"
+                class="logo-portada"
+            >
+            <h1>Reserva tu cancha. <span class="acento-dorado">Domina el partido.</span></h1>
             <p class="frase">
                 "El fútbol se disfruta mejor cuando tienes la cancha lista y un buen rival esperando."
             </p>
             <p class="subtitulo">
-                Encuentra canchas sintéticas disponibles, organiza tus reservas y conecta con otros equipos para jugar.
+                Encuentra canchas sintéticas disponibles, reserva tu horario en segundos y conecta con otros equipos para jugar.
             </p>
 
             <div class="botones-portada">
                 <a href="/canchas" class="boton boton-principal">Buscar canchas</a>
-                <a href="/rivales" class="boton boton-secundario">Encontrar rivales</a>
+                <a href="/rivales" class="boton boton-naranja">Encontrar rivales</a>
+            </div>
+
+            <div class="franja-metricas">
+                <div class="metrica">
+                    <strong>Fútbol 5 · 7 · 11</strong>
+                    <span>Canchas sintéticas para cada modalidad</span>
+                </div>
+                <div class="metrica">
+                    <strong>Reserva directa</strong>
+                    <span>Consulta horarios reales y confirma tu turno</span>
+                </div>
+                <div class="metrica">
+                    <strong>Rivales activos</strong>
+                    <span>Publica tu partido y recibe solicitudes</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección: Cómo funciona CanchaApp -->
+    <!-- Cómo funciona -->
     <section id="como-funciona" class="seccion-clara">
         <div class="contenedor">
-            <h2 class="titulo-seccion">¿Qué puedes hacer en CanchaApp?</h2>
+            <h2 class="titulo-seccion">¿Cómo funciona Ready Match?</h2>
+            <p class="descripcion-seccion">
+                Todo lo que necesitas para organizar tu próximo partido en tres pasos simples.
+            </p>
 
             <div class="cuadricula">
                 <div class="caja-info">
-                    <h3>1. Explora canchas</h3>
-                    <p>Consulta canchas sintéticas de fútbol 5, 7 u 11 con su ubicación, precio por hora y horarios.</p>
+                    <span class="numero-paso">PASO 01</span>
+                    <h3>Explora canchas</h3>
+                    <p>Consulta canchas sintéticas de fútbol 5, 7 u 11 con su ubicación, precio por hora y horarios disponibles.</p>
                 </div>
 
                 <div class="caja-info">
-                    <h3>2. Reserva fácil</h3>
-                    <p>Elige la fecha y la hora disponible que mejor le sirva a tu grupo sin perder tiempo llamando.</p>
+                    <span class="numero-paso">PASO 02</span>
+                    <h3>Reserva tu turno</h3>
+                    <p>Elige la fecha y la hora que mejor le sirva a tu grupo sin llamadas ni esperas innecesarias.</p>
                 </div>
 
                 <div class="caja-info">
-                    <h3>3. Encuentra rival</h3>
-                    <p>Crea tu equipo y publica cuándo quieres jugar para que otros equipos te reten a un partido.</p>
+                    <span class="numero-paso">PASO 03</span>
+                    <h3>Encuentra rival</h3>
+                    <p>Crea tu equipo y publica cuándo quieres jugar para recibir retos de otros capitanes.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección: Canchas destacadas (ahora vienen directo de SQLite) -->
+    <!-- Canchas destacadas (panel único con carrusel fluido) -->
     <section id="canchas-destacadas" class="seccion-gris">
         <div class="contenedor">
             <h2 class="titulo-seccion">Canchas destacadas</h2>
             <p class="descripcion-seccion">
-                Algunas de las canchas sintéticas registradas en nuestra plataforma.
+                Espacios sintéticos listos para tu próximo encuentro.
             </p>
 
-            <div class="cuadricula">
-                {% for cancha in canchas %}
-                <article class="tarjeta-cancha">
-                    <img
-                        src="{{ url_for('static', filename=cancha.imagen) }}"
-                        alt="{{ cancha.nombre }}"
-                        class="imagen-cancha"
-                    >
+            {% if canchas %}
+            <div class="carrusel-contenedor" id="carruselCanchas">
+                <div class="carrusel-ventana">
+                    <div class="carrusel-pista" id="carruselPista">
+                        {% for cancha in canchas %}
+                        <article class="carrusel-slide">
+                            <div class="carrusel-imagen-marco">
+                                <img
+                                    src="{{ url_for('static', filename=cancha.imagen) }}"
+                                    alt="{{ cancha.nombre }}"
+                                    class="carrusel-imagen"
+                                >
+                                <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
+                            </div>
 
-                    <div class="contenido-tarjeta">
-                        <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
-                        <h3>{{ cancha.nombre }}</h3>
-                        <p class="direccion">📍 {{ cancha.direccion }}</p>
-                        <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
-                        <a href="/cancha/{{ cancha.id }}" class="boton boton-principal boton-ancho">
-                            Ver detalles
-                        </a>
+                            <div class="carrusel-info">
+                                <span class="carrusel-subtitulo">Cancha destacada</span>
+                                <h3>{{ cancha.nombre }}</h3>
+                                <p class="direccion">{{ cancha.direccion }}</p>
+                                <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
+                                <a href="/cancha/{{ cancha.id }}" class="boton boton-principal boton-ancho">
+                                    Ver horarios y reservar
+                                </a>
+                            </div>
+                        </article>
+                        {% endfor %}
                     </div>
-                </article>
-                {% endfor %}
-            </div>
+                </div>
 
-            <div class="centrado" style="margin-top: 30px;">
-                <a href="/canchas" class="boton boton-secundario">Ver listado completo de canchas</a>
+                {% if canchas | length > 1 %}
+                <button type="button" class="carrusel-flecha carrusel-anterior" id="btnAnterior" aria-label="Cancha anterior">&lsaquo;</button>
+                <button type="button" class="carrusel-flecha carrusel-siguiente" id="btnSiguiente" aria-label="Siguiente cancha">&rsaquo;</button>
+
+                <div class="carrusel-puntos" id="carruselPuntos">
+                    {% for cancha in canchas %}
+                    <button
+                        type="button"
+                        class="carrusel-punto {% if loop.first %}activo{% endif %}"
+                        data-indice="{{ loop.index0 }}"
+                        aria-label="Ir a {{ cancha.nombre }}"
+                    ></button>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="centrado" style="margin-top: 32px;">
+                <a href="/canchas" class="boton boton-secundario">Ver todas las canchas</a>
             </div>
         </div>
     </section>
+
+    <script>
+        (function () {
+            var carrusel = document.getElementById("carruselCanchas");
+            var pista = document.getElementById("carruselPista");
+            if (!carrusel || !pista) return;
+
+            var slides = pista.querySelectorAll(".carrusel-slide");
+            var total = slides.length;
+            if (total <= 1) return;
+
+            var puntos = carrusel.querySelectorAll(".carrusel-punto");
+            var btnAnterior = document.getElementById("btnAnterior");
+            var btnSiguiente = document.getElementById("btnSiguiente");
+            var indiceActual = 0;
+            var temporizador = null;
+
+            function irASlide(nuevoIndice) {
+                indiceActual = (nuevoIndice + total) % total;
+                pista.style.transform = "translateX(-" + (indiceActual * 100) + "%)";
+                for (var i = 0; i < puntos.length; i++) {
+                    puntos[i].classList.toggle("activo", i === indiceActual);
+                }
+            }
+
+            function iniciarAutoDeslizamiento() {
+                detenerAutoDeslizamiento();
+                temporizador = setInterval(function () {
+                    irASlide(indiceActual + 1);
+                }, 4500);
+            }
+
+            function detenerAutoDeslizamiento() {
+                if (temporizador) {
+                    clearInterval(temporizador);
+                    temporizador = null;
+                }
+            }
+
+            if (btnAnterior) {
+                btnAnterior.addEventListener("click", function () {
+                    irASlide(indiceActual - 1);
+                    iniciarAutoDeslizamiento();
+                });
+            }
+
+            if (btnSiguiente) {
+                btnSiguiente.addEventListener("click", function () {
+                    irASlide(indiceActual + 1);
+                    iniciarAutoDeslizamiento();
+                });
+            }
+
+            for (var i = 0; i < puntos.length; i++) {
+                puntos[i].addEventListener("click", function () {
+                    irASlide(parseInt(this.getAttribute("data-indice"), 10));
+                    iniciarAutoDeslizamiento();
+                });
+            }
+
+            // Pausa el movimiento mientras el usuario lee o pasa el mouse encima
+            carrusel.addEventListener("mouseenter", detenerAutoDeslizamiento);
+            carrusel.addEventListener("mouseleave", iniciarAutoDeslizamiento);
+
+            iniciarAutoDeslizamiento();
+        })();
+    </script>
 
     <!-- Llamado a la acción -->
     {% if not session.get("usuario_id") %}
@@ -107,10 +224,10 @@
         <div class="contenedor caja-aviso">
             <h2>¿Listo para saltar a la cancha?</h2>
             <p>
-                Crea tu cuenta gratis como jugador o administrador de cancha para comenzar.
+                Crea tu cuenta gratis como jugador o registra tu complejo deportivo para gestionar tus horarios y reservas.
             </p>
-            <div class="botones-portada" style="margin-top: 18px;">
-                <a href="/registro" class="boton boton-principal">Crear cuenta</a>
+            <div class="botones-portada" style="margin-top: 22px;">
+                <a href="/registro" class="boton boton-naranja">Crear cuenta gratis</a>
                 <a href="/login" class="boton boton-secundario">Ya tengo cuenta</a>
             </div>
         </div>

@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block titulo %}Panel de Administrador - CanchaApp{% endblock %}
+{% block titulo %}Panel de Administrador - Ready Match{% endblock %}
 
 {% block contenido %}
 <section class="seccion-gris">
     <div class="contenedor">
         <div class="panel-encabezado">
-            <span class="etiqueta-rol">Perfil: Administrador de canchas</span>
+            <span class="etiqueta-rol">Administrador de canchas</span>
             <h1>Panel de Administración</h1>
             <p>
                 Bienvenido, <strong>{{ session.get("usuario_nombre") }}</strong>.
-                Aquí puedes registrar tus canchas, gestionar horarios y aprobar o rechazar reservas.
+                Gestiona tus canchas sintéticas, configura horarios y administra las solicitudes de reserva.
             </p>
         </div>
 
-        <!-- Sección de solicitudes de reserva recibidas -->
+        <!-- Solicitudes de reserva recibidas -->
         <div class="caja-panel" style="margin-bottom: 28px;">
-            <h2>📋 Solicitudes de reserva recibidas</h2>
+            <h2>Solicitudes de reserva recibidas</h2>
             <p class="texto-izquierda">
-                Revisa las reservas pedidas por los jugadores para tus canchas. No es posible confirmar dos reservas en el mismo horario.
+                Revisa las solicitudes enviadas por los jugadores. El sistema evita confirmar dos reservas en el mismo horario.
             </p>
 
             {% if reservas_recibidas %}
@@ -28,10 +28,16 @@
                         <div class="datos-reserva">
                             <h3>{{ reserva.nombre_cancha }}</h3>
                             <p class="dato-extra">
-                                <strong>Jugador:</strong> {{ reserva.nombre_jugador }} ({{ reserva.correo_jugador }})
+                                <strong>Titular:</strong> {{ reserva.nombre_reserva or reserva.nombre_jugador }}
+                                {% if reserva.identificacion %}
+                                    &nbsp;|&nbsp; <strong>Identificación:</strong> {{ reserva.identificacion }}
+                                {% endif %}
                             </p>
                             <p class="dato-extra">
-                                <strong>Turno:</strong> 📅 {{ reserva.fecha }} — 🕒 {{ reserva.hora }} (1 hora)
+                                <strong>Cuenta:</strong> {{ reserva.nombre_jugador }} ({{ reserva.correo_jugador }})
+                            </p>
+                            <p class="dato-extra">
+                                <strong>Turno:</strong> {{ reserva.fecha }} — {{ reserva.hora }} (1 hora)
                                 &nbsp;|&nbsp; <strong>Precio:</strong> {{ reserva.precio_cancha | precio_cop }}
                             </p>
                         </div>
@@ -68,11 +74,11 @@
             {% endif %}
         </div>
 
-        <!-- Formulario para registrar una nueva cancha -->
+        <!-- Registrar nueva cancha -->
         <div class="caja-panel" style="margin-bottom: 28px;">
-            <h2>🏟️ Registrar nueva cancha</h2>
+            <h2>Registrar nueva cancha</h2>
             <p class="texto-izquierda">
-                Completa los datos de tu cancha sintética. Solo tú podrás modificarla.
+                Completa los datos de tu escenario deportivo. Solo tú podrás modificar su información y horarios.
             </p>
 
             <form method="POST" action="/administrador/agregar_cancha" enctype="multipart/form-data">
@@ -130,8 +136,19 @@
                     </div>
 
                     <div class="campo-formulario">
-                        <label for="foto">O sube tu propia foto (opcional)</label>
-                        <input type="file" id="foto" name="foto" accept=".jpg,.jpeg,.png,.webp">
+                        <label>O sube tu propia foto (opcional)</label>
+                        <div class="subir-archivo">
+                            <label for="foto-nueva-cancha" class="boton-subir-foto">Seleccionar imagen</label>
+                            <input
+                                type="file"
+                                id="foto-nueva-cancha"
+                                name="foto"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                class="input-archivo-oculto"
+                                onchange="mostrarNombreArchivo(this, 'nombre-foto-nueva')"
+                            >
+                            <span id="nombre-foto-nueva" class="texto-archivo">Ninguna imagen seleccionada</span>
+                        </div>
                     </div>
                 </div>
 
@@ -141,32 +158,168 @@
             </form>
         </div>
 
-        <!-- Listado de las canchas del administrador y sus horarios -->
+        <!-- Mis canchas y horarios -->
         <h2 class="titulo-subseccion">Mis canchas y horarios disponibles</h2>
 
         {% if canchas_con_horarios %}
             {% for item in canchas_con_horarios %}
             <div class="caja-panel tarjeta-admin-cancha">
                 <div class="encabezado-admin-cancha">
-                    <img
-                        src="{{ url_for('static', filename=item.cancha.imagen) }}"
-                        alt="{{ item.cancha.nombre }}"
-                        class="miniatura-cancha"
-                    >
-                    <div>
-                        <span class="insignia-futbol">{{ item.cancha.tipo_futbol }}</span>
-                        <h3>{{ item.cancha.nombre }}</h3>
-                        <p class="direccion">📍 {{ item.cancha.direccion }}</p>
-                        <p class="precio">{{ item.cancha.precio | precio_cop }} <span>/ hora</span></p>
+                    <div class="info-admin-cancha">
+                        <img
+                            src="{{ url_for('static', filename=item.cancha.imagen) }}"
+                            alt="{{ item.cancha.nombre }}"
+                            class="miniatura-cancha"
+                        >
+                        <div>
+                            <span class="insignia-futbol">{{ item.cancha.tipo_futbol }}</span>
+                            <h3>{{ item.cancha.nombre }}</h3>
+                            <p class="direccion">{{ item.cancha.direccion }}</p>
+                            <p class="precio">{{ item.cancha.precio | precio_cop }} <span>/ hora</span></p>
+                        </div>
+                    </div>
+
+                    <div class="botones-accion">
+                        <button
+                            type="button"
+                            class="boton boton-secundario boton-pequeno"
+                            onclick="alternarEdicion({{ item.cancha.id }})"
+                        >
+                            Editar cancha
+                        </button>
+                        <form
+                            method="POST"
+                            action="/administrador/eliminar_cancha/{{ item.cancha.id }}"
+                            onsubmit="return confirm('¿Seguro que deseas eliminar esta cancha? También se borrarán sus horarios y reservas.');"
+                        >
+                            <button type="submit" class="boton boton-peligro boton-pequeno">
+                                Eliminar
+                            </button>
+                        </form>
                     </div>
                 </div>
 
-                <!-- Formulario para agregar un nuevo horario a esta cancha -->
+                <!-- Formulario desplegable para editar esta cancha -->
+                <div id="editar-cancha-{{ item.cancha.id }}" class="panel-edicion-cancha" style="display: none;">
+                    <h3>Editar información de la cancha</h3>
+                    <form
+                        method="POST"
+                        action="/administrador/editar_cancha/{{ item.cancha.id }}"
+                        enctype="multipart/form-data"
+                    >
+                        <div class="cuadricula-dos">
+                            <div class="campo-formulario">
+                                <label>Nombre de la cancha</label>
+                                <input type="text" name="nombre" value="{{ item.cancha.nombre }}" required>
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label>Dirección</label>
+                                <input type="text" name="direccion" value="{{ item.cancha.direccion }}" required>
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label>Precio por hora (sin puntos)</label>
+                                <input type="number" name="precio" value="{{ item.cancha.precio }}" min="1000" step="1000" required>
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label>Tipo de fútbol</label>
+                                <select name="tipo_futbol" required>
+                                    {% for tipo in tipos_futbol %}
+                                        <option value="{{ tipo }}" {% if item.cancha.tipo_futbol == tipo %}selected{% endif %}>
+                                            {{ tipo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label>Fotografía</label>
+                                <select name="imagen_predeterminada">
+                                    <option value="mantener">Conservar fotografía actual</option>
+                                    <option value="imagenes/cancha1.jpg">Cancha sintética de día</option>
+                                    <option value="imagenes/cancha2.jpg">Cancha sintética iluminada de noche</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label>O subir una foto nueva (opcional)</label>
+                                <div class="subir-archivo">
+                                    <label for="foto-editar-{{ item.cancha.id }}" class="boton-subir-foto">Seleccionar imagen</label>
+                                    <input
+                                        type="file"
+                                        id="foto-editar-{{ item.cancha.id }}"
+                                        name="foto"
+                                        accept=".jpg,.jpeg,.png,.webp"
+                                        class="input-archivo-oculto"
+                                        onchange="mostrarNombreArchivo(this, 'nombre-foto-editar-{{ item.cancha.id }}')"
+                                    >
+                                    <span id="nombre-foto-editar-{{ item.cancha.id }}" class="texto-archivo">Ninguna imagen seleccionada</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="botones-accion">
+                            <button type="submit" class="boton boton-principal boton-pequeno">
+                                Guardar cambios
+                            </button>
+                            <button
+                                type="button"
+                                class="boton boton-secundario boton-pequeno"
+                                onclick="alternarEdicion({{ item.cancha.id }})"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Opción 1: Agregar varios horarios de una vez -->
+                <div class="panel-horarios-multiples" id="multi-horarios-{{ item.cancha.id }}">
+                    <div class="cabecera-horarios-multi">
+                        <div>
+                            <h4>Agregar varios horarios a la vez</h4>
+                            <p class="nota-campo">Elige una fecha y marca todas las horas disponibles con un clic.</p>
+                        </div>
+                        <div class="atajos-horarios">
+                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'manana')">Mañana</button>
+                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'tarde')">Tarde</button>
+                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'noche')">Noche</button>
+                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'todas')">Todas</button>
+                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'limpiar')">Limpiar</button>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="/administrador/agregar_horarios_multiples">
+                        <input type="hidden" name="cancha_id" value="{{ item.cancha.id }}">
+
+                        <div class="campo-formulario" style="max-width: 260px;">
+                            <label>Fecha para estos horarios</label>
+                            <input type="date" name="fecha" min="{{ fecha_hoy }}" required>
+                        </div>
+
+                        <div class="cuadricula-horas">
+                            {% for hora in horas_disponibles %}
+                            <label class="casilla-hora">
+                                <input type="checkbox" name="horas" value="{{ hora }}">
+                                <span>{{ hora }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="boton boton-principal boton-pequeno" style="margin-top: 14px;">
+                            Agregar horarios seleccionados
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Opción 2: Agregar un solo horario (uno por uno) -->
                 <form method="POST" action="/administrador/agregar_horario" class="formulario-horario">
                     <input type="hidden" name="cancha_id" value="{{ item.cancha.id }}">
 
                     <div class="campo-formulario">
-                        <label>Fecha</label>
+                        <label>Agregar un horario individual — Fecha</label>
                         <input type="date" name="fecha" min="{{ fecha_hoy }}" required>
                     </div>
 
@@ -179,12 +332,12 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="boton boton-principal">
-                        + Agregar horario
+                    <button type="submit" class="boton boton-secundario">
+                        Agregar horario
                     </button>
                 </form>
 
-                <!-- Horarios ya cargados para esta cancha -->
+                <!-- Horarios registrados -->
                 <div class="zona-horarios-admin">
                     <strong>Horarios registrados ({{ item.horarios | length }}):</strong>
 
@@ -192,9 +345,9 @@
                         <div class="chips-horarios">
                             {% for horario in item.horarios %}
                             <div class="chip-horario">
-                                <span>📅 {{ horario.fecha }} — 🕒 {{ horario.hora }}</span>
+                                <span>{{ horario.fecha }} — {{ horario.hora }}</span>
                                 <form method="POST" action="/administrador/eliminar_horario/{{ horario.id }}">
-                                    <button type="submit" class="boton-x" title="Eliminar horario">✕</button>
+                                    <button type="submit" class="boton-x" title="Eliminar horario">&times;</button>
                                 </form>
                             </div>
                             {% endfor %}
@@ -208,10 +361,53 @@
         {% else %}
             <div class="caja-panel">
                 <p class="texto-vacio">
-                    Todavía no tienes canchas registradas. Usa el formulario de arriba para crear tu primera cancha.
+                    Todavía no tienes canchas registradas. Usa el formulario superior para crear tu primera cancha.
                 </p>
             </div>
         {% endif %}
     </div>
 </section>
+
+<script>
+    function alternarEdicion(canchaId) {
+        var panel = document.getElementById("editar-cancha-" + canchaId);
+        if (!panel) return;
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+
+    function mostrarNombreArchivo(input, idEtiqueta) {
+        var etiqueta = document.getElementById(idEtiqueta);
+        if (!etiqueta) return;
+        if (input.files && input.files.length > 0) {
+            etiqueta.textContent = input.files[0].name;
+            etiqueta.classList.add("archivo-cargado");
+        } else {
+            etiqueta.textContent = "Ninguna imagen seleccionada";
+            etiqueta.classList.remove("archivo-cargado");
+        }
+    }
+
+    function seleccionarBloque(canchaId, bloque) {
+        var contenedor = document.getElementById("multi-horarios-" + canchaId);
+        if (!contenedor) return;
+
+        var casillas = contenedor.querySelectorAll('input[type="checkbox"][name="horas"]');
+        var rangos = {
+            manana: ["07:00", "08:00", "09:00", "10:00", "11:00", "12:00"],
+            tarde: ["13:00", "14:00", "15:00", "16:00", "17:00"],
+            noche: ["18:00", "19:00", "20:00", "21:00", "22:00"]
+        };
+
+        for (var i = 0; i < casillas.length; i++) {
+            var hora = casillas[i].value;
+            if (bloque === "todas") {
+                casillas[i].checked = true;
+            } else if (bloque === "limpiar") {
+                casillas[i].checked = false;
+            } else {
+                casillas[i].checked = rangos[bloque].indexOf(hora) !== -1;
+            }
+        }
+    }
+</script>
 {% endblock %}

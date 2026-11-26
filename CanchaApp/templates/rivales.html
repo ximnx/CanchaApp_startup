@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
-{% block titulo %}Buscar rival - CanchaApp{% endblock %}
+{% block titulo %}Buscar rival - Ready Match{% endblock %}
 
 {% block contenido %}
 <section class="seccion-gris">
     <div class="contenedor">
         <h1 class="titulo-seccion">Buscar equipo rival</h1>
         <p class="descripcion-seccion">
-            Publica cuándo quiere jugar tu equipo o presiona "Quiero jugar" para retar a otro equipo.
+            Publica cuándo quiere jugar tu equipo o envía una solicitud para retar a otro club.
         </p>
 
-        <!-- Solicitudes recibidas para los partidos publicados por el jugador -->
+        <!-- Solicitudes recibidas -->
         {% if solicitudes_recibidas %}
         <div class="caja-panel" style="margin-bottom: 26px;">
-            <h2>📥 Solicitudes recibidas para tus partidos</h2>
+            <h2>Solicitudes recibidas para tus partidos</h2>
             <p class="texto-izquierda">
-                Otros equipos quieren jugar contra ti. Puedes aceptar o rechazar cada solicitud.
+                Otros equipos quieren jugar contra ti. Acepta o rechaza cada reto.
             </p>
 
             <div class="lista-reservas">
@@ -28,7 +28,9 @@
                             &nbsp;|&nbsp; {{ sol.tipo_futbol_retador }} ({{ sol.categoria_retador }})
                         </p>
                         <p class="dato-extra">
-                            <strong>Partido:</strong> 📅 {{ sol.fecha }} — 🕒 {{ sol.hora }} &nbsp;|&nbsp; 📍 {{ sol.lugar }}
+                            <strong>Fecha:</strong> {{ sol.fecha }} &nbsp;|&nbsp;
+                            <strong>Hora:</strong> {{ sol.hora }} &nbsp;|&nbsp;
+                            <strong>Lugar:</strong> {{ sol.lugar }}
                         </p>
                     </div>
 
@@ -60,17 +62,19 @@
         </div>
         {% endif %}
 
-        <!-- Solicitudes que el jugador envió a otros equipos -->
+        <!-- Solicitudes enviadas -->
         {% if solicitudes_enviadas %}
         <div class="caja-panel" style="margin-bottom: 26px;">
-            <h2>📤 Mis solicitudes enviadas</h2>
+            <h2>Mis solicitudes enviadas</h2>
             <div class="lista-reservas" style="margin-top: 12px;">
                 {% for sol in solicitudes_enviadas %}
                 <div class="tarjeta-reserva">
                     <div class="datos-reserva">
-                        <strong>{{ sol.mi_equipo }} → {{ sol.equipo_publicador }}</strong>
+                        <strong>{{ sol.mi_equipo }} vs {{ sol.equipo_publicador }}</strong>
                         <p class="dato-extra">
-                            📅 {{ sol.fecha }} — 🕒 {{ sol.hora }} &nbsp;|&nbsp; 📍 {{ sol.lugar }}
+                            <strong>Fecha:</strong> {{ sol.fecha }} &nbsp;|&nbsp;
+                            <strong>Hora:</strong> {{ sol.hora }} &nbsp;|&nbsp;
+                            <strong>Lugar:</strong> {{ sol.lugar }}
                         </p>
                     </div>
                     <span class="badge-estado estado-{{ sol.estado }}">
@@ -82,13 +86,13 @@
         </div>
         {% endif %}
 
-        <!-- Formulario para publicar que un equipo busca rival -->
+        <!-- Formulario para publicar búsqueda de rival -->
         {% if session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
             {% if mis_equipos %}
             <div class="caja-panel" style="margin-bottom: 30px;">
-                <h2>📣 Publicar que buscamos rival</h2>
+                <h2>Publicar búsqueda de rival</h2>
                 <p class="texto-izquierda">
-                    Ejemplo: "Los Titanes buscan rival para fútbol 5, el sábado a las 18:00".
+                    Ejemplo: "Los Titanes buscan rival para fútbol 5 el sábado a las 18:00".
                 </p>
 
                 <form method="POST" action="/rivales/publicar">
@@ -147,7 +151,7 @@
                         ></textarea>
                     </div>
 
-                    <button type="submit" class="boton boton-principal">
+                    <button type="submit" class="boton boton-naranja">
                         Publicar búsqueda de rival
                     </button>
                 </form>
@@ -156,22 +160,22 @@
             <div class="caja-aviso" style="margin-bottom: 30px;">
                 <h3>Primero crea tu equipo</h3>
                 <p>Para publicar un partido o presionar "Quiero jugar", necesitas tener al menos un equipo registrado.</p>
-                <div style="margin-top: 14px;">
-                    <a href="/equipos" class="boton boton-principal">Ir a crear mi equipo</a>
+                <div style="margin-top: 16px;">
+                    <a href="/equipos" class="boton boton-naranja">Ir a crear mi equipo</a>
                 </div>
             </div>
             {% endif %}
         {% elif not session.get("usuario_id") %}
             <div class="caja-aviso" style="margin-bottom: 30px;">
                 <h3>¿Buscas con quién jugar?</h3>
-                <p>Inicia sesión como jugador para publicar partidos o retar a los equipos de abajo.</p>
-                <div style="margin-top: 14px;">
-                    <a href="/login" class="boton boton-principal">Iniciar sesión</a>
+                <p>Inicia sesión como jugador para publicar partidos o retar a los equipos activos.</p>
+                <div style="margin-top: 16px;">
+                    <a href="/login" class="boton boton-naranja">Iniciar sesión</a>
                 </div>
             </div>
         {% endif %}
 
-        <!-- Filtros por tipo de fútbol y categoría -->
+        <!-- Filtros -->
         <div class="barra-filtros">
             <a href="/rivales" class="filtro {% if not tipo_seleccionado and not categoria_seleccionada %}filtro-activo{% endif %}">
                 Todos
@@ -188,33 +192,35 @@
             {% endfor %}
         </div>
 
-        <!-- Publicaciones de equipos buscando rival -->
+        <!-- Publicaciones -->
         {% if partidos_vista %}
             <div class="cuadricula">
                 {% for item in partidos_vista %}
                 {% set p = item.partido %}
                 <article class="tarjeta-equipo tarjeta-partido">
-                    <div class="insignias-equipo">
-                        <span class="insignia-futbol">{{ p.tipo_futbol }}</span>
-                        <span class="insignia-categoria">{{ p.categoria }}</span>
-                        {% if item.rival_aceptado %}
-                            <span class="insignia-propia">Rival confirmado</span>
-                        {% endif %}
-                    </div>
+                    <div>
+                        <div class="insignias-equipo">
+                            <span class="insignia-futbol">{{ p.tipo_futbol }}</span>
+                            <span class="insignia-categoria">{{ p.categoria }}</span>
+                            {% if item.rival_aceptado %}
+                                <span class="insignia-propia">Rival confirmado</span>
+                            {% endif %}
+                        </div>
 
-                    <h3>{{ p.nombre_equipo }} busca rival</h3>
-                    <p class="dato-extra"><strong>📅 Fecha:</strong> {{ p.fecha }} &nbsp;|&nbsp; <strong>🕒 Hora:</strong> {{ p.hora }}</p>
-                    <p class="dato-extra"><strong>📍 Lugar:</strong> {{ p.lugar }}</p>
-                    <p class="dato-extra"><strong>Capitán:</strong> {{ p.nombre_capitan }}</p>
-                    <p class="descripcion-equipo">{{ p.descripcion }}</p>
+                        <h3>{{ p.nombre_equipo }} busca rival</h3>
+                        <p class="dato-extra"><strong>Fecha:</strong> {{ p.fecha }} &nbsp;|&nbsp; <strong>Hora:</strong> {{ p.hora }}</p>
+                        <p class="dato-extra"><strong>Lugar:</strong> {{ p.lugar }}</p>
+                        <p class="dato-extra"><strong>Capitán:</strong> {{ p.nombre_capitan }}</p>
+                        <p class="descripcion-equipo">{{ p.descripcion }}</p>
+                    </div>
 
                     <div class="zona-accion-partido">
                         {% if item.rival_aceptado %}
                             <p class="aviso-confirmado">
-                                ✅ Partido acordado contra <strong>{{ item.rival_aceptado }}</strong>
+                                Partido acordado contra <strong>{{ item.rival_aceptado }}</strong>
                             </p>
                         {% elif session.get("usuario_id") == p.capitan_id %}
-                            <span class="etiqueta-propia-suave">Esta es tu publicación</span>
+                            <span class="etiqueta-propia-suave">Publicación de tu equipo</span>
                         {% elif session.get("usuario_id") and session.get("tipo_usuario") == "jugador" and mis_equipos %}
                             <form method="POST" action="/rivales/solicitar/{{ p.id }}" class="form-quiero-jugar">
                                 <select name="equipo_id" required>
@@ -222,7 +228,7 @@
                                         <option value="{{ eq.id }}">{{ eq.nombre }}</option>
                                     {% endfor %}
                                 </select>
-                                <button type="submit" class="boton boton-principal boton-ancho">
+                                <button type="submit" class="boton boton-naranja boton-ancho">
                                     Quiero jugar
                                 </button>
                             </form>

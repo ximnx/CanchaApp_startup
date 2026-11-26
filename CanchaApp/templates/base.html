@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titulo %}CanchaApp{% endblock %}</title>
-    <!-- Conectamos el archivo de estilos CSS desde la carpeta static -->
+    <title>{% block titulo %}Ready Match{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}">
+    <!-- Fuentes deportivas modernas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <!-- Menú de navegación compartido por todas las páginas -->
+    <!-- Menú de navegación principal -->
     <header class="encabezado">
         <div class="contenedor barra-navegacion">
-            <a href="/" class="logo">⚽ CanchaApp</a>
+            <a href="/" class="logo" aria-label="Ready Match - Inicio">
+                <img
+                    src="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}"
+                    alt="Ready Match"
+                    class="logo-img"
+                >
+            </a>
 
             <nav class="menu">
                 <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
@@ -20,7 +30,6 @@
                 <a href="/equipos" class="{% if request.path.startswith('/equipos') %}activo{% endif %}">Equipos</a>
                 <a href="/rivales" class="{% if request.path.startswith('/rivales') %}activo{% endif %}">Buscar rival</a>
 
-                <!-- Si el usuario ya inició sesión, mostramos su nombre y opciones -->
                 {% if session.get("usuario_id") %}
                     {% if session.get("tipo_usuario") == "administrador" %}
                         <a href="/administrador" class="{% if request.path.startswith('/administrador') %}activo{% endif %}">Panel Admin</a>
@@ -32,7 +41,7 @@
                         {% if session.get("usuario_foto") %}
                             <img
                                 src="{{ url_for('static', filename=session.get('usuario_foto')) }}"
-                                alt="Mi foto"
+                                alt="Foto de perfil"
                                 class="avatar-menu"
                             >
                         {% else %}
@@ -44,7 +53,6 @@
                     </a>
                     <a href="/cerrar_sesion" class="boton-salir">Cerrar sesión</a>
                 {% else %}
-                    <!-- Si es un visitante sin sesión iniciada -->
                     <a href="/login" class="{% if request.path == '/login' %}activo{% endif %}">Iniciar sesión</a>
                     <a href="/registro" class="boton-menu">Registrarse</a>
                 {% endif %}
@@ -52,7 +60,7 @@
         </div>
     </header>
 
-    <!-- Mensajes flash de confirmación o error enviados desde Flask -->
+    <!-- Mensajes de confirmación o error -->
     {% with mensajes = get_flashed_messages(with_categories=true) %}
         {% if mensajes %}
             <div class="contenedor zona-mensajes">
@@ -65,16 +73,70 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Aquí se inserta el contenido propio de cada página -->
+    <!-- Contenido principal -->
     <main>
         {% block contenido %}{% endblock %}
     </main>
 
-    <!-- Pie de página compartido -->
+    <!-- Pie de página profesional -->
     <footer class="pie-pagina">
         <div class="contenedor">
-            <p><strong>CanchaApp</strong> — Proyecto universitario de Ingeniería de Sistemas</p>
-            <p class="pie-pequeno">Hecho con Python, Flask, SQLite, HTML y CSS</p>
+            <div class="pie-cuadricula">
+                <div>
+                    <img
+                        src="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}"
+                        alt="Ready Match"
+                        class="logo-pie"
+                    >
+                    <p class="pie-descripcion">
+                        La plataforma deportiva para reservar canchas sintéticas, crear equipos y organizar partidos en toda Colombia.
+                    </p>
+                </div>
+
+                <div class="pie-columna">
+                    <h4>Explorar</h4>
+                    <ul class="pie-lista">
+                        <li><a href="/">Inicio</a></li>
+                        <li><a href="/canchas">Canchas sintéticas</a></li>
+                        <li><a href="/equipos">Equipos</a></li>
+                        <li><a href="/rivales">Buscar rival</a></li>
+                    </ul>
+                </div>
+
+                <div class="pie-columna">
+                    <h4>Tu cuenta</h4>
+                    <ul class="pie-lista">
+                        {% if session.get("usuario_id") %}
+                            <li><a href="/perfil">Mi perfil</a></li>
+                            {% if session.get("tipo_usuario") == "administrador" %}
+                                <li><a href="/administrador">Panel de administración</a></li>
+                            {% else %}
+                                <li><a href="/mis_reservas">Mis reservas</a></li>
+                            {% endif %}
+                            <li><a href="/cerrar_sesion">Cerrar sesión</a></li>
+                        {% else %}
+                            <li><a href="/login">Iniciar sesión</a></li>
+                            <li><a href="/registro">Crear cuenta</a></li>
+                            <li><a href="/olvide_contrasena">Recuperar contraseña</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="pie-columna">
+                    <h4>Información</h4>
+                    <ul class="pie-lista">
+                        <li>Cobertura nacional en Colombia</li>
+                        <li>Fútbol 5, Fútbol 7 y Fútbol 11</li>
+                        <li>Categorías masculino, femenino y mixto</li>
+                        <li>soporte@readymatch.co</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pie-inferior">
+                <span>&copy; 2026 Ready Match. Todos los derechos reservados.</span>
+                <span>Reservas de canchas sintéticas y gestión de partidos</span>
+            </div>
         </div>
     </footer>
 

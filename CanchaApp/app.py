@@ -16,7 +16,6 @@ from werkzeug.utils import secure_filename
 # Importamos nuestras funciones de base de datos desde database.py
 from database import (
     crear_tablas,
-    cargar_datos_iniciales,
     registrar_usuario,
     buscar_usuario_por_correo,
     buscar_usuario_por_id,
@@ -27,6 +26,8 @@ from database import (
     obtener_todas_las_canchas,
     obtener_canchas_por_administrador,
     obtener_cancha_por_id,
+    actualizar_cancha,
+    eliminar_cancha,
     agregar_horario,
     obtener_horarios_de_cancha,
     eliminar_horario,
@@ -97,12 +98,11 @@ HORAS_DISPONIBLES = [
 TIPOS_FUTBOL = ["Fútbol 5", "Fútbol 7", "Fútbol 11"]
 CATEGORIAS_EQUIPO = ["Masculino", "Femenino", "Mixto"]
 
-# Código secreto que los dueños de CanchaApp entregan para registrar administradores
+# Código secreto que los dueños de Ready Match entregan para registrar administradores
 CODIGO_ADMINISTRADOR = "FUTBOL7"
 
-# Creamos las tablas y cargamos 2 canchas de ejemplo si la base de datos está vacía
+# Creamos las tablas en SQLite automáticamente al iniciar la aplicación
 crear_tablas()
-cargar_datos_iniciales(generate_password_hash("admin123"))
 
 
 # ---------------- FUNCIONES DE APOYO ----------------
@@ -144,16 +144,16 @@ def enviar_correo_recuperacion(destinatario, codigo):
     clave_aplicacion = os.environ.get("CLAVE_CORREO_APP", "").replace(" ", "").strip()
 
     if not correo_remitente or not clave_aplicacion:
-        print(f"[CanchaApp - Gmail sin configurar] Código de recuperación para {destinatario}: {codigo}")
+        print(f"[Ready Match - Gmail sin configurar] Código de recuperación para {destinatario}: {codigo}")
         return False
 
     mensaje = EmailMessage()
-    mensaje["Subject"] = "Código de recuperación de contraseña - CanchaApp"
-    mensaje["From"] = f"CanchaApp <{correo_remitente}>"
+    mensaje["Subject"] = "Código de recuperación de contraseña - Ready Match"
+    mensaje["From"] = f"Ready Match <{correo_remitente}>"
     mensaje["To"] = destinatario
     mensaje.set_content(
         f"Hola,\n\n"
-        f"Recibimos una solicitud para cambiar tu contraseña en CanchaApp.\n"
+        f"Recibimos una solicitud para cambiar tu contraseña en Ready Match.\n"
         f"Tu código de recuperación es: {codigo}\n\n"
         f"Este código vence en 15 minutos.\n"
         f"Si no solicitaste este cambio, puedes ignorar este correo.\n"
@@ -163,11 +163,11 @@ def enviar_correo_recuperacion(destinatario, codigo):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as servidor:
             servidor.login(correo_remitente, clave_aplicacion)
             servidor.send_message(mensaje)
-        print(f"[CanchaApp] Correo de recuperación enviado correctamente a {destinatario}")
+        print(f"[Ready Match] Correo de recuperación enviado correctamente a {destinatario}")
         return True
     except Exception as error:
-        print(f"[CanchaApp - Error SMTP] No se pudo enviar el correo: {error}")
-        print(f"[CanchaApp - Respaldo consola] Código para {destinatario}: {codigo}")
+        print(f"[Ready Match - Error SMTP] No se pudo enviar el correo: {error}")
+        print(f"[Ready Match - Respaldo consola] Código para {destinatario}: {codigo}")
         return False
 
 
@@ -175,7 +175,7 @@ def enviar_correo_recuperacion(destinatario, codigo):
 
 @app.route("/")
 def inicio():
-    canchas_destacadas = obtener_todas_las_canchas()[:3]
+    canchas_destacadas = obtener_todas_las_canchas()[:5]
     return render_template("index.html", canchas=canchas_destacadas)
 
 
@@ -208,7 +208,7 @@ def registro():
 
         # Si el usuario quiere ser administrador, debe ingresar el código secreto
         if tipo_usuario == "administrador" and codigo_admin != CODIGO_ADMINISTRADOR:
-            flash("Código de administrador incorrecto. Solicítalo a los dueños de CanchaApp.", "error")
+            flash("Código de administrador incorrecto. Solicítalo a los dueños de Ready Match.", "error")
             return render_template("registro.html")
 
         if buscar_usuario_por_correo(correo):
@@ -481,6 +481,8 @@ def solicitar_reserva():
     cancha_id = request.form.get("cancha_id", "").strip()
     fecha = request.form.get("fecha", "").strip()
     hora = request.form.get("hora", "").strip()
+    nombre_reserva = request.form.get("nombre_reserva", "").strip()
+    identificacion = request.form.get("identificacion", "").strip()
 
     if not cancha_id.isdigit() or not fecha or not hora:
         flash("Por favor selecciona una fecha y una hora válidas.", "error")
@@ -491,6 +493,15 @@ def solicitar_reserva():
     if not cancha:
         flash("La cancha seleccionada no existe.", "error")
         return redirect(url_for("ver_canchas"))
+
+    # Validamos nombre completo y número de identificación del titular de la reserva
+    if len(nombre_reserva) < 3:
+        flash("Por favor ingresa tu nombre completo para registrar la reserva.", "error")
+        return redirect(url_for("detalle_cancha", cancha_id=cancha_id_num))
+
+    if len(identificacion) < 5 or len(identificacion) > 20:
+        flash("Por favor ingresa un número de identificación válido (entre 5 y 20 caracteres).", "error")
+        return redirect(url_for("detalle_cancha", cancha_id=cancha_id_num))
 
     # Regla: no se pueden reservar fechas pasadas
     fecha_hoy = date.today().isoformat()
@@ -513,10 +524,10 @@ def solicitar_reserva():
         flash("Ya enviaste una solicitud de reserva para ese mismo día y hora.", "error")
         return redirect(url_for("detalle_cancha", cancha_id=cancha_id_num))
 
-    crear_reserva(session["usuario_id"], cancha_id_num, fecha, hora)
+    crear_reserva(session["usuario_id"], cancha_id_num, fecha, hora, nombre_reserva, identificacion)
     flash(
-        f"¡Solicitud enviada! Reservaste {cancha['nombre']} para el {fecha} a las {hora}. "
-        "El administrador la revisará pronto.",
+        f"¡Solicitud enviada! Reservaste {cancha['nombre']} a nombre de {nombre_reserva} "
+        f"para el {fecha} a las {hora}. El administrador la revisará pronto.",
         "exito"
     )
     return redirect(url_for("mis_reservas"))
@@ -841,6 +852,70 @@ def agregar_cancha():
     return redirect(url_for("panel_administrador"))
 
 
+@app.route("/administrador/editar_cancha/<int:cancha_id>", methods=["POST"])
+def editar_cancha(cancha_id):
+    if "usuario_id" not in session or session.get("tipo_usuario") != "administrador":
+        flash("Solo los administradores pueden modificar canchas.", "error")
+        return redirect(url_for("inicio"))
+
+    cancha = obtener_cancha_por_id(cancha_id)
+    if not cancha or cancha["administrador_id"] != session["usuario_id"]:
+        flash("No puedes editar una cancha que no te pertenece.", "error")
+        return redirect(url_for("panel_administrador"))
+
+    nombre = request.form.get("nombre", "").strip()
+    direccion = request.form.get("direccion", "").strip()
+    precio_texto = request.form.get("precio", "").strip()
+    tipo_futbol = request.form.get("tipo_futbol", "").strip()
+    imagen_predeterminada = request.form.get("imagen_predeterminada", "mantener")
+
+    if not nombre or not direccion or not precio_texto or tipo_futbol not in TIPOS_FUTBOL:
+        flash("Por favor completa correctamente todos los datos de la cancha.", "error")
+        return redirect(url_for("panel_administrador"))
+
+    if not precio_texto.isdigit() or int(precio_texto) <= 0:
+        flash("El precio por hora debe ser un número mayor que cero (sin puntos ni comas).", "error")
+        return redirect(url_for("panel_administrador"))
+
+    precio = int(precio_texto)
+
+    # Por defecto mantenemos la fotografía actual de la cancha
+    ruta_imagen = cancha["imagen"]
+    if imagen_predeterminada in ("imagenes/cancha1.jpg", "imagenes/cancha2.jpg"):
+        ruta_imagen = imagen_predeterminada
+
+    archivo = request.files.get("foto")
+    if archivo and archivo.filename:
+        if archivo_imagen_valido(archivo.filename):
+            nombre_seguro = secure_filename(archivo.filename)
+            nombre_final = f"cancha_{session['usuario_id']}_{int(time.time())}_{nombre_seguro}"
+            os.makedirs(CARPETA_IMAGENES, exist_ok=True)
+            archivo.save(os.path.join(CARPETA_IMAGENES, nombre_final))
+            ruta_imagen = f"imagenes/{nombre_final}"
+        else:
+            flash("Formato de imagen no permitido. Usa JPG, PNG o WEBP.", "error")
+            return redirect(url_for("panel_administrador"))
+
+    actualizar_cancha(cancha_id, session["usuario_id"], nombre, direccion, precio, tipo_futbol, ruta_imagen)
+    flash(f"Cancha '{nombre}' actualizada correctamente.", "exito")
+    return redirect(url_for("panel_administrador"))
+
+
+@app.route("/administrador/eliminar_cancha/<int:cancha_id>", methods=["POST"])
+def eliminar_cancha_admin(cancha_id):
+    if "usuario_id" not in session or session.get("tipo_usuario") != "administrador":
+        flash("Solo los administradores pueden eliminar canchas.", "error")
+        return redirect(url_for("inicio"))
+
+    eliminada = eliminar_cancha(cancha_id, session["usuario_id"])
+    if eliminada:
+        flash("Cancha eliminada correctamente junto con sus horarios y reservas.", "exito")
+    else:
+        flash("No puedes eliminar una cancha que no te pertenece.", "error")
+
+    return redirect(url_for("panel_administrador"))
+
+
 @app.route("/administrador/agregar_horario", methods=["POST"])
 def agregar_horario_cancha():
     if "usuario_id" not in session or session.get("tipo_usuario") != "administrador":
@@ -870,6 +945,57 @@ def agregar_horario_cancha():
         flash(f"Horario agregado: {fecha} a las {hora} en {cancha['nombre']}.", "exito")
     else:
         flash("Ese horario ya estaba registrado para esta cancha.", "error")
+
+    return redirect(url_for("panel_administrador"))
+
+
+@app.route("/administrador/agregar_horarios_multiples", methods=["POST"])
+def agregar_horarios_multiples_cancha():
+    if "usuario_id" not in session or session.get("tipo_usuario") != "administrador":
+        flash("Solo los administradores pueden agregar horarios.", "error")
+        return redirect(url_for("inicio"))
+
+    cancha_id = request.form.get("cancha_id", "").strip()
+    fecha = request.form.get("fecha", "").strip()
+    horas_seleccionadas = request.form.getlist("horas")
+
+    if not cancha_id.isdigit() or not fecha:
+        flash("Por favor selecciona una fecha válida.", "error")
+        return redirect(url_for("panel_administrador"))
+
+    horas_validas = [h for h in horas_seleccionadas if h in HORAS_DISPONIBLES]
+    if not horas_validas:
+        flash("Selecciona al menos una hora para agregar horarios.", "error")
+        return redirect(url_for("panel_administrador"))
+
+    fecha_hoy = date.today().isoformat()
+    if fecha < fecha_hoy:
+        flash("No puedes agregar horarios en fechas pasadas.", "error")
+        return redirect(url_for("panel_administrador"))
+
+    cancha = obtener_cancha_por_id(int(cancha_id))
+    if not cancha or cancha["administrador_id"] != session["usuario_id"]:
+        flash("No puedes modificar los horarios de una cancha que no te pertenece.", "error")
+        return redirect(url_for("panel_administrador"))
+
+    agregados = 0
+    repetidos = 0
+    for hora in horas_validas:
+        if agregar_horario(int(cancha_id), fecha, hora):
+            agregados += 1
+        else:
+            repetidos += 1
+
+    if agregados > 0 and repetidos > 0:
+        flash(
+            f"Se agregaron {agregados} horarios nuevos para el {fecha} en {cancha['nombre']} "
+            f"({repetidos} ya estaban registrados).",
+            "exito"
+        )
+    elif agregados > 0:
+        flash(f"Se agregaron {agregados} horarios para el {fecha} en {cancha['nombre']}.", "exito")
+    else:
+        flash("Todos los horarios seleccionados ya estaban registrados para esa fecha.", "error")
 
     return redirect(url_for("panel_administrador"))
 

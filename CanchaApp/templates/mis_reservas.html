@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block titulo %}Mis reservas - CanchaApp{% endblock %}
+{% block titulo %}Mis reservas - Ready Match{% endblock %}
 
 {% block contenido %}
 <section class="seccion-gris">
     <div class="contenedor">
         <div class="panel-encabezado">
-            <span class="etiqueta-rol">Perfil: Jugador</span>
+            <span class="etiqueta-rol">Jugador</span>
             <h1>Mis reservas</h1>
             <p>
-                Aquí puedes consultar el estado de todas las solicitudes de reserva que has realizado.
+                Consulta el historial y estado actual de todas tus solicitudes de cancha.
             </p>
         </div>
 
@@ -24,11 +24,19 @@
                                 {{ reserva.nombre_cancha }}
                             </a>
                         </h3>
-                        <p class="direccion">📍 {{ reserva.direccion_cancha }}</p>
+                        <p class="direccion">{{ reserva.direccion_cancha }}</p>
                         <p class="dato-extra">
-                            <strong>Fecha:</strong> 📅 {{ reserva.fecha }} &nbsp;|&nbsp;
-                            <strong>Hora:</strong> 🕒 {{ reserva.hora }} (1 hora)
+                            <strong>Fecha:</strong> {{ reserva.fecha }} &nbsp;|&nbsp;
+                            <strong>Hora:</strong> {{ reserva.hora }} (1 hora)
                         </p>
+                        {% if reserva.nombre_reserva or reserva.identificacion %}
+                        <p class="dato-extra">
+                            <strong>Titular:</strong> {{ reserva.nombre_reserva }}
+                            {% if reserva.identificacion %}
+                                &nbsp;|&nbsp; <strong>Identificación:</strong> {{ reserva.identificacion }}
+                            {% endif %}
+                        </p>
+                        {% endif %}
                         <p class="precio">{{ reserva.precio_cancha | precio_cop }} <span>/ hora</span></p>
                     </div>
 

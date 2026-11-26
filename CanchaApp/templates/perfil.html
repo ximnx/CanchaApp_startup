@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block titulo %}Mi perfil - CanchaApp{% endblock %}
+{% block titulo %}Mi perfil - Ready Match{% endblock %}
 
 {% block contenido %}
 <section class="seccion-gris">
@@ -44,13 +44,19 @@
                 </div>
 
                 <div class="campo-formulario">
-                    <label for="foto">Cambiar foto de perfil (JPG, PNG o WEBP)</label>
-                    <input
-                        type="file"
-                        id="foto"
-                        name="foto"
-                        accept=".jpg,.jpeg,.png,.webp"
-                    >
+                    <label>Cambiar foto de perfil (JPG, PNG o WEBP)</label>
+                    <div class="subir-archivo">
+                        <label for="foto" class="boton-subir-foto">Seleccionar imagen</label>
+                        <input
+                            type="file"
+                            id="foto"
+                            name="foto"
+                            accept=".jpg,.jpeg,.png,.webp"
+                            class="input-archivo-oculto"
+                            onchange="mostrarNombreArchivo(this, 'nombre-foto-perfil')"
+                        >
+                        <span id="nombre-foto-perfil" class="texto-archivo">Ninguna imagen seleccionada</span>
+                    </div>
                     <small class="nota-campo">
                         Si no seleccionas una foto nueva, se conservará la actual.
                     </small>
@@ -71,4 +77,18 @@
         </div>
     </div>
 </section>
+
+<script>
+    function mostrarNombreArchivo(input, idEtiqueta) {
+        var etiqueta = document.getElementById(idEtiqueta);
+        if (!etiqueta) return;
+        if (input.files && input.files.length > 0) {
+            etiqueta.textContent = input.files[0].name;
+            etiqueta.classList.add("archivo-cargado");
+        } else {
+            etiqueta.textContent = "Ninguna imagen seleccionada";
+            etiqueta.classList.remove("archivo-cargado");
+        }
+    }
+</script>
 {% endblock %}

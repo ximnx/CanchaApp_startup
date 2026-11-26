@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block titulo %}{{ cancha.nombre }} - Reservar en CanchaApp{% endblock %}
+{% block titulo %}{{ cancha.nombre }} - Reservar en Ready Match{% endblock %}
 
 {% block contenido %}
 <section class="seccion-gris">
     <div class="contenedor">
-        <a href="/canchas" class="enlace-volver">← Volver al listado de canchas</a>
+        <a href="/canchas" class="enlace-volver">&larr; Volver al listado de canchas</a>
 
-        <!-- Tarjeta con toda la información de la cancha seleccionada -->
+        <!-- Ficha de la cancha -->
         <div class="detalle-cancha">
             <img
                 src="{{ url_for('static', filename=cancha.imagen) }}"
@@ -18,7 +18,7 @@
             <div class="info-detalle">
                 <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
                 <h1>{{ cancha.nombre }}</h1>
-                <p class="direccion">📍 {{ cancha.direccion }}</p>
+                <p class="direccion"><strong>Ubicación:</strong> {{ cancha.direccion }}</p>
                 <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
                 <p class="dato-extra">
                     <strong>Administrador:</strong> {{ cancha.nombre_administrador }}
@@ -29,11 +29,11 @@
             </div>
         </div>
 
-        <!-- Listado visual de horarios de esta cancha -->
+        <!-- Horarios disponibles -->
         <div class="caja-panel" style="margin-top: 28px;">
             <h2>1. Horarios de esta cancha</h2>
             <p class="texto-izquierda">
-                Revisa qué turnos están disponibles. Puedes hacer clic en un horario disponible para seleccionarlo en el formulario.
+                Haz clic en cualquier horario disponible para seleccionarlo automáticamente en el formulario de reserva.
             </p>
 
             {% if horarios %}
@@ -46,8 +46,8 @@
                         {% endif %}
                     >
                         <div>
-                            <strong>📅 {{ horario.fecha }}</strong>
-                            <p>🕒 {{ horario.hora }} (1 hora)</p>
+                            <strong>{{ horario.fecha }}</strong>
+                            <p>{{ horario.hora }} (1 hora)</p>
                         </div>
 
                         {% if horario.ocupado %}
@@ -65,13 +65,13 @@
             {% endif %}
         </div>
 
-        <!-- Formulario para solicitar la reserva -->
+        <!-- Formulario de solicitud -->
         <div class="caja-panel" style="margin-top: 24px;">
             <h2>2. Solicitar reserva</h2>
 
             {% if not session.get("usuario_id") %}
                 <p class="texto-izquierda">
-                    Debes iniciar sesión con una cuenta de jugador para poder reservar esta cancha.
+                    Inicia sesión con tu cuenta de jugador para enviar una solicitud de reserva.
                 </p>
                 <a href="/login" class="boton boton-principal">Iniciar sesión para reservar</a>
 
@@ -87,28 +87,56 @@
 
             {% else %}
                 <p class="texto-izquierda">
-                    Elige la fecha y la hora disponible y presiona el botón para enviar tu solicitud al administrador.
+                    Completa tus datos, elige la fecha y hora disponibles y envía tu solicitud al administrador de la cancha.
                 </p>
 
-                <form method="POST" action="/reservar" class="formulario-reserva">
+                <form method="POST" action="/reservar" class="formulario-reserva-completo">
                     <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
 
-                    <div class="campo-formulario">
-                        <label for="fecha">Fecha</label>
-                        <select id="fecha" name="fecha" required>
-                            {% for fecha in fechas_disponibles %}
-                                <option value="{{ fecha }}">{{ fecha }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    <div class="cuadricula-dos">
+                        <div class="campo-formulario">
+                            <label for="nombre_reserva">Nombre completo</label>
+                            <input
+                                type="text"
+                                id="nombre_reserva"
+                                name="nombre_reserva"
+                                value="{{ session.get('usuario_nombre', '') }}"
+                                placeholder="Ej: Laura Gómez Martínez"
+                                minlength="3"
+                                required
+                            >
+                        </div>
 
-                    <div class="campo-formulario">
-                        <label for="hora">Hora disponible (1 hora)</label>
-                        <select id="hora" name="hora" required>
-                            {% for hora in horas_en_cancha %}
-                                <option value="{{ hora }}">{{ hora }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="campo-formulario">
+                            <label for="identificacion">Número de identificación (C.C. / T.I.)</label>
+                            <input
+                                type="text"
+                                id="identificacion"
+                                name="identificacion"
+                                placeholder="Ej: 1020304050"
+                                minlength="5"
+                                maxlength="20"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="fecha">Fecha</label>
+                            <select id="fecha" name="fecha" required>
+                                {% for fecha in fechas_disponibles %}
+                                    <option value="{{ fecha }}">{{ fecha }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="hora">Hora disponible (1 hora)</label>
+                            <select id="hora" name="hora" required>
+                                {% for hora in horas_en_cancha %}
+                                    <option value="{{ hora }}">{{ hora }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
 
                     <button type="submit" class="boton boton-principal">
@@ -120,7 +148,6 @@
     </div>
 </section>
 
-<!-- Pequeño JavaScript opcional para llenar fecha y hora al hacer clic en una tarjeta -->
 <script>
     function seleccionarHorario(fecha, hora) {
         var campoFecha = document.getElementById("fecha");

@@ -1,166 +1,1807 @@
-/* CANCHAAPP | Diseño deportivo */
-:root{
-  --verde:#168447; --oscuro:#103d2a; --claro:#e8f5ec;
-  --fondo:#f3f7f4; --blanco:#fff; --texto:#20332a;
-  --gris:#68776e; --borde:#dce6df; --rojo:#c83e36;
-  --radio:14px; --sombra:0 6px 22px #173b2812;
+/* ==========================================================
+   READY MATCH — IDENTIDAD VISUAL PROFESIONAL
+   Paleta extraída del logo oficial Ready Match:
+   - Azul noche estadio: #070C17 / #0E192D / #162542
+   - Azul eléctrico:     #0077FF / #00C2FF
+   - Naranja / Dorado:   #FF6B00 / #FFB800
+   - Superficie clara:   #F3F6FA / #FFFFFF
+   ========================================================== */
+
+:root {
+    --oscuro-profundo: #070C17;
+    --oscuro: #0E192D;
+    --oscuro-medio: #162542;
+    --azul: #0077FF;
+    --azul-brillante: #00C2FF;
+    --azul-hover: #005FD1;
+    --azul-claro: #EBF5FF;
+    --naranja: #FF6B00;
+    --dorado: #FFB800;
+    --naranja-claro: #FFF4E8;
+    --fondo: #F3F6FA;
+    --blanco: #FFFFFF;
+    --texto: #132035;
+    --gris: #5A6A82;
+    --borde: #DCE4F0;
+    --verde-estado: #0E7C47;
+    --verde-claro: #E8F8F0;
+    --rojo: #D13438;
+    --radio: 16px;
+    --radio-sm: 10px;
+    --sombra-suave: 0 8px 24px rgba(10, 22, 46, 0.07);
+    --sombra-hover: 0 16px 36px rgba(10, 22, 46, 0.14);
+    --fuente-titulo: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+    --fuente-texto: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font:16px/1.6 Arial,Helvetica,sans-serif;background:var(--fondo);color:var(--texto);min-height:100vh;display:flex;flex-direction:column}
-main{flex:1;min-width:0}
-img{max-width:100%}
-a{color:var(--verde);text-decoration:none}
-a:hover{color:var(--oscuro)}
-.contenedor{width:92%;max-width:1150px;margin:auto}
-.centrado{text-align:center}
 
-/* 1. Encabezado y navegación */
-.encabezado{background:var(--oscuro);color:white;padding:14px 0;box-shadow:0 3px 14px #0002;position:relative;z-index:5}
-.barra-navegacion,.menu{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.barra-navegacion{justify-content:space-between}
-.logo{font-size:25px;font-weight:800;color:white}
-.logo:hover{color:var(--claro)}
-.menu{gap:7px}
-.menu a{color:white;padding:8px 11px;border-radius:9px;font-size:14px;font-weight:700}
-.menu a:hover,.menu a.activo,.boton-salir{background:#ffffff20;color:white}
-.boton-menu{background:var(--verde)}
-.saludo-usuario{color:#d9f3e2;font-weight:bold}
-.enlace-perfil{display:inline-flex;align-items:center;gap:8px;color:white!important}
-.avatar-menu,.avatar-menu-inicial{width:30px;height:30px;border-radius:50%}
-.avatar-menu{object-fit:cover}
-.avatar-menu-inicial{display:inline-grid;place-items:center;background:var(--verde);color:white}
-
-/* 2. Portada y secciones */
-.portada{background:linear-gradient(135deg,#0d3422,#168447);color:white;text-align:center;padding:68px 0}
-.contenido-portada{max-width:760px}
-.portada h1{font-size:clamp(32px,5vw,52px);line-height:1.15;margin:12px 0}
-.frase{font-size:20px;color:#d7f5e1;font-style:italic;margin-bottom:12px}
-.subtitulo{max-width:680px;margin:0 auto 24px;color:#f0fff4}
-.etiqueta{display:inline-block;padding:5px 13px;border:1px solid #ffffff55;border-radius:30px;background:#ffffff20;font-weight:bold}
-.botones-portada{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
-.seccion-clara,.seccion-gris{padding:45px 0}
-.seccion-clara{background:white}
-.seccion-gris{background:var(--fondo)}
-.titulo-seccion{text-align:center;color:var(--oscuro);font-size:30px;margin-bottom:10px}
-.titulo-subseccion{font-size:23px;color:var(--oscuro);margin-bottom:14px}
-.descripcion-seccion{text-align:center;color:var(--gris);max-width:720px;margin:0 auto 26px}
-
-/* 3. Botones */
-.boton{display:inline-block;padding:10px 18px;min-height:40px;border:0;border-radius:9px;text-align:center;font-weight:bold;cursor:pointer;transition:.2s}
-.boton:hover{transform:translateY(-2px);filter:brightness(.94)}
-.boton-principal{background:var(--verde);color:white}
-.boton-principal:hover,.boton-peligro:hover{color:white}
-.boton-secundario{background:var(--claro);color:var(--oscuro)}
-.boton-secundario:hover{color:var(--oscuro)}
-.boton-peligro{background:var(--rojo);color:white}
-.boton-ancho{display:block;width:100%;margin-top:10px}
-.boton-pequeno{padding:7px 12px;min-height:32px;font-size:13px}
-
-/* 4. Tarjetas, paneles y equipos */
-.cuadricula{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
-.cuadricula-dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.tarjeta-cancha,.tarjeta-equipo,.tarjeta-reserva,.caja-panel,.tarjeta-formulario,
-.panel-encabezado,.caja-info,.caja-aviso{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sombra)}
-.tarjeta-cancha,.tarjeta-equipo{overflow:hidden;transition:.2s}
-.tarjeta-cancha:hover,.tarjeta-equipo:hover{box-shadow:0 10px 26px #173b2822;transform:translateY(-2px)}
-.imagen-cancha{display:block;width:100%;height:205px;object-fit:cover}
-.contenido-tarjeta,.tarjeta-equipo{padding:19px}
-.tarjeta-cancha h3,.tarjeta-equipo h3,.caja-panel h2,.caja-panel h3{color:var(--oscuro);margin-bottom:8px}
-.direccion,.dato-extra,.texto-izquierda,.texto-vacio,.descripcion-equipo,.correo-perfil{color:var(--gris)}
-.precio{color:var(--verde);font-size:19px;font-weight:800}
-.precio span{font-size:14px;font-weight:400;color:var(--gris)}
-.panel-encabezado,.caja-panel{padding:24px;margin-bottom:20px}
-.panel-encabezado h1{font-size:27px;color:var(--oscuro)}
-.caja-info,.caja-aviso{padding:22px;margin:14px 0}
-.banner-usuario{background:var(--claro);padding:22px 0;border-bottom:1px solid var(--borde)}
-.contenido-banner-usuario,.acciones-banner,.encabezado-admin-cancha{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.insignias-equipo{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.etiqueta-rol,.insignia-futbol,.insignia-categoria,.insignia-propia{display:inline-block;padding:4px 10px;border-radius:30px;background:var(--claro);color:var(--oscuro);font-size:12px;font-weight:bold}
-.insignia-categoria{background:var(--oscuro);color:white}
-.insignia-propia{background:var(--verde);color:white}
-
-/* 5. Formularios */
-.tarjeta-formulario{max-width:510px;margin:30px auto;padding:28px}
-.tarjeta-formulario h1{text-align:center;color:var(--oscuro);margin-bottom:8px}
-.texto-ayuda{text-align:center;color:var(--gris);margin-bottom:20px}
-.campo-formulario{margin-bottom:15px}
-.campo-formulario label{display:block;margin-bottom:6px;color:var(--oscuro);font-weight:bold}
-.campo-formulario input,.campo-formulario select,.campo-formulario textarea,.form-quiero-jugar select{width:100%;padding:11px 12px;border:1px solid #cbd8ce;border-radius:8px;background:white;color:var(--texto);font:inherit}
-.campo-formulario input:focus,.campo-formulario select:focus,.campo-formulario textarea:focus{outline:2px solid #8bcba2;border-color:var(--verde)}
-.nota-campo{display:block;margin-top:4px;color:var(--gris);font-size:12px}
-.enlace-inferior{text-align:center;margin-top:16px}
-
-/* 6. Canchas, horarios y reservas */
-.barra-filtros{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:20px 0}
-.filtro{padding:7px 14px;border:1px solid var(--borde);border-radius:30px;background:white;color:var(--oscuro);font-weight:bold}
-.filtro:hover,.filtro-activo{background:var(--verde);color:white}
-.detalle-cancha{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;overflow:hidden;background:white;border:1px solid var(--borde);border-radius:var(--radio)}
-.imagen-detalle{width:100%;height:100%;min-height:240px;max-height:370px;object-fit:cover}
-.info-detalle{padding:24px;align-self:center}
-.info-detalle h1{color:var(--oscuro);margin-bottom:10px}
-.lista-horarios,.chips-horarios,.botones-accion{display:flex;gap:10px;flex-wrap:wrap}
-.datos-reserva{display:flex;flex-direction:column;gap:4px}
-.acciones-reserva{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.tarjeta-horario,.chip-horario{padding:12px;border:1px solid var(--borde);border-radius:9px;background:white}
-.tarjeta-horario{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.horario-libre{background:#edf9f0;border-color:#a6d8b5;cursor:pointer}
-.horario-ocupado{background:#eee;opacity:.6}
-.etiqueta-disponible,.etiqueta-ocupado{padding:4px 9px;border-radius:20px;background:var(--claro);color:var(--oscuro);font-size:12px;font-weight:bold}
-.etiqueta-ocupado{background:#fde9e7;color:#9c2822}
-.formulario-reserva,.formulario-horario{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
-.formulario-reserva .campo-formulario,.formulario-horario .campo-formulario{margin-bottom:0;flex:1;min-width:170px}
-.lista-reservas{display:grid;gap:13px}
-.tarjeta-reserva{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px}
-.tarjeta-reserva-admin{background:var(--fondo)}
-.badge-estado{display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:bold}
-.estado-pendiente{background:#fff2d5;color:#875900}
-.estado-confirmada,.estado-aceptada{background:#e3f5e8;color:#176d3e}
-.estado-rechazada{background:#fde9e7;color:#a52d27}
-.tarjeta-admin-cancha{margin-bottom:20px}
-.miniatura-cancha{width:145px;height:100px;object-fit:cover;border-radius:9px}
-.formulario-horario{margin:12px 0;padding:14px;background:var(--fondo);border-radius:9px}
-.chip-horario{display:inline-flex;align-items:center;gap:8px}
-.boton-x{border:0;background:none;color:var(--rojo);font-weight:bold;cursor:pointer}
-
-/* 7. Mensajes y perfil */
-.tarjeta-partido{display:flex;flex-direction:column;justify-content:space-between}
-.zona-accion-partido{margin-top:14px;padding-top:12px;border-top:1px solid var(--borde)}
-.etiqueta-propia-suave,.aviso-confirmado{display:inline-block;padding:8px 11px;border-radius:8px;background:var(--claro);color:var(--oscuro);font-size:13px;font-weight:bold}
-.zona-mensajes{margin:14px 0}
-.alerta{padding:11px 14px;margin-bottom:9px;border-radius:9px;font-weight:bold}
-.alerta-exito{background:#e3f5e8;color:#176d3e}
-.alerta-error{background:#fde9e7;color:#a52d27}
-.texto-vacio{padding:22px;text-align:center;background:white;border:1px dashed var(--borde);border-radius:10px}
-.enlace-volver,.enlace-titulo{color:var(--oscuro);font-weight:bold}
-.enlace-volver{display:inline-block;margin-bottom:14px}
-.tarjeta-perfil{max-width:600px;margin:auto}
-.cabecera-perfil{text-align:center;margin-bottom:20px}
-.foto-perfil-grande,.avatar-grande-inicial{width:115px;height:115px;margin-bottom:10px;border:4px solid var(--verde);border-radius:50%;object-fit:cover}
-.avatar-grande-inicial{display:grid;place-items:center;margin:0 auto 10px;background:var(--oscuro);color:white;font-size:40px}
-
-/* 8. Pie de página */
-.pie-pagina{margin-top:auto;padding:24px 0;background:var(--oscuro);color:white;text-align:center}
-.pie-pequeno{color:#cde8d5;font-size:13px}
-
-/* 9. Adaptación a celulares y tabletas */
-@media(max-width:760px){
- .barra-navegacion{flex-direction:column;align-items:center}
- .menu{justify-content:center}
- .portada{padding:48px 0}
- .cuadricula-dos,.detalle-cancha{grid-template-columns:1fr}
- .tarjeta-formulario{margin:20px auto;padding:21px}
- .panel-encabezado,.caja-panel{padding:18px}
- .acciones-reserva{align-items:flex-start}
- .imagen-detalle{max-height:260px}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
-@media(max-width:480px){
- .contenedor{width:94%}
- .menu{gap:4px}
- .menu a{padding:6px 8px;font-size:12px}
- .titulo-seccion{font-size:25px}
- .portada h1{font-size:34px}
- .botones-portada{flex-direction:column}
- .botones-portada .boton{width:100%}
- .tarjeta-reserva{padding:14px}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--fuente-texto);
+    font-size: 15.5px;
+    line-height: 1.6;
+    background-color: var(--fondo);
+    color: var(--texto);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    min-width: 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    color: var(--azul);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--azul-hover);
+}
+
+.contenedor {
+    width: 92%;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.centrado {
+    text-align: center;
+}
+
+/* ---------------- 1. BARRA DE NAVEGACIÓN ---------------- */
+.encabezado {
+    background: rgba(7, 12, 23, 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 194, 255, 0.2);
+    box-shadow: 0 6px 24px rgba(4, 8, 18, 0.35);
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.barra-navegacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 44px;
+    width: auto;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.logo:hover .logo-img {
+    transform: scale(1.03);
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.menu a {
+    color: #CBD7EA;
+    padding: 8px 13px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.15px;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.menu a:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--blanco);
+}
+
+.menu a.activo {
+    background-color: rgba(0, 194, 255, 0.14);
+    color: var(--blanco);
+    box-shadow: inset 0 -2px 0 var(--azul-brillante);
+}
+
+.boton-menu {
+    background: linear-gradient(135deg, var(--naranja), var(--dorado)) !important;
+    color: #0B1220 !important;
+    padding: 9px 18px !important;
+    border-radius: 999px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+}
+
+.boton-menu:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    color: #0B1220 !important;
+}
+
+.enlace-perfil {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px !important;
+    padding: 5px 14px 5px 6px !important;
+    color: var(--blanco) !important;
+}
+
+.enlace-perfil:hover {
+    background-color: rgba(0, 194, 255, 0.16) !important;
+    border-color: rgba(0, 194, 255, 0.45);
+}
+
+.avatar-menu,
+.avatar-menu-inicial {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--azul-brillante);
+}
+
+.avatar-menu {
+    object-fit: cover;
+}
+
+.avatar-menu-inicial {
+    display: inline-grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
+    color: var(--blanco);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.boton-salir {
+    background-color: rgba(255, 255, 255, 0.09) !important;
+    color: #DCE6F7 !important;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px !important;
+    padding: 8px 14px !important;
+}
+
+.boton-salir:hover {
+    background-color: rgba(209, 52, 56, 0.88) !important;
+    border-color: transparent;
+    color: var(--blanco) !important;
+}
+
+/* ---------------- 2. PORTADA ESTADIO NOCTURNO (CYAN + NARANJA) ---------------- */
+.portada {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    color: var(--blanco);
+    padding: 76px 0 70px;
+    background-color: var(--oscuro-profundo);
+    background-image:
+        radial-gradient(circle at 20% 25%, rgba(0, 194, 255, 0.22), transparent 44%),
+        radial-gradient(circle at 82% 28%, rgba(255, 107, 0, 0.22), transparent 44%),
+        radial-gradient(circle at 50% 100%, rgba(0, 119, 255, 0.18), transparent 55%),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 0px,
+            rgba(255, 255, 255, 0.018) 72px,
+            transparent 72px,
+            transparent 144px
+        ),
+        linear-gradient(160deg, #060B15 0%, #0D1A33 55%, #122342 100%);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--azul-brillante), var(--azul), var(--naranja), var(--dorado)) 1;
+}
+
+/* Geometría sutil de cancha de fútbol en el fondo */
+.portada::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: 360px;
+    height: 360px;
+    border: 1.5px solid rgba(255, 255, 255, 0.07);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.portada::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 48%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    pointer-events: none;
+}
+
+.contenido-portada {
+    position: relative;
+    z-index: 2;
+    max-width: 820px;
+}
+
+.logo-portada {
+    height: 84px;
+    width: auto;
+    margin: 0 auto 20px;
+    display: block;
+    filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.45));
+}
+
+.etiqueta {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(0, 194, 255, 0.12);
+    border: 1px solid rgba(0, 194, 255, 0.35);
+    color: #9EE7FF;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.portada h1 {
+    font-family: var(--fuente-titulo);
+    font-size: clamp(40px, 6.2vw, 66px);
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 1px;
+    line-height: 1.04;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.portada h1 .acento-dorado {
+    background: linear-gradient(90deg, var(--dorado), var(--naranja));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.frase {
+    font-size: 18px;
+    color: #D4E4F7;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.subtitulo {
+    max-width: 640px;
+    margin: 0 auto 30px;
+    color: #9FB3CE;
+    font-size: 16px;
+}
+
+.botones-portada {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.franja-metricas {
+    margin-top: 42px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.metrica strong {
+    display: block;
+    font-family: var(--fuente-titulo);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--blanco);
+}
+
+.metrica span {
+    font-size: 13px;
+    color: #96AAC7;
+}
+
+/* ---------------- 3. BOTONES ---------------- */
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-height: 44px;
+    border: none;
+    border-radius: 11px;
+    font-family: var(--fuente-texto);
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, filter 0.18s ease;
+}
+
+.boton:hover {
+    transform: translateY(-2px);
+}
+
+.boton-principal {
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-brillante) 100%);
+    color: var(--blanco);
+    box-shadow: 0 6px 20px rgba(0, 119, 255, 0.28);
+}
+
+.boton-principal:hover {
+    color: var(--blanco);
+    box-shadow: 0 10px 26px rgba(0, 119, 255, 0.4);
+    filter: brightness(1.05);
+}
+
+.boton-naranja {
+    background: linear-gradient(135deg, var(--naranja) 0%, var(--dorado) 100%);
+    color: #0B1220;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
+}
+
+.boton-naranja:hover {
+    color: #0B1220;
+    box-shadow: 0 10px 26px rgba(255, 107, 0, 0.42);
+    filter: brightness(1.05);
+}
+
+.boton-secundario {
+    background-color: var(--azul-claro);
+    color: var(--oscuro);
+    border: 1px solid #C8DDF6;
+}
+
+.boton-secundario:hover {
+    background-color: var(--blanco);
+    color: var(--azul);
+    box-shadow: 0 6px 16px rgba(10, 22, 46, 0.1);
+}
+
+.boton-peligro {
+    background-color: var(--rojo);
+    color: var(--blanco);
+}
+
+.boton-peligro:hover {
+    background-color: #B0262A;
+    color: var(--blanco);
+}
+
+.boton-ancho {
+    display: flex;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.boton-pequeno {
+    padding: 8px 15px;
+    min-height: 36px;
+    font-size: 13px;
+    border-radius: 9px;
+}
+
+/* ---------------- 4. SECCIONES Y ENCABEZADOS ---------------- */
+.seccion-clara,
+.seccion-gris {
+    padding: 60px 0;
+}
+
+.seccion-clara {
+    background-color: var(--blanco);
+}
+
+.seccion-gris {
+    background-color: var(--fondo);
+}
+
+.titulo-seccion {
+    font-family: var(--fuente-titulo);
+    font-size: clamp(32px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--oscuro);
+    margin-bottom: 10px;
+}
+
+.titulo-seccion::after {
+    content: "";
+    display: block;
+    width: 72px;
+    height: 4px;
+    margin: 10px auto 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--azul-brillante), var(--azul), var(--naranja));
+}
+
+.titulo-subseccion {
+    font-family: var(--fuente-titulo);
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--oscuro);
+    margin-bottom: 16px;
+}
+
+.descripcion-seccion {
+    text-align: center;
+    color: var(--gris);
+    max-width: 660px;
+    margin: 10px auto 34px;
+}
+
+/* ---------------- 5. CUADRÍCULAS, TARJETAS Y PANELES ---------------- */
+.cuadricula {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 22px;
+}
+
+.cuadricula-dos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.tarjeta-cancha,
+.tarjeta-equipo,
+.tarjeta-reserva,
+.caja-panel,
+.tarjeta-formulario,
+.panel-encabezado {
+    background-color: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+}
+
+/* Pasos de "Cómo funciona" */
+.caja-info {
+    background-color: var(--blanco);
+    border: 1px solid var(--borde);
+    border-top: 4px solid var(--azul);
+    border-radius: var(--radio);
+    padding: 28px 24px;
+    box-shadow: var(--sombra-suave);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.caja-info:nth-child(2) {
+    border-top-color: var(--naranja);
+}
+
+.caja-info:nth-child(3) {
+    border-top-color: var(--azul-brillante);
+}
+
+.caja-info:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-hover);
+}
+
+.numero-paso {
+    display: inline-block;
+    font-family: var(--fuente-titulo);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--azul);
+    background-color: var(--azul-claro);
+    padding: 3px 11px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+}
+
+.caja-info:nth-child(2) .numero-paso {
+    color: var(--naranja);
+    background-color: var(--naranja-claro);
+}
+
+.caja-info h3 {
+    font-family: var(--fuente-titulo);
+    font-size: 25px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--oscuro);
+    margin-bottom: 8px;
+}
+
+.caja-info p {
+    color: var(--gris);
+}
+
+/* Tarjetas de canchas */
+.tarjeta-cancha {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.tarjeta-cancha:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sombra-hover);
+    border-color: #B4D3F8;
+}
+
+.marco-imagen-cancha {
+    position: relative;
+    overflow: hidden;
+    height: 215px;
+    background-color: var(--oscuro);
+}
+
+.imagen-cancha {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.tarjeta-cancha:hover .imagen-cancha {
+    transform: scale(1.05);
+}
+
+.marco-imagen-cancha .insignia-futbol {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    margin-bottom: 0;
+    background: rgba(7, 12, 23, 0.85);
+    color: var(--blanco);
+    border: 1px solid rgba(0, 194, 255, 0.5);
+    backdrop-filter: blur(6px);
+}
+
+/* Carrusel único de canchas destacadas */
+.carrusel-contenedor {
+    position: relative;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.carrusel-ventana {
+    overflow: hidden;
+    border-radius: var(--radio);
+    background-color: var(--blanco);
+    border: 1px solid var(--borde);
+    box-shadow: var(--sombra-hover);
+}
+
+.carrusel-pista {
+    display: flex;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.carrusel-slide {
+    min-width: 100%;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    align-items: stretch;
+}
+
+.carrusel-imagen-marco {
+    position: relative;
+    min-height: 360px;
+    max-height: 410px;
+    overflow: hidden;
+    background-color: var(--oscuro);
+}
+
+.carrusel-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.carrusel-imagen-marco .insignia-futbol {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    margin-bottom: 0;
+    background: rgba(7, 12, 23, 0.85);
+    color: var(--blanco);
+    border: 1px solid rgba(0, 194, 255, 0.55);
+    backdrop-filter: blur(6px);
+}
+
+.carrusel-info {
+    padding: 36px 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--blanco);
+}
+
+.carrusel-subtitulo {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--naranja);
+    margin-bottom: 8px;
+}
+
+.carrusel-info h3 {
+    font-family: var(--fuente-titulo);
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--oscuro);
+    margin-bottom: 10px;
+}
+
+.carrusel-info .precio {
+    font-size: 26px;
+    margin-top: 6px;
+    margin-bottom: 18px;
+}
+
+.carrusel-flecha {
+    position: absolute;
+    top: 46%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(7, 12, 23, 0.78);
+    color: var(--blanco);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    z-index: 4;
+}
+
+.carrusel-flecha:hover {
+    background: var(--azul);
+    transform: translateY(-50%) scale(1.06);
+}
+
+.carrusel-anterior {
+    left: -22px;
+}
+
+.carrusel-siguiente {
+    right: -22px;
+}
+
+.carrusel-puntos {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.carrusel-punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: none;
+    background-color: #C3D0E2;
+    cursor: pointer;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.carrusel-punto.activo {
+    width: 30px;
+    background: linear-gradient(90deg, var(--azul), var(--azul-brillante));
+}
+
+.contenido-tarjeta {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.contenido-tarjeta h3,
+.tarjeta-equipo h3 {
+    font-family: var(--fuente-titulo);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--oscuro);
+    margin-bottom: 8px;
+}
+
+.contenido-tarjeta .boton {
+    margin-top: auto;
+}
+
+.direccion,
+.dato-extra,
+.texto-izquierda,
+.descripcion-equipo,
+.correo-perfil {
+    color: var(--gris);
+    font-size: 14.5px;
+}
+
+.direccion {
+    margin-bottom: 12px;
+}
+
+.dato-extra {
+    margin-top: 5px;
+}
+
+.precio {
+    color: var(--oscuro);
+    font-size: 23px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 14px;
+}
+
+.precio span {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--gris);
+}
+
+/* Insignias deportivas */
+.insignias-equipo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.insignia-futbol,
+.insignia-categoria,
+.insignia-propia,
+.etiqueta-rol {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.insignia-futbol {
+    background-color: var(--azul-claro);
+    color: var(--azul);
+    border: 1px solid #C2DDFB;
+    margin-bottom: 10px;
+    align-self: flex-start;
+}
+
+.insignias-equipo .insignia-futbol {
+    margin-bottom: 0;
+}
+
+.insignia-categoria,
+.etiqueta-rol {
+    background-color: var(--oscuro);
+    color: var(--blanco);
+}
+
+.etiqueta-rol {
+    margin-bottom: 10px;
+}
+
+.insignia-propia {
+    background: linear-gradient(135deg, var(--naranja), var(--dorado));
+    color: #0B1220;
+}
+
+/* Banner de bienvenida y paneles */
+.banner-usuario {
+    background: linear-gradient(90deg, #EAF3FF 0%, #FFF7EE 100%);
+    border-bottom: 1px solid var(--borde);
+    padding: 24px 0;
+}
+
+.contenido-banner-usuario,
+.acciones-banner,
+.encabezado-admin-cancha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.banner-usuario h2 {
+    font-family: var(--fuente-titulo);
+    font-size: 30px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--oscuro);
+}
+
+.panel-encabezado {
+    padding: 28px;
+    margin-bottom: 24px;
+    border-left: 5px solid var(--azul);
+}
+
+.panel-encabezado h1 {
+    font-family: var(--fuente-titulo);
+    font-size: 36px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--oscuro);
+    margin-bottom: 6px;
+}
+
+.caja-panel {
+    padding: 26px;
+    margin-bottom: 22px;
+}
+
+.caja-panel h2 {
+    font-family: var(--fuente-titulo);
+    font-size: 27px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--oscuro);
+    margin-bottom: 6px;
+}
+
+.caja-panel h3 {
+    color: var(--oscuro);
+    margin-bottom: 8px;
+}
+
+.texto-izquierda {
+    margin-top: 2px;
+    margin-bottom: 18px;
+}
+
+.caja-aviso {
+    background: linear-gradient(135deg, #091326 0%, #142B52 60%, #102446 100%);
+    color: var(--blanco);
+    border-radius: var(--radio);
+    border: 1px solid rgba(0, 194, 255, 0.25);
+    padding: 40px 28px;
+    text-align: center;
+    box-shadow: var(--sombra-hover);
+}
+
+.caja-aviso h2,
+.caja-aviso h3 {
+    font-family: var(--fuente-titulo);
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--blanco);
+}
+
+.caja-aviso p {
+    color: #BDD0EA;
+}
+
+.caja-aviso .boton-secundario {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--blanco);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.caja-aviso .boton-secundario:hover {
+    background-color: var(--blanco);
+    color: var(--oscuro);
+}
+
+/* ---------------- 6. MENSAJES FLASH (ALERTAS) ---------------- */
+.zona-mensajes {
+    margin-top: 18px;
+}
+
+.alerta {
+    padding: 13px 18px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 14.5px;
+    box-shadow: 0 4px 12px rgba(10, 22, 46, 0.06);
+}
+
+.alerta-exito {
+    background-color: var(--verde-claro);
+    color: var(--verde-estado);
+    border-left: 5px solid var(--verde-estado);
+}
+
+.alerta-error {
+    background-color: #FDECEC;
+    color: #9A1E22;
+    border-left: 5px solid var(--rojo);
+}
+
+/* ---------------- 7. FORMULARIOS ---------------- */
+.tarjeta-formulario {
+    max-width: 500px;
+    margin: 24px auto;
+    padding: 34px 32px;
+    border-top: 4px solid var(--azul);
+}
+
+.tarjeta-formulario h1 {
+    font-family: var(--fuente-titulo);
+    font-size: 34px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--oscuro);
+    margin-bottom: 6px;
+}
+
+.texto-ayuda {
+    text-align: center;
+    color: var(--gris);
+    font-size: 14.5px;
+    margin-bottom: 24px;
+}
+
+.campo-formulario {
+    margin-bottom: 16px;
+}
+
+.campo-formulario label {
+    display: block;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--oscuro);
+    margin-bottom: 6px;
+}
+
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea,
+.form-quiero-jugar select {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1.5px solid #CED9EA;
+    border-radius: var(--radio-sm);
+    background-color: var(--blanco);
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus,
+.form-quiero-jugar select:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.16);
+}
+
+.nota-campo {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--gris);
+}
+
+/* Botón estético para subir imágenes */
+.subir-archivo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1.5px dashed #B5CBE8;
+    border-radius: var(--radio-sm);
+    background-color: #F8FBFF;
+    flex-wrap: wrap;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.subir-archivo:hover {
+    border-color: var(--azul);
+    background-color: var(--azul-claro);
+}
+
+.input-archivo-oculto {
+    display: none !important;
+}
+
+.boton-subir-foto {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0 !important;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
+    color: var(--blanco) !important;
+    font-size: 13.5px !important;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 119, 255, 0.22);
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.boton-subir-foto:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+.texto-archivo {
+    font-size: 13.5px;
+    color: var(--gris);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+}
+
+.texto-archivo.archivo-cargado {
+    color: var(--oscuro);
+    font-weight: 700;
+}
+
+/* Selector múltiple de horarios en Panel Admin */
+.panel-horarios-multiples {
+    background-color: #F7FAFF;
+    border: 1px solid #CFDFF4;
+    border-left: 4px solid var(--azul);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 14px 0 16px;
+}
+
+.cabecera-horarios-multi {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.cabecera-horarios-multi h4 {
+    font-family: var(--fuente-titulo);
+    font-size: 21px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--oscuro);
+}
+
+.atajos-horarios {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.boton-atajo {
+    background-color: var(--blanco);
+    color: var(--oscuro);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.boton-atajo:hover {
+    background-color: var(--azul);
+    border-color: var(--azul);
+    color: var(--blanco);
+}
+
+.cuadricula-horas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+}
+
+.casilla-hora {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.casilla-hora input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.casilla-hora span {
+    display: block;
+    text-align: center;
+    padding: 8px 6px;
+    border-radius: 9px;
+    border: 1.5px solid var(--borde);
+    background-color: var(--blanco);
+    color: var(--oscuro);
+    font-size: 13.5px;
+    font-weight: 700;
+    transition: all 0.16s ease;
+}
+
+.casilla-hora:hover span {
+    border-color: var(--azul);
+}
+
+.casilla-hora input:checked + span {
+    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
+    border-color: transparent;
+    color: var(--blanco);
+    box-shadow: 0 4px 10px rgba(0, 119, 255, 0.24);
+}
+
+.enlace-inferior {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--gris);
+}
+
+.enlace-inferior a {
+    font-weight: 700;
+    color: var(--azul);
+}
+
+.enlace-inferior a:hover {
+    text-decoration: underline;
+}
+
+/* ---------------- 8. FILTROS, DETALLE DE CANCHA, HORARIOS Y RESERVAS ---------------- */
+.barra-filtros {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+.filtro {
+    background-color: var(--blanco);
+    color: var(--oscuro);
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1.5px solid var(--borde);
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.filtro:hover,
+.filtro-activo {
+    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
+    color: var(--blanco);
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(0, 119, 255, 0.28);
+}
+
+.enlace-volver {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--oscuro);
+    margin-bottom: 18px;
+}
+
+.enlace-volver:hover {
+    color: var(--azul);
+}
+
+.detalle-cancha {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    background-color: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+}
+
+.imagen-detalle {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    max-height: 390px;
+    object-fit: cover;
+    display: block;
+}
+
+.info-detalle {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info-detalle h1 {
+    font-family: var(--fuente-titulo);
+    font-size: 36px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--oscuro);
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
+
+.lista-horarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+}
+
+.tarjeta-horario {
+    background-color: var(--blanco);
+    border: 1.5px solid var(--borde);
+    border-radius: 12px;
+    padding: 15px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: all 0.18s ease;
+}
+
+.horario-libre {
+    border-left: 5px solid var(--azul);
+    background-color: #F8FBFF;
+    cursor: pointer;
+}
+
+.horario-libre:hover {
+    background-color: var(--azul-claro);
+    border-color: var(--azul);
+    transform: translateY(-2px);
+}
+
+.horario-ocupado {
+    background-color: #F2F4F7;
+    border-left: 5px solid #C2CBD6;
+    opacity: 0.72;
+}
+
+.etiqueta-disponible,
+.etiqueta-ocupado {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.etiqueta-disponible {
+    background-color: var(--verde-claro);
+    color: var(--verde-estado);
+}
+
+.etiqueta-ocupado {
+    background-color: #FDECEC;
+    color: #9A1E22;
+}
+
+.formulario-reserva,
+.formulario-horario {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.formulario-horario {
+    background-color: var(--fondo);
+    border: 1px solid var(--borde);
+    padding: 16px;
+    border-radius: 12px;
+    margin: 14px 0 18px;
+}
+
+.formulario-reserva .campo-formulario,
+.formulario-horario .campo-formulario {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 175px;
+}
+
+.lista-reservas {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tarjeta-reserva {
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-left: 5px solid var(--azul);
+}
+
+.tarjeta-reserva-admin {
+    background-color: var(--fondo);
+}
+
+.datos-reserva {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.datos-reserva h3 {
+    font-family: var(--fuente-titulo);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--oscuro);
+}
+
+.enlace-titulo {
+    color: var(--oscuro);
+}
+
+.enlace-titulo:hover {
+    color: var(--azul);
+}
+
+.acciones-reserva {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.botones-accion {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.badge-estado {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.estado-pendiente {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.estado-confirmada,
+.estado-aceptada {
+    background-color: var(--verde-claro);
+    color: var(--verde-estado);
+}
+
+.estado-rechazada {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+/* ---------------- 9. PANEL ADMIN: CANCHAS Y CHIPS ---------------- */
+.tarjeta-admin-cancha {
+    margin-bottom: 22px;
+}
+
+.info-admin-cancha {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.panel-edicion-cancha {
+    background-color: var(--fondo);
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--naranja);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 14px 0 18px;
+}
+
+.panel-edicion-cancha h3 {
+    font-family: var(--fuente-titulo);
+    font-size: 22px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.miniatura-cancha {
+    width: 160px;
+    height: 108px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--borde);
+}
+
+.chips-horarios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chip-horario {
+    background-color: var(--azul-claro);
+    color: var(--oscuro);
+    border: 1px solid #C2DDFB;
+    padding: 6px 13px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.boton-x {
+    background: none;
+    border: none;
+    color: var(--rojo);
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* ---------------- 10. EQUIPOS Y BUSCAR RIVALES ---------------- */
+.tarjeta-equipo {
+    padding: 22px;
+    border-top: 4px solid var(--azul);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-equipo:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-hover);
+}
+
+.descripcion-equipo {
+    margin-top: 12px;
+    line-height: 1.55;
+}
+
+.tarjeta-partido {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-top-color: var(--naranja);
+}
+
+.zona-accion-partido {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #E6ECF5;
+}
+
+.form-quiero-jugar select {
+    margin-bottom: 6px;
+}
+
+.etiqueta-propia-suave,
+.aviso-confirmado {
+    display: block;
+    text-align: center;
+    background-color: var(--azul-claro);
+    color: var(--oscuro);
+    border: 1px solid #C2DDFB;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.aviso-confirmado {
+    background-color: var(--verde-claro);
+    color: var(--verde-estado);
+    border-color: #B7E7CE;
+}
+
+.texto-vacio {
+    color: var(--gris);
+    font-size: 15px;
+    padding: 20px;
+    text-align: center;
+    background-color: var(--fondo);
+    border: 1.5px dashed #C7D4E6;
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+/* ---------------- 11. PERFIL DE USUARIO ---------------- */
+.tarjeta-perfil {
+    max-width: 560px;
+}
+
+.cabecera-perfil {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #E6ECF5;
+}
+
+.foto-perfil-grande,
+.avatar-grande-inicial {
+    width: 124px;
+    height: 124px;
+    border-radius: 50%;
+    border: 4px solid var(--azul-brillante);
+    box-shadow: 0 8px 22px rgba(0, 119, 255, 0.22);
+    margin: 0 auto 14px;
+}
+
+.foto-perfil-grande {
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-grande-inicial {
+    background: linear-gradient(135deg, var(--oscuro), var(--azul));
+    color: var(--blanco);
+    font-family: var(--fuente-titulo);
+    font-size: 52px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+}
+
+.correo-perfil {
+    margin-bottom: 10px;
+}
+
+/* ---------------- 12. PIE DE PÁGINA CORPORATIVO ---------------- */
+.pie-pagina {
+    background: linear-gradient(180deg, #091120 0%, #050912 100%);
+    border-top: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--azul-brillante), var(--azul), var(--naranja), var(--dorado)) 1;
+    color: #CBD7EA;
+    padding: 52px 0 24px;
+}
+
+.pie-cuadricula {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: 32px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.logo-pie {
+    height: 40px;
+    width: auto;
+    display: block;
+    margin-bottom: 14px;
+}
+
+.pie-descripcion {
+    font-size: 14px;
+    color: #8EA3C2;
+    max-width: 300px;
+    line-height: 1.65;
+}
+
+.pie-columna h4 {
+    font-family: var(--fuente-titulo);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--blanco);
+    margin-bottom: 14px;
+}
+
+.pie-lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.pie-lista a,
+.pie-lista li {
+    font-size: 14px;
+    color: #93A7C4;
+}
+
+.pie-lista a:hover {
+    color: var(--azul-brillante);
+}
+
+.pie-inferior {
+    padding-top: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: #6F84A3;
+}
+
+/* ---------------- 13. DISEÑO PARA CELULARES Y TABLETAS ---------------- */
+@media (max-width: 900px) {
+    .pie-cuadricula {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .barra-navegacion {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .menu {
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .portada {
+        padding: 52px 0 48px;
+    }
+
+    .logo-portada {
+        height: 64px;
+    }
+
+    .franja-metricas {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .cuadricula-dos,
+    .detalle-cancha,
+    .carrusel-slide {
+        grid-template-columns: 1fr;
+    }
+
+    .carrusel-imagen-marco {
+        min-height: 230px;
+        max-height: 260px;
+    }
+
+    .carrusel-info {
+        padding: 24px 20px;
+    }
+
+    .carrusel-anterior {
+        left: 10px;
+        top: 120px;
+    }
+
+    .carrusel-siguiente {
+        right: 10px;
+        top: 120px;
+    }
+
+    .tarjeta-formulario,
+    .panel-encabezado,
+    .caja-panel {
+        padding: 22px 18px;
+    }
+
+    .acciones-reserva {
+        align-items: flex-start;
+    }
+
+    .formulario-reserva button,
+    .formulario-horario button {
+        width: 100%;
+    }
+
+    .miniatura-cancha {
+        width: 100%;
+        height: 170px;
+    }
+
+    .imagen-detalle {
+        max-height: 260px;
+    }
+}
+
+@media (max-width: 520px) {
+    .contenedor {
+        width: 94%;
+    }
+
+    .logo-img {
+        height: 36px;
+    }
+
+    .menu a {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+
+    .botones-portada {
+        flex-direction: column;
+    }
+
+    .botones-portada .boton {
+        width: 100%;
+    }
+
+    .tarjeta-reserva {
+        padding: 16px;
+    }
+
+    .pie-cuadricula {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .pie-inferior {
+        flex-direction: column;
+        text-align: center;
+    }
 }

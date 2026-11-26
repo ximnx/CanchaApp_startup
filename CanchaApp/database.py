@@ -80,10 +80,21 @@ def crear_tablas():
             fecha TEXT NOT NULL,
             hora TEXT NOT NULL,
             estado TEXT NOT NULL DEFAULT 'pendiente',
+            nombre_reserva TEXT NOT NULL DEFAULT '',
+            identificacion TEXT NOT NULL DEFAULT '',
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
             FOREIGN KEY (cancha_id) REFERENCES canchas(id)
         )
     """)
+
+    # Si la tabla reservas ya existía sin datos del titular, agregamos las columnas sin borrar datos
+    columnas_reservas = [
+        fila["name"] for fila in cursor.execute("PRAGMA table_info(reservas)").fetchall()
+    ]
+    if "nombre_reserva" not in columnas_reservas:
+        cursor.execute("ALTER TABLE reservas ADD COLUMN nombre_reserva TEXT NOT NULL DEFAULT ''")
+    if "identificacion" not in columnas_reservas:
+        cursor.execute("ALTER TABLE reservas ADD COLUMN identificacion TEXT NOT NULL DEFAULT ''")
 
     # 5. Tabla de equipos creados por jugadores (capitanes)
     cursor.execute("""
@@ -297,6 +308,50 @@ def obtener_cancha_por_id(cancha_id):
     return cancha
 
 
+def actualizar_cancha(cancha_id, administrador_id, nombre, direccion, precio, tipo_futbol, imagen):
+    """Actualiza los datos de una cancha solo si pertenece al administrador indicado."""
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute(
+        """
+        UPDATE canchas
+        SET nombre = ?, direccion = ?, precio = ?, tipo_futbol = ?, imagen = ?
+        WHERE id = ? AND administrador_id = ?
+        """,
+        (nombre, direccion, precio, tipo_futbol, imagen, cancha_id, administrador_id)
+    )
+    actualizadas = cursor.rowcount
+    conexion.commit()
+    conexion.close()
+    return actualizadas > 0
+
+
+def eliminar_cancha(cancha_id, administrador_id):
+    """Elimina una cancha junto con sus horarios y reservas si pertenece al administrador."""
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    # Verificamos primero que la cancha exista y pertenezca a este administrador
+    cursor.execute(
+        "SELECT id FROM canchas WHERE id = ? AND administrador_id = ?",
+        (cancha_id, administrador_id)
+    )
+    if not cursor.fetchone():
+        conexion.close()
+        return False
+
+    # Eliminamos primero los registros dependientes por las llaves foráneas
+    cursor.execute("DELETE FROM reservas WHERE cancha_id = ?", (cancha_id,))
+    cursor.execute("DELETE FROM horarios WHERE cancha_id = ?", (cancha_id,))
+    cursor.execute(
+        "DELETE FROM canchas WHERE id = ? AND administrador_id = ?",
+        (cancha_id, administrador_id)
+    )
+    conexion.commit()
+    conexion.close()
+    return True
+
+
 def agregar_horario(cancha_id, fecha, hora):
     """Agrega un horario disponible a una cancha si no está repetido."""
     conexion = obtener_conexion()
@@ -470,16 +525,16 @@ def usuario_tiene_reserva_activa(usuario_id, cancha_id, fecha, hora):
     return resultado is not None
 
 
-def crear_reserva(usuario_id, cancha_id, fecha, hora):
-    """Guarda una nueva solicitud de reserva con estado inicial 'pendiente'."""
+def crear_reserva(usuario_id, cancha_id, fecha, hora, nombre_reserva, identificacion):
+    """Guarda una nueva solicitud de reserva con los datos del titular y estado 'pendiente'."""
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute(
         """
-        INSERT INTO reservas (usuario_id, cancha_id, fecha, hora, estado)
-        VALUES (?, ?, ?, ?, 'pendiente')
+        INSERT INTO reservas (usuario_id, cancha_id, fecha, hora, estado, nombre_reserva, identificacion)
+        VALUES (?, ?, ?, ?, 'pendiente', ?, ?)
         """,
-        (usuario_id, cancha_id, fecha, hora)
+        (usuario_id, cancha_id, fecha, hora, nombre_reserva, identificacion)
     )
     conexion.commit()
     conexion.close()
