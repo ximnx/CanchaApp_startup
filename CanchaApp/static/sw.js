@@ -1,6 +1,6 @@
 /* Service Worker de Ready Match (PWA instalable y notificaciones) */
 
-const CACHE_NOMBRE = "ready-match-v4";
+const CACHE_NOMBRE = "ready-match-v5";
 const ARCHIVOS_BASE = [
     "/static/style.css",
     "/static/pwa.js",

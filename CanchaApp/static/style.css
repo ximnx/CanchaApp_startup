@@ -18,9 +18,13 @@
     --orange-soft: #FFF1E6;
 
     /* Superficies y texto (contraste AA) */
+    --white: #FFFFFF;
     --canvas-desktop: #E4EBF4;
     --bg: #F3F6FB;
     --surface: #FFFFFF;
+    --blue-tint: #DCE9FF;
+    --skeleton-base: #EBF0F7;
+    --skeleton-shine: #F6F9FD;
     --border: #E2E8F2;
     --border-strong: #CBD5E4;
     --text: #0F172A;
@@ -145,7 +149,6 @@ textarea {
 .ajuste-item,
 .btn-filtro-sheet,
 .btn-hora,
-.chip-fecha,
 .acceso-todas,
 .nav-item {
     transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -161,7 +164,6 @@ textarea {
 .ajuste-item:active,
 .btn-filtro-sheet:active,
 .btn-hora:not(:disabled):active,
-.chip-fecha:active,
 .acceso-todas:active,
 .nav-item:active {
     transform: scale(0.97);
@@ -246,7 +248,7 @@ textarea {
     height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
     padding-top: env(safe-area-inset-top, 0px);
     background-color: var(--navy);
-    color: #FFFFFF;
+    color: var(--white);
     z-index: 900;
     display: flex;
     align-items: center;
@@ -325,7 +327,7 @@ textarea {
     padding: 0 12px;
     border: none;
     background: rgba(255, 255, 255, 0.12);
-    color: #FFFFFF;
+    color: var(--white);
     font-size: 13px;
     font-weight: 700;
     border-radius: 999px;
@@ -338,7 +340,7 @@ textarea {
 
 .btn-texto-barra.naranja {
     background-color: var(--orange);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .topbar-clara .btn-texto-barra {
@@ -503,7 +505,7 @@ textarea {
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
-    color: #FFFFFF;
+    color: var(--white);
     padding: 18px var(--pad-x) 22px;
     border-radius: 0 0 22px 22px;
     box-shadow: var(--shadow-card);
@@ -546,13 +548,13 @@ textarea {
 .hero-inicio h1 {
     font-size: 20px;
     font-weight: 800;
-    color: #FFFFFF;
+    color: var(--white);
     line-height: 1.2;
 }
 
 .hero-inicio p {
     font-size: 13px;
-    color: #DCE9FF;
+    color: var(--blue-tint);
     margin-top: 4px;
 }
 
@@ -681,7 +683,7 @@ textarea {
     display: block;
     font-size: 16px;
     font-weight: 800;
-    color: #FFFFFF;
+    color: var(--white);
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -706,7 +708,7 @@ textarea {
 
 .chip-precio-naranja {
     background-color: var(--orange);
-    color: #FFFFFF;
+    color: var(--white);
     font-size: 12px;
     font-weight: 800;
     padding: 4px 10px;
@@ -782,7 +784,7 @@ textarea {
 
 .btn-primario {
     background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
-    color: #FFFFFF;
+    color: var(--white);
     box-shadow: 0 4px 12px rgba(242, 92, 5, 0.24);
 }
 
@@ -792,7 +794,7 @@ textarea {
 
 .btn-azul {
     background-color: var(--blue);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .btn-borde {
@@ -878,7 +880,7 @@ textarea {
 
 .badge-contador {
     background-color: var(--orange);
-    color: #FFFFFF;
+    color: var(--white);
     font-size: 10.5px;
     font-weight: 800;
     min-width: 17px;
@@ -1272,31 +1274,31 @@ textarea {
 .chip.activo {
     background-color: var(--navy);
     border-color: var(--navy);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .chip.activo-futbol {
     background-color: var(--sport-futbol);
     border-color: var(--sport-futbol);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .chip.activo-baloncesto {
     background-color: var(--sport-baloncesto);
     border-color: var(--sport-baloncesto);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .chip.activo-voleibol {
     background-color: var(--sport-voleibol);
     border-color: var(--sport-voleibol);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .chip.activo-favoritas {
     background-color: var(--orange);
     border-color: var(--orange);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .barra-subresultados {
@@ -1329,38 +1331,6 @@ textarea {
     margin-top: 10px;
 }
 
-.selector-fechas {
-    display: flex;
-    gap: 7px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    margin: 10px 0 12px;
-    scrollbar-width: none;
-}
-
-.selector-fechas::-webkit-scrollbar {
-    display: none;
-}
-
-.chip-fecha {
-    flex-shrink: 0;
-    min-height: 40px;
-    padding: 0 13px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-strong);
-    background-color: var(--surface);
-    color: var(--navy);
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.chip-fecha.activo {
-    background-color: var(--navy);
-    border-color: var(--navy);
-    color: #FFFFFF;
-}
-
 .grid-horas {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1383,7 +1353,7 @@ textarea {
 .btn-hora.seleccionado {
     background-color: var(--blue);
     border-color: var(--blue);
-    color: #FFFFFF;
+    color: var(--white);
     box-shadow: 0 3px 10px rgba(0, 102, 238, 0.25);
 }
 
@@ -1418,7 +1388,7 @@ textarea {
 /* ---------------- 12. PERFIL CON BANNER AZUL Y ANILLO NARANJA ---------------- */
 .perfil-banner {
     background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
-    color: #FFFFFF;
+    color: var(--white);
     padding: 20px var(--pad-x) 24px;
     display: flex;
     align-items: center;
@@ -1442,7 +1412,7 @@ textarea {
 
 .avatar-inicial {
     background-color: var(--navy-deep);
-    color: #FFFFFF;
+    color: var(--white);
     font-size: 24px;
     font-weight: 800;
     display: grid;
@@ -1452,12 +1422,12 @@ textarea {
 .perfil-banner h1 {
     font-size: 18.5px;
     font-weight: 800;
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .perfil-banner p {
     font-size: 12.5px;
-    color: #DCE9FF;
+    color: var(--blue-tint);
 }
 
 .lista-ajustes {
@@ -1641,7 +1611,7 @@ textarea {
 .skeleton-linea {
     height: 52px;
     border-radius: var(--radius-sm);
-    background: linear-gradient(90deg, #EBF0F7 25%, #F6F9FD 50%, #EBF0F7 75%);
+    background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
     background-size: 200% 100%;
     animation: shimmerCarga 1.3s linear infinite;
 }
@@ -1862,11 +1832,11 @@ textarea {
 .dia-pill.activo {
     background-color: var(--blue);
     border-color: var(--blue);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 .dia-pill.activo .d-abrev {
-    color: #DCE9FF;
+    color: var(--blue-tint);
 }
 
 .btn-nav-dia {
@@ -2041,8 +2011,8 @@ textarea {
 
 .calor-0 { background-color: #EDF2F8; color: #7E8CA0; }
 .calor-1 { background-color: #CFE3FF; color: #0B3B8C; }
-.calor-2 { background-color: #4A95FF; color: #FFFFFF; }
-.calor-3 { background-color: var(--orange); color: #FFFFFF; }
+.calor-2 { background-color: #4A95FF; color: var(--white); }
+.calor-3 { background-color: var(--orange); color: var(--white); }
 
 .aviso-beta {
     margin: 12px var(--pad-x) 0;
@@ -2071,7 +2041,7 @@ textarea {
 
 .btn-whatsapp {
     background-color: var(--ok-text);
-    color: #FFFFFF;
+    color: var(--white);
 }
 
 /* ---------------- 16. PREFERS-REDUCED-MOTION ---------------- */
