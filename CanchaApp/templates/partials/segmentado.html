@@ -1,0 +1,14 @@
+{# Parcial reutilizable: control segmentado con píldora deslizante #}
+<div class="seccion-compacta" style="padding-bottom: 8px;">
+    <div class="segmentado" role="tablist">
+        <div class="segmentado-pill" aria-hidden="true"></div>
+        {% for op in segmentado_opciones %}
+        <a href="{{ op.url }}" class="{% if op.activo %}activo{% endif %}" role="tab" aria-selected="{{ 'true' if op.activo else 'false' }}">
+            <span>{{ op.etiqueta }}</span>
+            {% if op.contador %}
+                <span class="badge-contador">{{ op.contador }}</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</div>

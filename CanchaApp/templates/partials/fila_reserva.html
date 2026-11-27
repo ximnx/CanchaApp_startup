@@ -1,0 +1,57 @@
+{# Parcial reutilizable: fila de reserva con calendario, estado de pago y regla de cancelación 3h #}
+{% set cal = reserva.fecha | fecha_cal %}
+<article class="fila-registro">
+    <div class="fila-reserva-layout">
+        <div class="bloque-calendario" aria-label="Fecha {{ reserva.fecha }}">
+            <span class="cal-mes">{{ cal[0] }}</span>
+            <span class="cal-dia">{{ cal[1] }}</span>
+        </div>
+
+        <div style="flex: 1; min-width: 0;">
+            <div class="fila-registro-top">
+                <a href="/cancha/{{ reserva.cancha_id }}" class="fila-registro-titulo" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ reserva.nombre_cancha }}
+                </a>
+                <span class="etiqueta estado-{{ reserva.estado }}">{{ reserva.estado | capitalize }}</span>
+            </div>
+            <p class="texto-apoyo" style="margin-top: 2px;">
+                {{ reserva.hora }} · {{ reserva.deporte_reserva }} ({{ reserva.modalidad_reserva }})
+            </p>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                <span class="precio-destacado" style="font-size: 13px;">{{ reserva.precio_cancha | precio_cop }}</span>
+                <span class="etiqueta estado-{{ 'confirmada' if reserva.estado_pago == 'pagado' else ('pendiente' if reserva.estado_pago == 'pendiente' else 'azul') }}">
+                    Pago: {{ reserva.estado_pago | capitalize }}
+                </span>
+                {% if reserva.es_fija %}
+                    <span class="etiqueta etiqueta-azul">Fija</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if mostrar_cancelar and reserva.estado == "confirmada" %}
+        {% if reserva.puede_cancelar %}
+        <form
+            method="POST"
+            action="/mis_reservas/cancelar/{{ reserva.id }}"
+            onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva? El turno quedará libre para otros jugadores.');"
+            style="margin-top: 10px;"
+        >
+            {{ csrf_input() }}
+            <button type="submit" class="btn btn-peligro btn-sm">Cancelar reserva</button>
+        </form>
+        {% else %}
+        <div style="margin-top: 10px;">
+            <button type="button" class="btn btn-borde btn-sm" disabled style="opacity: 0.55; cursor: not-allowed;">
+                Cancelar reserva
+            </button>
+            <p class="texto-apoyo" style="margin-top: 5px; color: var(--warn-text);">
+                {{ reserva.motivo_no_cancelar or 'Ya no puedes cancelar. Comunícate con la cancha.' }}
+                {% if reserva.telefono_cancha %} Tel: {{ reserva.telefono_cancha }}.{% elif reserva.direccion_cancha %} Dirección: {{ reserva.direccion_cancha }}.{% endif %}
+            </p>
+        </div>
+        {% endif %}
+    {% elif reserva.motivo_cancelacion %}
+        <p class="texto-apoyo" style="margin-top: 6px;">Motivo: {{ reserva.motivo_cancelacion }}</p>
+    {% endif %}
+</article>

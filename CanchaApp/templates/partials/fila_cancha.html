@@ -1,0 +1,49 @@
+{# Parcial reutilizable: fila de cancha con color por deporte, precio en naranja y favorita #}
+<article class="fila-cancha">
+    <a href="/cancha/{{ cancha.id }}" aria-label="{{ cancha.nombre }}">
+        <img
+            src="{{ url_for('static', filename=cancha.imagen) }}"
+            alt="{{ cancha.nombre }}"
+            class="fila-cancha-foto"
+            width="76"
+            height="76"
+            loading="lazy"
+        >
+    </a>
+
+    <div class="fila-cancha-info">
+        <a href="/cancha/{{ cancha.id }}">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                <span class="etiqueta etiqueta-{{ cancha.deporte | clase_deporte }}">{{ cancha.deporte }}</span>
+                <span class="texto-apoyo" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ cancha.tipo_futbol }}</span>
+            </div>
+            <h3 class="fila-cancha-titulo">{{ cancha.nombre }}</h3>
+            <p class="fila-cancha-meta">{{ cancha.direccion }}</p>
+        </a>
+        <div class="fila-cancha-pie">
+            <span class="precio-destacado">
+                {% if cancha.tiene_tarifas %}<span>Desde </span>{% endif %}{{ cancha.precio_desde | precio_cop }} <span>/ h</span>
+            </span>
+            {% if cancha.disponibles > 0 %}
+                <span class="etiqueta estado-disponible">{{ cancha.etiqueta_disponibles }}</span>
+            {% else %}
+                <span class="etiqueta estado-bloqueado">Sin turnos</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if session.get("usuario_id") %}
+    <form method="POST" action="/favoritos/{{ cancha.id }}">
+        {{ csrf_input() }}
+        <button
+            type="submit"
+            class="btn-fav-mini {% if cancha.es_favorita %}activo{% endif %}"
+            aria-label="{% if cancha.es_favorita %}Quitar favorita{% else %}Guardar favorita{% endif %}"
+        >
+            <svg viewBox="0 0 24 24" fill="{% if cancha.es_favorita %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M12 21s-7-4.5-9.2-8.4C1.2 9.7 2.8 6 6.4 6c2 0 3.5 1.1 4.6 2.5C12.1 7.1 13.6 6 15.6 6c3.6 0 5.2 3.7 3.6 6.6C19 16.5 12 21 12 21z"/>
+            </svg>
+        </button>
+    </form>
+    {% endif %}
+</article>

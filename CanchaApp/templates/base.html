@@ -2,143 +2,189 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0D182C">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ready Match">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block titulo %}Ready Match{% endblock %}</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}">
-    <!-- Fuentes deportivas modernas -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='imagenes/icon-192.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body data-usuario-logueado="{{ '1' if session.get('usuario_id') else '0' }}">
 
-    <!-- Menú de navegación principal -->
-    <header class="encabezado">
-        <div class="contenedor barra-navegacion">
-            <a href="/" class="logo" aria-label="Ready Match - Inicio">
-                <img
-                    src="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}"
-                    alt="Ready Match"
-                    class="logo-img"
-                >
-            </a>
+    <div class="app-shell">
+        <!-- Encabezado compacto de app móvil: título, volver opcional y máximo una acción -->
+        <header class="app-topbar {% block topbar_clase %}{% endblock %}">
+            <div class="topbar-izq">
+                {% block header_izq %}
+                    {% block volver %}{% endblock %}
+                    <span class="topbar-titulo">{% block encabezado_titulo %}Ready Match{% endblock %}</span>
+                {% endblock %}
+            </div>
 
-            <nav class="menu">
-                <a href="/" class="{% if request.path == '/' %}activo{% endif %}">Inicio</a>
-                <a href="/canchas" class="{% if request.path.startswith('/cancha') %}activo{% endif %}">Canchas</a>
-                <a href="/equipos" class="{% if request.path.startswith('/equipos') %}activo{% endif %}">Equipos</a>
-                <a href="/rivales" class="{% if request.path.startswith('/rivales') %}activo{% endif %}">Buscar rival</a>
-
+            {% block header_accion %}
                 {% if session.get("usuario_id") %}
-                    {% if session.get("tipo_usuario") == "administrador" %}
-                        <a href="/administrador" class="{% if request.path.startswith('/administrador') %}activo{% endif %}">Panel Admin</a>
-                    {% else %}
-                        <a href="/mis_reservas" class="{% if request.path == '/mis_reservas' %}activo{% endif %}">Mis reservas</a>
-                    {% endif %}
-
-                    <a href="/perfil" class="enlace-perfil {% if request.path == '/perfil' %}activo{% endif %}">
-                        {% if session.get("usuario_foto") %}
-                            <img
-                                src="{{ url_for('static', filename=session.get('usuario_foto')) }}"
-                                alt="Foto de perfil"
-                                class="avatar-menu"
-                            >
-                        {% else %}
-                            <span class="avatar-menu-inicial">
-                                {{ session.get("usuario_nombre", "U")[0] | upper }}
-                            </span>
-                        {% endif %}
-                        <span>{{ session.get("usuario_nombre") }}</span>
-                    </a>
-                    <a href="/cerrar_sesion" class="boton-salir">Cerrar sesión</a>
-                {% else %}
-                    <a href="/login" class="{% if request.path == '/login' %}activo{% endif %}">Iniciar sesión</a>
-                    <a href="/registro" class="boton-menu">Registrarse</a>
-                {% endif %}
-            </nav>
-        </div>
-    </header>
-
-    <!-- Mensajes de confirmación o error -->
-    {% with mensajes = get_flashed_messages(with_categories=true) %}
-        {% if mensajes %}
-            <div class="contenedor zona-mensajes">
-                {% for categoria, mensaje in mensajes %}
-                    <div class="alerta alerta-{{ categoria }}">
-                        {{ mensaje }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
-    <!-- Contenido principal -->
-    <main>
-        {% block contenido %}{% endblock %}
-    </main>
-
-    <!-- Pie de página profesional -->
-    <footer class="pie-pagina">
-        <div class="contenedor">
-            <div class="pie-cuadricula">
-                <div>
-                    <img
-                        src="{{ url_for('static', filename='imagenes/logo_ready_match.png') }}"
-                        alt="Ready Match"
-                        class="logo-pie"
+                    <button
+                        type="button"
+                        class="btn-icono-barra"
+                        onclick="abrirNotificaciones()"
+                        aria-label="Notificaciones"
                     >
-                    <p class="pie-descripcion">
-                        La plataforma deportiva para reservar canchas sintéticas, crear equipos y organizar partidos en toda Colombia.
-                    </p>
-                </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span id="puntoNotif" class="punto-notif" style="display: none;"></span>
+                    </button>
+                {% else %}
+                    <a href="/login" class="btn-texto-barra">Entrar</a>
+                {% endif %}
+            {% endblock %}
+        </header>
 
-                <div class="pie-columna">
-                    <h4>Explorar</h4>
-                    <ul class="pie-lista">
-                        <li><a href="/">Inicio</a></li>
-                        <li><a href="/canchas">Canchas sintéticas</a></li>
-                        <li><a href="/equipos">Equipos</a></li>
-                        <li><a href="/rivales">Buscar rival</a></li>
-                    </ul>
+        <!-- Avisos flash discretos tipo toast -->
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <div class="toast-zona" role="status" aria-live="polite">
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="toast toast-{{ categoria }}">
+                            <span>{{ mensaje }}</span>
+                            <button type="button" class="toast-cerrar" onclick="this.parentElement.style.display='none'" aria-label="Cerrar">&times;</button>
+                        </div>
+                    {% endfor %}
                 </div>
+            {% endif %}
+        {% endwith %}
 
-                <div class="pie-columna">
-                    <h4>Tu cuenta</h4>
-                    <ul class="pie-lista">
-                        {% if session.get("usuario_id") %}
-                            <li><a href="/perfil">Mi perfil</a></li>
-                            {% if session.get("tipo_usuario") == "administrador" %}
-                                <li><a href="/administrador">Panel de administración</a></li>
-                            {% else %}
-                                <li><a href="/mis_reservas">Mis reservas</a></li>
-                            {% endif %}
-                            <li><a href="/cerrar_sesion">Cerrar sesión</a></li>
-                        {% else %}
-                            <li><a href="/login">Iniciar sesión</a></li>
-                            <li><a href="/registro">Crear cuenta</a></li>
-                            <li><a href="/olvide_contrasena">Recuperar contraseña</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
+        <!-- Pantalla activa -->
+        <main class="app-screen">
+            {% block contenido %}{% endblock %}
+        </main>
 
-                <div class="pie-columna">
-                    <h4>Información</h4>
-                    <ul class="pie-lista">
-                        <li>Cobertura nacional en Colombia</li>
-                        <li>Fútbol 5, Fútbol 7 y Fútbol 11</li>
-                        <li>Categorías masculino, femenino y mixto</li>
-                        <li>soporte@readymatch.co</li>
-                    </ul>
-                </div>
+        <!-- Navegación inferior fija (5 destinos, diferenciada por rol) -->
+        <nav class="app-bottom-nav" aria-label="Navegación principal">
+            <div class="app-bottom-inner">
+                <div id="navIndicador" class="nav-indicador" aria-hidden="true"></div>
+                {% if session.get("tipo_usuario") == "administrador" %}
+                    {% set admin_tab = request.args.get('tab', 'agenda') %}
+                    <a href="/administrador" class="nav-item {% if request.path == '/administrador' and admin_tab == 'agenda' %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                        </svg>
+                        <span>Agenda</span>
+                    </a>
+                    <a href="/administrador/clientes" class="nav-item {% if request.path.startswith('/administrador/clientes') %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <circle cx="9" cy="8" r="3"/>
+                            <path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/>
+                            <circle cx="17" cy="9" r="2.3"/>
+                            <path d="M15.5 19c.2-2.2 1.7-3.8 3.8-4.2 1.4.3 2.7 1.7 2.7 4.2"/>
+                        </svg>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="/administrador/reportes" class="nav-item {% if request.path.startswith('/administrador/reportes') %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <line x1="4" y1="20" x2="20" y2="20"/>
+                            <rect x="6" y="12" width="3" height="8" rx="1"/>
+                            <rect x="11" y="7" width="3" height="13" rx="1"/>
+                            <rect x="16" y="4" width="3" height="16" rx="1"/>
+                        </svg>
+                        <span>Reportes</span>
+                    </a>
+                    <a href="/administrador?tab=canchas" class="nav-item {% if request.path == '/administrador' and admin_tab == 'canchas' %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Canchas</span>
+                    </a>
+                    <a href="/perfil" class="nav-item {% if request.path == '/perfil' %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.5"/>
+                            <path d="M5 20c0-3.8 3.1-6.5 7-6.5s7 2.7 7 6.5"/>
+                        </svg>
+                        <span>Perfil</span>
+                    </a>
+                {% else %}
+                    <a href="/" class="nav-item {% if request.path == '/' %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>
+                        </svg>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="/canchas" class="nav-item {% if request.path.startswith('/cancha') %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Canchas</span>
+                    </a>
+                    <a href="/rivales" class="nav-item {% if request.path.startswith('/rivales') %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <circle cx="9" cy="8" r="3"/>
+                            <path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/>
+                            <circle cx="17" cy="9" r="2.3"/>
+                            <path d="M15.5 19c.2-2.2 1.7-3.8 3.8-4.2 1.4.3 2.7 1.7 2.7 4.2"/>
+                        </svg>
+                        <span>Partidos</span>
+                    </a>
+                    <a href="{{ '/mis_reservas' if session.get('usuario_id') else '/login' }}" class="nav-item {% if request.path == '/mis_reservas' %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                            <polyline points="9 15 11.2 17.2 15.5 13"/>
+                        </svg>
+                        <span>Mis reservas</span>
+                    </a>
+                    <a href="{{ '/perfil' if session.get('usuario_id') else '/login' }}" class="nav-item {% if request.path in ('/perfil', '/equipos', '/login', '/registro') %}activo{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.5"/>
+                            <path d="M5 20c0-3.8 3.1-6.5 7-6.5s7 2.7 7 6.5"/>
+                        </svg>
+                        <span>Perfil</span>
+                    </a>
+                {% endif %}
             </div>
+        </nav>
+    </div>
 
-            <div class="pie-inferior">
-                <span>&copy; 2026 Ready Match. Todos los derechos reservados.</span>
-                <span>Reservas de canchas sintéticas y gestión de partidos</span>
+    {% if session.get("usuario_id") %}
+    <!-- Acceso único a notificaciones (desde icono del encabezado o Configuración) -->
+    <div id="sheetNotificaciones" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Notificaciones">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Notificaciones</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetNotificaciones')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <p id="estadoNotifTexto" class="texto-apoyo" style="margin-bottom: 10px;">Comprobando estado...</p>
+                <div class="fila-botones" style="margin-top: 0; margin-bottom: 14px;">
+                    <button type="button" id="btnActivarNotif" class="btn btn-primario btn-sm" onclick="activarNotificacionesReadyMatch()" style="display: none;">
+                        Activar avisos
+                    </button>
+                    <button type="button" id="btnProbarNotif" class="btn btn-borde btn-sm" onclick="probarNotificacionReadyMatch()" style="display: none;">
+                        Probar aviso
+                    </button>
+                </div>
+                <div id="listaNotificaciones"></div>
             </div>
         </div>
-    </footer>
+    </div>
+    {% endif %}
 
+    <script src="{{ url_for('static', filename='pwa.js') }}"></script>
 </body>
 </html>

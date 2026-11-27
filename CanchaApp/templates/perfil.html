@@ -1,94 +1,252 @@
 {% extends "base.html" %}
 
-{% block titulo %}Mi perfil - Ready Match{% endblock %}
+{% block titulo %}Perfil - Ready Match{% endblock %}
+{% block encabezado_titulo %}Perfil{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="tarjeta-formulario tarjeta-perfil">
-            <div class="cabecera-perfil">
-                {% if usuario.foto %}
-                    <img
-                        src="{{ url_for('static', filename=usuario.foto) }}"
-                        alt="Foto de {{ usuario.nombre }}"
-                        class="foto-perfil-grande"
-                    >
-                {% else %}
-                    <div class="avatar-grande-inicial">
-                        {{ usuario.nombre[0] | upper }}
-                    </div>
-                {% endif %}
-
-                <h1>{{ usuario.nombre }}</h1>
-                <p class="correo-perfil">{{ usuario.correo }}</p>
-                <span class="etiqueta-rol">
-                    {% if usuario.tipo_usuario == "administrador" %}
-                        Administrador de canchas
-                    {% else %}
-                        Jugador
-                    {% endif %}
-                </span>
-            </div>
-
-            <form method="POST" action="/perfil" enctype="multipart/form-data">
-                <div class="campo-formulario">
-                    <label for="nombre">Nombre completo</label>
-                    <input
-                        type="text"
-                        id="nombre"
-                        name="nombre"
-                        value="{{ usuario.nombre }}"
-                        minlength="2"
-                        required
-                    >
-                </div>
-
-                <div class="campo-formulario">
-                    <label>Cambiar foto de perfil (JPG, PNG o WEBP)</label>
-                    <div class="subir-archivo">
-                        <label for="foto" class="boton-subir-foto">Seleccionar imagen</label>
-                        <input
-                            type="file"
-                            id="foto"
-                            name="foto"
-                            accept=".jpg,.jpeg,.png,.webp"
-                            class="input-archivo-oculto"
-                            onchange="mostrarNombreArchivo(this, 'nombre-foto-perfil')"
-                        >
-                        <span id="nombre-foto-perfil" class="texto-archivo">Ninguna imagen seleccionada</span>
-                    </div>
-                    <small class="nota-campo">
-                        Si no seleccionas una foto nueva, se conservará la actual.
-                    </small>
-                </div>
-
-                <button type="submit" class="boton boton-principal boton-ancho">
-                    Guardar cambios
-                </button>
-            </form>
-
-            {% if usuario.foto %}
-            <form method="POST" action="/perfil/quitar_foto" style="margin-top: 12px;">
-                <button type="submit" class="boton boton-secundario boton-ancho">
-                    Quitar foto de perfil
-                </button>
-            </form>
+    <!-- Cabecera con banner azul y avatar con anillo naranja -->
+    <section class="perfil-banner">
+        {% if usuario.foto %}
+            <img src="{{ url_for('static', filename=usuario.foto) }}" alt="{{ usuario.nombre }}" class="avatar-perfil" width="68" height="68">
+        {% else %}
+            <div class="avatar-inicial">{{ usuario.nombre[0] | upper }}</div>
+        {% endif %}
+        <div style="min-width: 0;">
+            <h1>{{ usuario.nombre }}</h1>
+            <p>{{ usuario.correo }}</p>
+            {% if usuario.telefono %}
+                <p style="margin-top: 1px;">Cel: {{ usuario.telefono }}</p>
             {% endif %}
+            <span class="etiqueta" style="background: rgba(255, 255, 255, 0.16); color: #FFFFFF; margin-top: 6px;">
+                {{ 'Administrador' if usuario.tipo_usuario == 'administrador' else 'Jugador' }}
+            </span>
+        </div>
+    </section>
+
+    {% if suscripcion %}
+    <div class="aviso-beta">
+        <span>
+            {% if suscripcion.estado == 'beta' %}
+                Plan Beta, gratis hasta {{ suscripcion.fecha_fin }}
+            {% elif suscripcion.estado == 'activa' %}
+                Plan Activo hasta {{ suscripcion.fecha_fin }}
+            {% else %}
+                Plan vencido ({{ suscripcion.fecha_fin }})
+            {% endif %}
+        </span>
+        <span class="etiqueta etiqueta-azul">{{ suscripcion.estado | capitalize }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Lista de ajustes con iconos en círculos de tonos suaves -->
+    <div class="lista-ajustes">
+        <button type="button" class="ajuste-item" onclick="abrirSheet('sheetDatosPersonales')">
+            <span class="ajuste-izq">
+                <span class="ajuste-icono azul">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                        <circle cx="12" cy="8" r="3.5"/>
+                        <path d="M5 20c0-3.8 3.1-6.5 7-6.5s7 2.7 7 6.5"/>
+                    </svg>
+                </span>
+                <span>
+                    <span class="ajuste-titulo">Datos personales y foto</span>
+                    <span class="ajuste-sub">Edita tu nombre y fotografía</span>
+                </span>
+            </span>
+            <span class="texto-apoyo">&rsaquo;</span>
+        </button>
+
+        {% if usuario.tipo_usuario == "jugador" %}
+        <a href="/equipos" class="ajuste-item">
+            <span class="ajuste-izq">
+                <span class="ajuste-icono naranja">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                        <circle cx="9" cy="8" r="3"/>
+                        <path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/>
+                        <circle cx="17" cy="9" r="2.3"/>
+                        <path d="M15.5 19c.2-2.2 1.7-3.8 3.8-4.2 1.4.3 2.7 1.7 2.7 4.2"/>
+                    </svg>
+                </span>
+                <span>
+                    <span class="ajuste-titulo">Mis equipos</span>
+                    <span class="ajuste-sub">
+                        {% if total_equipos == 1 %}1 equipo registrado{% elif total_equipos > 1 %}{{ total_equipos }} equipos registrados{% else %}Crear y editar equipos e integrantes{% endif %}
+                    </span>
+                </span>
+            </span>
+            <span class="texto-apoyo">&rsaquo;</span>
+        </a>
+        {% endif %}
+
+        <button type="button" class="ajuste-item" onclick="abrirSheet('sheetDeportesFavoritos')">
+            <span class="ajuste-izq">
+                <span class="ajuste-icono celeste">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M3.6 9h16.8M3.6 15h16.8"/>
+                    </svg>
+                </span>
+                <span>
+                    <span class="ajuste-titulo">Deportes favoritos</span>
+                    <span class="ajuste-sub">
+                        {{ deportes_favoritos | join(', ') if deportes_favoritos else 'Selecciona tus disciplinas' }}
+                    </span>
+                </span>
+            </span>
+            <span class="texto-apoyo">&rsaquo;</span>
+        </button>
+
+        <button type="button" class="ajuste-item" onclick="abrirSheet('sheetConfiguracion')">
+            <span class="ajuste-izq">
+                <span class="ajuste-icono gris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+                    </svg>
+                </span>
+                <span>
+                    <span class="ajuste-titulo">Configuración</span>
+                    <span class="ajuste-sub">Notificaciones y contraseña</span>
+                </span>
+            </span>
+            <span class="texto-apoyo">&rsaquo;</span>
+        </button>
+
+        <a
+            href="/cerrar_sesion"
+            class="ajuste-item peligro"
+            onclick="return confirm('¿Deseas cerrar tu sesión?');"
+        >
+            <span class="ajuste-izq">
+                <span class="ajuste-icono rojo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </span>
+                <span class="ajuste-titulo">Cerrar sesión</span>
+            </span>
+            <span class="texto-apoyo">&rsaquo;</span>
+        </a>
+    </div>
+
+    <!-- Bottom sheet: Datos personales y foto -->
+    <div id="sheetDatosPersonales" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Datos personales">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Datos personales</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetDatosPersonales')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <form method="POST" action="/perfil" enctype="multipart/form-data">
+                    {{ csrf_input() }}
+                    <input type="hidden" name="seccion" value="datos">
+                    <div class="campo">
+                        <label for="nombre">Nombre completo</label>
+                        <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" minlength="2" required>
+                    </div>
+                    <div class="campo">
+                        <label for="telefono_perfil">Celular (Colombia, 10 dígitos)</label>
+                        <input type="tel" id="telefono_perfil" name="telefono" value="{{ usuario.telefono or '' }}" placeholder="Ej: 3001234567" maxlength="15">
+                    </div>
+                    <div class="campo">
+                        <label>Foto de perfil (JPG, PNG o WEBP)</label>
+                        <div class="subir-foto-wrap">
+                            <label for="foto" class="btn-subir">Elegir foto</label>
+                            <input
+                                type="file"
+                                id="foto"
+                                name="foto"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                class="input-oculto"
+                                onchange="mostrarNombreArchivo(this, 'nombre-foto-perfil')"
+                            >
+                            <span id="nombre-foto-perfil" class="texto-apoyo">Ninguna imagen</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primario btn-ancho">Guardar datos</button>
+                </form>
+
+                {% if usuario.foto %}
+                <form method="POST" action="/perfil/quitar_foto" onsubmit="return confirm('¿Quitar foto actual?');" style="margin-top: 10px;">
+                    {{ csrf_input() }}
+                    <button type="submit" class="btn btn-borde btn-sm btn-ancho">Quitar foto actual</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
     </div>
-</section>
 
-<script>
-    function mostrarNombreArchivo(input, idEtiqueta) {
-        var etiqueta = document.getElementById(idEtiqueta);
-        if (!etiqueta) return;
-        if (input.files && input.files.length > 0) {
-            etiqueta.textContent = input.files[0].name;
-            etiqueta.classList.add("archivo-cargado");
-        } else {
-            etiqueta.textContent = "Ninguna imagen seleccionada";
-            etiqueta.classList.remove("archivo-cargado");
-        }
-    }
-</script>
+    <!-- Bottom sheet: Deportes favoritos -->
+    <div id="sheetDeportesFavoritos" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Deportes favoritos">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Deportes favoritos</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetDeportesFavoritos')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <form method="POST" action="/perfil">
+                    {{ csrf_input() }}
+                    <input type="hidden" name="seccion" value="deportes">
+                    <div class="casillas-grid" style="margin-bottom: 16px;">
+                        {% for dep in deportes_catalogo %}
+                        <label class="casilla-pill">
+                            <input type="checkbox" name="deportes_favoritos" value="{{ dep.nombre }}" {% if dep.nombre in deportes_favoritos %}checked{% endif %}>
+                            <span>{{ dep.nombre }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primario btn-ancho">Guardar preferencias</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom sheet: Configuración (notificaciones y contraseña) -->
+    <div id="sheetConfiguracion" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Configuración">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Configuración</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetConfiguracion')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <div style="margin-bottom: 16px;">
+                    <h3 class="subtitulo" style="margin-bottom: 6px;">Notificaciones</h3>
+                    <p class="texto-apoyo" style="margin-bottom: 10px;">Gestiona los avisos emergentes de reservas y partidos.</p>
+                    <div class="fila-botones" style="margin-top: 0;">
+                        <button type="button" class="btn btn-borde btn-sm" onclick="cerrarSheet('sheetConfiguracion'); abrirNotificaciones();">
+                            Abrir notificaciones
+                        </button>
+                        <button type="button" id="btnInstalarApp" class="btn btn-borde btn-sm" style="display: none;">
+                            Instalar app
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="divisor" style="margin: 14px 0;">
+
+                <h3 class="subtitulo" style="margin-bottom: 10px;">Cambiar contraseña</h3>
+                <form method="POST" action="/perfil/contrasena">
+                    {{ csrf_input() }}
+                    <div class="campo">
+                        <label for="c_actual">Contraseña actual</label>
+                        <input type="password" id="c_actual" name="contrasena_actual" required>
+                    </div>
+                    <div class="campo">
+                        <label for="c_nueva">Nueva contraseña</label>
+                        <input type="password" id="c_nueva" name="nueva_contrasena" minlength="6" placeholder="Mínimo 6 caracteres" required>
+                    </div>
+                    <div class="campo">
+                        <label for="c_conf">Confirmar nueva contraseña</label>
+                        <input type="password" id="c_conf" name="confirmar_contrasena" minlength="6" required>
+                    </div>
+                    <button type="submit" class="btn btn-primario btn-ancho">Actualizar contraseña</button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

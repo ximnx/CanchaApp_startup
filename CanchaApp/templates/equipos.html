@@ -1,120 +1,220 @@
 {% extends "base.html" %}
 
-{% block titulo %}Equipos - Ready Match{% endblock %}
+{% block titulo %}Mis equipos - Ready Match{% endblock %}
+
+{% block volver %}
+    <a href="/perfil" class="btn-icono-barra" aria-label="Volver a Perfil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}Mis equipos{% endblock %}
+
+{% block header_accion %}
+    <button type="button" class="btn-texto-barra naranja" onclick="abrirSheet('sheetCrearEquipo')">
+        + Nuevo
+    </button>
+{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <h1 class="titulo-seccion">Equipos registrados</h1>
-        <p class="descripcion-seccion">
-            Crea tu equipo en categoría masculina, femenina o mixta y descubre clubes activos en tu ciudad.
-        </p>
+    {% if equipos_vista %}
+        <div class="lista-tarjetas-app lista-stagger">
+            {% for item in equipos_vista %}
+            {% set eq = item.equipo %}
+            {% set dep_eq = eq.deporte or 'Fútbol' %}
+            <article class="fila-registro franja-{{ dep_eq | clase_deporte }}">
+                <div class="fila-registro-top">
+                    <div>
+                        <span class="etiqueta etiqueta-{{ dep_eq | clase_deporte }}" style="margin-bottom: 4px;">{{ dep_eq }}</span>
+                        <span class="fila-registro-titulo" style="display: block;">{{ eq.nombre }}</span>
+                        <p class="texto-apoyo" style="margin-top: 2px;">
+                            {{ eq.tipo_futbol }} · {{ eq.categoria }}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn-mini-inline"
+                        data-id="{{ eq.id }}"
+                        data-nombre="{{ eq.nombre }}"
+                        data-deporte="{{ eq.deporte or 'Fútbol' }}"
+                        data-modalidad="{{ eq.tipo_futbol }}"
+                        data-categoria="{{ eq.categoria }}"
+                        data-desc="{{ eq.descripcion }}"
+                        onclick="abrirEditarEquipo(this)"
+                    >
+                        Editar
+                    </button>
+                </div>
 
-        {% if session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
-        <div class="caja-panel" style="margin-bottom: 30px;">
-            <h2>Crear un nuevo equipo</h2>
-            <p class="texto-izquierda">
-                Capitán del equipo: <strong>{{ session.get("usuario_nombre") }}</strong>
-            </p>
+                <p class="texto-apoyo" style="margin-top: 4px; color: var(--text);">{{ eq.descripcion }}</p>
 
-            <form method="POST" action="/equipos/crear">
-                <div class="cuadricula-dos">
-                    <div class="campo-formulario">
-                        <label for="nombre">Nombre del equipo</label>
-                        <input
-                            type="text"
-                            id="nombre"
-                            name="nombre"
-                            placeholder="Ej: Los Titanes FC"
-                            required
-                        >
+                <!-- Integrantes del equipo -->
+                <div style="margin-top: 10px;">
+                    <span class="texto-apoyo" style="font-weight: 700;">
+                        Integrantes ({{ (item.integrantes | length) + 1 }})
+                    </span>
+                    <div class="chips-lista">
+                        <span class="chip-item">{{ session.get("usuario_nombre") }} (Capitán)</span>
+                        {% for m in item.integrantes %}
+                        <span class="chip-item">
+                            {{ m.nombre_integrante }}{% if m.posicion %} · {{ m.posicion }}{% endif %}
+                            <form method="POST" action="/equipos/integrantes/eliminar/{{ m.id }}" style="display: inline;">
+                                {{ csrf_input() }}
+                                <button type="submit" class="btn-mini-inline" style="border: none; padding: 0 3px;" aria-label="Retirar">&times;</button>
+                            </form>
+                        </span>
+                        {% endfor %}
                     </div>
 
-                    <div class="campo-formulario">
-                        <label for="categoria">Categoría</label>
-                        <select id="categoria" name="categoria" required>
+                    <form method="POST" action="/equipos/{{ eq.id }}/integrantes/agregar" style="display: flex; gap: 6px; margin-top: 10px;">
+                        {{ csrf_input() }}
+                        <input type="text" name="nombre_integrante" placeholder="Agregar integrante" minlength="2" maxlength="60" required style="flex: 1; min-height: 38px; padding: 0 10px; border: 1px solid var(--border-strong); border-radius: 8px;">
+                        <input type="text" name="posicion" placeholder="Posición" maxlength="40" style="width: 96px; min-height: 38px; padding: 0 8px; border: 1px solid var(--border-strong); border-radius: 8px;">
+                        <button type="submit" class="btn btn-borde btn-sm">+</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="estado-vacio">
+            <strong>Todavía no tienes equipos</strong>
+            <p>Crea tu primer equipo para organizar integrantes y buscar rivales.</p>
+            <div style="margin-top: 14px;">
+                <button type="button" class="btn btn-primario btn-sm" onclick="abrirSheet('sheetCrearEquipo')">
+                    Crear equipo
+                </button>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Bottom sheet: Crear equipo -->
+    <div id="sheetCrearEquipo" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Crear equipo">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Nuevo equipo</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetCrearEquipo')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <form method="POST" action="/equipos/crear">
+                    {{ csrf_input() }}
+                    <div class="campo">
+                        <label for="eq_nombre">Nombre del equipo</label>
+                        <input type="text" id="eq_nombre" name="nombre" placeholder="Ej: Halcones Basket" required>
+                    </div>
+                    <div class="fila-dos">
+                        <div class="campo">
+                            <label for="eq_deporte">Deporte</label>
+                            <select id="eq_deporte" name="deporte" onchange="llenarMods('eq_deporte', 'eq_mod')" required>
+                                {% for dep in deportes %}
+                                    <option value="{{ dep.nombre }}">{{ dep.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="eq_mod">Modalidad</label>
+                            <select id="eq_mod" name="tipo_futbol" required></select>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="eq_cat">Categoría</label>
+                        <select id="eq_cat" name="categoria" required>
                             {% for cat in categorias %}
                                 <option value="{{ cat }}">{{ cat }}</option>
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="campo">
+                        <label for="eq_ints">Integrantes iniciales (opcional, separados por coma)</label>
+                        <input type="text" id="eq_ints" name="integrantes_iniciales" placeholder="Ej: Mateo, Camila, Andrés">
+                    </div>
+                    <div class="campo">
+                        <label for="eq_desc">Descripción</label>
+                        <textarea id="eq_desc" name="descripcion" placeholder="Ej: Jugamos fines de semana." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primario btn-ancho">Guardar equipo</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                    <div class="campo-formulario">
-                        <label for="tipo_futbol">Tipo de fútbol</label>
-                        <select id="tipo_futbol" name="tipo_futbol" required>
-                            {% for tipo in tipos_futbol %}
-                                <option value="{{ tipo }}">{{ tipo }}</option>
+    <!-- Bottom sheet: Editar equipo -->
+    <div id="sheetEditarEquipo" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Editar equipo">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Editar equipo</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetEditarEquipo')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <form id="formEditarEquipo" method="POST" action="">
+                    {{ csrf_input() }}
+                    <div class="campo">
+                        <label for="ed_nombre">Nombre del equipo</label>
+                        <input type="text" id="ed_nombre" name="nombre" required>
+                    </div>
+                    <div class="fila-dos">
+                        <div class="campo">
+                            <label for="ed_deporte">Deporte</label>
+                            <select id="ed_deporte" name="deporte" onchange="llenarMods('ed_deporte', 'ed_mod')" required>
+                                {% for dep in deportes %}
+                                    <option value="{{ dep.nombre }}">{{ dep.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="ed_mod">Modalidad</label>
+                            <select id="ed_mod" name="tipo_futbol" required></select>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="ed_cat">Categoría</label>
+                        <select id="ed_cat" name="categoria" required>
+                            {% for cat in categorias %}
+                                <option value="{{ cat }}">{{ cat }}</option>
                             {% endfor %}
                         </select>
                     </div>
-
-                    <div class="campo-formulario">
-                        <label for="descripcion">Descripción del equipo</label>
-                        <textarea
-                            id="descripcion"
-                            name="descripcion"
-                            rows="2"
-                            placeholder="Ej: Jugamos los fines de semana en Bogotá, nivel competitivo."
-                            required
-                        ></textarea>
+                    <div class="campo">
+                        <label for="ed_desc">Descripción</label>
+                        <textarea id="ed_desc" name="descripcion" required></textarea>
                     </div>
-                </div>
-
-                <button type="submit" class="boton boton-principal">
-                    Guardar equipo
-                </button>
-            </form>
-        </div>
-        {% elif not session.get("usuario_id") %}
-        <div class="caja-aviso" style="margin-bottom: 30px;">
-            <h3>¿Quieres crear tu propio equipo?</h3>
-            <p>Inicia sesión con una cuenta de jugador para registrar tu equipo y comenzar a retar rivales.</p>
-            <div style="margin-top: 16px;">
-                <a href="/login" class="boton boton-naranja">Iniciar sesión</a>
+                    <button type="submit" class="btn btn-primario btn-ancho">Guardar cambios</button>
+                </form>
             </div>
         </div>
-        {% endif %}
-
-        <!-- Filtros por categoría -->
-        <div class="barra-filtros">
-            <a href="/equipos" class="filtro {% if not categoria_seleccionada %}filtro-activo{% endif %}">
-                Todas las categorías
-            </a>
-            {% for cat in categorias %}
-                <a href="/equipos?categoria={{ cat }}" class="filtro {% if categoria_seleccionada == cat %}filtro-activo{% endif %}">
-                    {{ cat }}
-                </a>
-            {% endfor %}
-        </div>
-
-        {% if equipos %}
-            <div class="cuadricula">
-                {% for equipo in equipos %}
-                <article class="tarjeta-equipo">
-                    <div class="insignias-equipo">
-                        <span class="insignia-futbol">{{ equipo.tipo_futbol }}</span>
-                        <span class="insignia-categoria">{{ equipo.categoria }}</span>
-                        {% if session.get("usuario_id") == equipo.capitan_id %}
-                            <span class="insignia-propia">Tu equipo</span>
-                        {% endif %}
-                    </div>
-
-                    <h3>{{ equipo.nombre }}</h3>
-                    <p class="dato-extra">
-                        <strong>Capitán:</strong> {{ equipo.nombre_capitan }}
-                    </p>
-                    <p class="descripcion-equipo">{{ equipo.descripcion }}</p>
-                </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="caja-panel centrado">
-                <h3>Aún no hay equipos registrados en esta categoría</h3>
-                <p class="texto-vacio">
-                    Sé el primero en crear un equipo para empezar a organizar partidos.
-                </p>
-            </div>
-        {% endif %}
     </div>
-</section>
+
+    <script>
+        var MODS_EQ = {{ modalidades_por_deporte | tojson }};
+
+        function llenarMods(idDep, idMod, valorInicial) {
+            var dep = document.getElementById(idDep).value;
+            var sel = document.getElementById(idMod);
+            var lista = MODS_EQ[dep] || [];
+            sel.innerHTML = "";
+            for (var i = 0; i < lista.length; i++) {
+                var opt = document.createElement("option");
+                opt.value = lista[i];
+                opt.textContent = lista[i];
+                if (valorInicial && lista[i] === valorInicial) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        }
+
+        function abrirEditarEquipo(btn) {
+            document.getElementById("formEditarEquipo").action = "/equipos/" + btn.getAttribute("data-id") + "/editar";
+            document.getElementById("ed_nombre").value = btn.getAttribute("data-nombre");
+            document.getElementById("ed_deporte").value = btn.getAttribute("data-deporte");
+            llenarMods("ed_deporte", "ed_mod", btn.getAttribute("data-modalidad"));
+            document.getElementById("ed_cat").value = btn.getAttribute("data-categoria");
+            document.getElementById("ed_desc").value = btn.getAttribute("data-desc");
+            abrirSheet("sheetEditarEquipo");
+        }
+
+        llenarMods("eq_deporte", "eq_mod");
+    </script>
 {% endblock %}

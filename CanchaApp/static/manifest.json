@@ -1,0 +1,41 @@
+{
+  "id": "/",
+  "name": "Ready Match — Canchas y Partidos",
+  "short_name": "Ready Match",
+  "description": "Reserva canchas de fútbol, baloncesto y voleibol, organiza tu equipo y encuentra rivales.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070C17",
+  "theme_color": "#0D182C",
+  "lang": "es-CO",
+  "icons": [
+    {
+      "src": "/static/imagenes/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/imagenes/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Canchas",
+      "short_name": "Canchas",
+      "url": "/canchas",
+      "icons": [{ "src": "/static/imagenes/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Partidos",
+      "short_name": "Partidos",
+      "url": "/rivales",
+      "icons": [{ "src": "/static/imagenes/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block titulo %}Recordatorios - Ready Match{% endblock %}
+
+{% block volver %}
+    <a href="/administrador" class="btn-icono-barra" aria-label="Volver a Agenda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}Recordatorios{% endblock %}
+{% block header_accion %}{% endblock %}
+
+{% block contenido %}
+    <div class="seccion-compacta" style="padding-bottom: 4px;">
+        <p class="texto-apoyo">
+            Reservas confirmadas de <strong>hoy y mañana</strong> con celular colombiano registrado.
+        </p>
+    </div>
+
+    {% if recordatorios %}
+        <div class="lista-tarjetas-app lista-stagger">
+            {% for rec in recordatorios %}
+            <article class="fila-registro">
+                <div class="fila-registro-top">
+                    <div>
+                        <span class="fila-registro-titulo">{{ rec.cliente }}</span>
+                        <p class="texto-apoyo" style="margin-top: 2px;">
+                            {{ 'Hoy' if rec.es_hoy else 'Mañana' }} ({{ rec.fecha }}) · {{ rec.hora }} — {{ rec.cancha }}
+                        </p>
+                        <p class="texto-apoyo">Cel: +57 {{ rec.telefono }}</p>
+                    </div>
+                    {% if rec.enviado %}
+                        <span class="etiqueta estado-confirmada">Enviado</span>
+                    {% else %}
+                        <span class="etiqueta estado-pendiente">Pendiente</span>
+                    {% endif %}
+                </div>
+
+                {% if not rec.enviado %}
+                <div class="fila-botones">
+                    <a
+                        href="{{ rec.enlace_wa }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn btn-whatsapp btn-sm"
+                    >
+                        Abrir WhatsApp
+                    </a>
+                    <form method="POST" action="/administrador/recordatorios/{{ rec.id }}/marcar">
+                        {{ csrf_input() }}
+                        <button type="submit" class="btn btn-borde btn-sm btn-ancho">Marcar enviado</button>
+                    </form>
+                </div>
+                {% else %}
+                <p class="texto-apoyo" style="margin-top: 6px; color: var(--ok-text);">
+                    Recordatorio ya registrado.
+                </p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="estado-vacio">
+            <svg class="vacio-ilustracion" viewBox="0 0 64 64" fill="none" stroke="var(--blue)" stroke-width="2" aria-hidden="true">
+                <rect x="10" y="14" width="44" height="36" rx="8" fill="var(--blue-soft)"/>
+                <polyline points="22 33 29 40 43 26" stroke="var(--ok-text)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <strong>Sin recordatorios pendientes</strong>
+            <p>Aquí verás las reservas de hoy y mañana que tengan celular registrado.</p>
+        </div>
+    {% endif %}
+{% endblock %}

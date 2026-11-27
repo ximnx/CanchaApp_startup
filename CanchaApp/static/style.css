@@ -1,1807 +1,2106 @@
-/* ==========================================================
-   READY MATCH — IDENTIDAD VISUAL PROFESIONAL
-   Paleta extraída del logo oficial Ready Match:
-   - Azul noche estadio: #070C17 / #0E192D / #162542
-   - Azul eléctrico:     #0077FF / #00C2FF
-   - Naranja / Dorado:   #FF6B00 / #FFB800
-   - Superficie clara:   #F3F6FA / #FFFFFF
-   ========================================================== */
+/* Ready Match — Sistema visual mobile-first: orden en estructura, vida en superficie */
 
 :root {
-    --oscuro-profundo: #070C17;
-    --oscuro: #0E192D;
-    --oscuro-medio: #162542;
-    --azul: #0077FF;
-    --azul-brillante: #00C2FF;
-    --azul-hover: #005FD1;
-    --azul-claro: #EBF5FF;
-    --naranja: #FF6B00;
-    --dorado: #FFB800;
-    --naranja-claro: #FFF4E8;
-    --fondo: #F3F6FA;
-    --blanco: #FFFFFF;
-    --texto: #132035;
-    --gris: #5A6A82;
-    --borde: #DCE4F0;
-    --verde-estado: #0E7C47;
-    --verde-claro: #E8F8F0;
-    --rojo: #D13438;
-    --radio: 16px;
-    --radio-sm: 10px;
-    --sombra-suave: 0 8px 24px rgba(10, 22, 46, 0.07);
-    --sombra-hover: 0 16px 36px rgba(10, 22, 46, 0.14);
-    --fuente-titulo: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
-    --fuente-texto: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+    /* Azules de marca */
+    --navy-deep: #070D1A;
+    --navy: #0D1B34;
+    --blue: #0066EE;
+    --blue-mid: #1D7BFF;
+    --sky: #0284C7;
+    --sky-soft: #E3F4FF;
+    --blue-soft: #EBF3FF;
+    --blue-line: #C3DAFE;
+
+    /* Naranjas y acentos cálidos */
+    --orange: #F25C05;
+    --orange-hover: #D94E00;
+    --orange-light: #FF8533;
+    --orange-soft: #FFF1E6;
+
+    /* Superficies y texto (contraste AA) */
+    --canvas-desktop: #E4EBF4;
+    --bg: #F3F6FB;
+    --surface: #FFFFFF;
+    --border: #E2E8F2;
+    --border-strong: #CBD5E4;
+    --text: #0F172A;
+    --muted: #536175;
+
+    /* Estados semánticos (solo para estados) */
+    --ok-bg: #E6F7EE;
+    --ok-text: #0E703B;
+    --ok-border: #A8E3C2;
+    --warn-bg: #FFF5DE;
+    --warn-text: #945600;
+    --warn-border: #FAD689;
+    --err-bg: #FDECEC;
+    --err-text: #B92525;
+    --err-border: #F8BABA;
+    --blk-bg: #EDF1F6;
+    --blk-text: #4F5D73;
+    --blk-border: #D4DCE8;
+
+    /* Color por deporte */
+    --sport-futbol: #0066EE;
+    --sport-futbol-bg: #EBF3FF;
+    --sport-baloncesto: #EA580C;
+    --sport-baloncesto-bg: #FFF1E6;
+    --sport-voleibol: #0284C7;
+    --sport-voleibol-bg: #E3F4FF;
+
+    /* Escala, layout y sombras suaves con tinte azul */
+    --app-max-w: 430px;
+    --topbar-h: 54px;
+    --bottomnav-h: 64px;
+    --pad-x: 16px;
+    --radius-sm: 10px;
+    --radius: 14px;
+    --radius-lg: 18px;
+    --shadow-card: 0 4px 14px rgba(13, 27, 52, 0.07), 0 1px 3px rgba(0, 102, 238, 0.05);
+    --shadow-sheet: 0 -8px 28px rgba(7, 13, 26, 0.18);
+    --shadow-nav: 0 -4px 14px rgba(13, 27, 52, 0.07);
 }
 
-* {
+/* ---------------- 1. BASE Y MARCO MÓVIL ---------------- */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
-    scroll-behavior: smooth;
+    background-color: var(--bg);
 }
 
 body {
-    font-family: var(--fuente-texto);
-    font-size: 15.5px;
-    line-height: 1.6;
-    background-color: var(--fondo);
-    color: var(--texto);
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text);
+    background-color: var(--bg);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-main {
-    flex: 1;
-    min-width: 0;
+a {
+    color: inherit;
+    text-decoration: none;
 }
 
 img {
     max-width: 100%;
-}
-
-a {
-    color: var(--azul);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-a:hover {
-    color: var(--azul-hover);
-}
-
-.contenedor {
-    width: 92%;
-    max-width: 1180px;
-    margin: 0 auto;
-}
-
-.centrado {
-    text-align: center;
-}
-
-/* ---------------- 1. BARRA DE NAVEGACIÓN ---------------- */
-.encabezado {
-    background: rgba(7, 12, 23, 0.96);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 194, 255, 0.2);
-    box-shadow: 0 6px 24px rgba(4, 8, 18, 0.35);
-    padding: 12px 0;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
-
-.barra-navegacion {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.logo {
-    display: inline-flex;
-    align-items: center;
-}
-
-.logo-img {
-    height: 44px;
-    width: auto;
     display: block;
-    transition: transform 0.2s ease;
 }
 
-.logo:hover .logo-img {
-    transform: scale(1.03);
-}
-
-.menu {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.menu a {
-    color: #CBD7EA;
-    padding: 8px 13px;
-    border-radius: 10px;
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
     font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.15px;
-    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.menu a:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    color: var(--blanco);
-}
-
-.menu a.activo {
-    background-color: rgba(0, 194, 255, 0.14);
-    color: var(--blanco);
-    box-shadow: inset 0 -2px 0 var(--azul-brillante);
-}
-
-.boton-menu {
-    background: linear-gradient(135deg, var(--naranja), var(--dorado)) !important;
-    color: #0B1220 !important;
-    padding: 9px 18px !important;
-    border-radius: 999px !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
-}
-
-.boton-menu:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.06);
-    color: #0B1220 !important;
-}
-
-.enlace-perfil {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background-color: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 999px !important;
-    padding: 5px 14px 5px 6px !important;
-    color: var(--blanco) !important;
-}
-
-.enlace-perfil:hover {
-    background-color: rgba(0, 194, 255, 0.16) !important;
-    border-color: rgba(0, 194, 255, 0.45);
-}
-
-.avatar-menu,
-.avatar-menu-inicial {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid var(--azul-brillante);
-}
-
-.avatar-menu {
-    object-fit: cover;
-}
-
-.avatar-menu-inicial {
-    display: inline-grid;
-    place-items: center;
-    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
-    color: var(--blanco);
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.boton-salir {
-    background-color: rgba(255, 255, 255, 0.09) !important;
-    color: #DCE6F7 !important;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 999px !important;
-    padding: 8px 14px !important;
-}
-
-.boton-salir:hover {
-    background-color: rgba(209, 52, 56, 0.88) !important;
-    border-color: transparent;
-    color: var(--blanco) !important;
-}
-
-/* ---------------- 2. PORTADA ESTADIO NOCTURNO (CYAN + NARANJA) ---------------- */
-.portada {
+.app-shell {
+    width: 100%;
+    max-width: var(--app-max-w);
+    min-height: 100vh;
+    margin: 0 auto;
+    background-color: var(--bg);
+    padding-top: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(var(--bottomnav-h) + 22px + env(safe-area-inset-bottom, 0px));
     position: relative;
-    overflow: hidden;
-    text-align: center;
-    color: var(--blanco);
-    padding: 76px 0 70px;
-    background-color: var(--oscuro-profundo);
-    background-image:
-        radial-gradient(circle at 20% 25%, rgba(0, 194, 255, 0.22), transparent 44%),
-        radial-gradient(circle at 82% 28%, rgba(255, 107, 0, 0.22), transparent 44%),
-        radial-gradient(circle at 50% 100%, rgba(0, 119, 255, 0.18), transparent 55%),
-        repeating-linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0.018) 0px,
-            rgba(255, 255, 255, 0.018) 72px,
-            transparent 72px,
-            transparent 144px
-        ),
-        linear-gradient(160deg, #060B15 0%, #0D1A33 55%, #122342 100%);
-    border-bottom: 3px solid transparent;
-    border-image: linear-gradient(90deg, var(--azul-brillante), var(--azul), var(--naranja), var(--dorado)) 1;
 }
 
-/* Geometría sutil de cancha de fútbol en el fondo */
-.portada::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 48%;
-    width: 360px;
-    height: 360px;
-    border: 1.5px solid rgba(255, 255, 255, 0.07);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
+@media (min-width: 481px) {
+    html,
+    body {
+        background-color: var(--canvas-desktop);
+    }
+
+    .app-shell {
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+    }
 }
 
-.portada::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 48%;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-    pointer-events: none;
+/* Entrada de pantalla (220ms fade + ligero desplazamiento sin dejar transform persistente) */
+.app-screen {
+    animation: pantallaEntrada 220ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
-.contenido-portada {
-    position: relative;
-    z-index: 2;
-    max-width: 820px;
+@keyframes pantallaEntrada {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.logo-portada {
-    height: 84px;
-    width: auto;
-    margin: 0 auto 20px;
-    display: block;
-    filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.45));
+/* Respuesta táctil inmediata en elementos interactivos */
+.btn,
+.chip,
+.deporte-tile,
+.fila-cancha,
+.ajuste-item,
+.btn-filtro-sheet,
+.btn-hora,
+.chip-fecha,
+.acceso-todas,
+.nav-item {
+    transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+                background-color 180ms ease,
+                border-color 180ms ease,
+                color 180ms ease,
+                opacity 180ms ease;
 }
 
-.etiqueta {
-    display: inline-block;
-    padding: 6px 16px;
-    border-radius: 999px;
-    background: rgba(0, 194, 255, 0.12);
-    border: 1px solid rgba(0, 194, 255, 0.35);
-    color: #9EE7FF;
-    font-size: 12.5px;
+.btn:active,
+.chip:active,
+.deporte-tile:active,
+.ajuste-item:active,
+.btn-filtro-sheet:active,
+.btn-hora:not(:disabled):active,
+.chip-fecha:active,
+.acceso-todas:active,
+.nav-item:active {
+    transform: scale(0.97);
+}
+
+/* Entrada escalonada (stagger 45ms) en listas */
+.lista-stagger > :not(.sheet-backdrop) {
+    animation: filaEntra 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.lista-stagger > :not(.sheet-backdrop):nth-child(1) { animation-delay: 20ms; }
+.lista-stagger > :not(.sheet-backdrop):nth-child(2) { animation-delay: 65ms; }
+.lista-stagger > :not(.sheet-backdrop):nth-child(3) { animation-delay: 110ms; }
+.lista-stagger > :not(.sheet-backdrop):nth-child(4) { animation-delay: 155ms; }
+.lista-stagger > :not(.sheet-backdrop):nth-child(5) { animation-delay: 200ms; }
+.lista-stagger > :not(.sheet-backdrop):nth-child(6) { animation-delay: 245ms; }
+.lista-stagger > :not(.sheet-backdrop):nth-child(n+7) { animation-delay: 280ms; }
+
+@keyframes filaEntra {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.seccion {
+    padding: 16px var(--pad-x);
+}
+
+.seccion-compacta {
+    padding: 12px var(--pad-x);
+}
+
+.divisor {
+    height: 1px;
+    background-color: var(--border);
+    border: 0;
+}
+
+.titulo-pantalla {
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-.portada h1 {
-    font-family: var(--fuente-titulo);
-    font-size: clamp(40px, 6.2vw, 66px);
-    font-weight: 800;
-    font-style: italic;
-    letter-spacing: 1px;
-    line-height: 1.04;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    text-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
-}
-
-.portada h1 .acento-dorado {
-    background: linear-gradient(90deg, var(--dorado), var(--naranja));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.frase {
-    font-size: 18px;
-    color: #D4E4F7;
-    font-style: italic;
-    margin-bottom: 10px;
+    color: var(--navy);
+    line-height: 1.2;
 }
 
 .subtitulo {
-    max-width: 640px;
-    margin: 0 auto 30px;
-    color: #9FB3CE;
-    font-size: 16px;
-}
-
-.botones-portada {
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    flex-wrap: wrap;
-}
-
-.franja-metricas {
-    margin-top: 42px;
-    padding-top: 26px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
-.metrica strong {
-    display: block;
-    font-family: var(--fuente-titulo);
-    font-size: 24px;
+    font-size: 15.5px;
     font-weight: 800;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    color: var(--blanco);
+    color: var(--navy);
+    line-height: 1.25;
 }
 
-.metrica span {
+.texto-apoyo {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.fila-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.enlace-accion {
     font-size: 13px;
-    color: #96AAC7;
-}
-
-/* ---------------- 3. BOTONES ---------------- */
-.boton {
+    font-weight: 700;
+    color: var(--blue);
+    min-height: 36px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+}
+
+/* ---------------- 2. ENCABEZADO SUPERIOR CON IDENTIDAD ---------------- */
+.app-topbar {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: var(--app-max-w);
+    height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+    background-color: var(--navy);
+    color: #FFFFFF;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
     gap: 8px;
-    padding: 12px 24px;
+}
+
+.app-topbar.topbar-clara {
+    background-color: var(--blue-soft);
+    color: var(--navy);
+    border-bottom: 1px solid var(--blue-line);
+}
+
+.topbar-izq {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.topbar-titulo {
+    font-size: 17.5px;
+    font-weight: 800;
+    color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 6px;
+}
+
+.topbar-marca {
+    display: inline-flex;
+    align-items: center;
     min-height: 44px;
-    border: none;
-    border-radius: 11px;
-    font-family: var(--fuente-texto);
-    font-size: 15px;
-    font-weight: 700;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, filter 0.18s ease;
+    padding-left: 4px;
 }
 
-.boton:hover {
-    transform: translateY(-2px);
+.topbar-logo-img {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
 }
 
-.boton-principal {
-    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-brillante) 100%);
-    color: var(--blanco);
-    box-shadow: 0 6px 20px rgba(0, 119, 255, 0.28);
-}
-
-.boton-principal:hover {
-    color: var(--blanco);
-    box-shadow: 0 10px 26px rgba(0, 119, 255, 0.4);
-    filter: brightness(1.05);
-}
-
-.boton-naranja {
-    background: linear-gradient(135deg, var(--naranja) 0%, var(--dorado) 100%);
-    color: #0B1220;
-    font-weight: 800;
-    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
-}
-
-.boton-naranja:hover {
-    color: #0B1220;
-    box-shadow: 0 10px 26px rgba(255, 107, 0, 0.42);
-    filter: brightness(1.05);
-}
-
-.boton-secundario {
-    background-color: var(--azul-claro);
-    color: var(--oscuro);
-    border: 1px solid #C8DDF6;
-}
-
-.boton-secundario:hover {
-    background-color: var(--blanco);
-    color: var(--azul);
-    box-shadow: 0 6px 16px rgba(10, 22, 46, 0.1);
-}
-
-.boton-peligro {
-    background-color: var(--rojo);
-    color: var(--blanco);
-}
-
-.boton-peligro:hover {
-    background-color: #B0262A;
-    color: var(--blanco);
-}
-
-.boton-ancho {
-    display: flex;
-    width: 100%;
-    margin-top: 12px;
-}
-
-.boton-pequeno {
-    padding: 8px 15px;
-    min-height: 36px;
-    font-size: 13px;
-    border-radius: 9px;
-}
-
-/* ---------------- 4. SECCIONES Y ENCABEZADOS ---------------- */
-.seccion-clara,
-.seccion-gris {
-    padding: 60px 0;
-}
-
-.seccion-clara {
-    background-color: var(--blanco);
-}
-
-.seccion-gris {
-    background-color: var(--fondo);
-}
-
-.titulo-seccion {
-    font-family: var(--fuente-titulo);
-    font-size: clamp(32px, 4vw, 42px);
-    font-weight: 800;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    text-align: center;
-    color: var(--oscuro);
-    margin-bottom: 10px;
-}
-
-.titulo-seccion::after {
-    content: "";
-    display: block;
-    width: 72px;
-    height: 4px;
-    margin: 10px auto 0;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--azul-brillante), var(--azul), var(--naranja));
-}
-
-.titulo-subseccion {
-    font-family: var(--fuente-titulo);
-    font-size: 28px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--oscuro);
-    margin-bottom: 16px;
-}
-
-.descripcion-seccion {
-    text-align: center;
-    color: var(--gris);
-    max-width: 660px;
-    margin: 10px auto 34px;
-}
-
-/* ---------------- 5. CUADRÍCULAS, TARJETAS Y PANELES ---------------- */
-.cuadricula {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-top: 22px;
-}
-
-.cuadricula-dos {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-}
-
-.tarjeta-cancha,
-.tarjeta-equipo,
-.tarjeta-reserva,
-.caja-panel,
-.tarjeta-formulario,
-.panel-encabezado {
-    background-color: var(--blanco);
-    border: 1px solid var(--borde);
-    border-radius: var(--radio);
-    box-shadow: var(--sombra-suave);
-}
-
-/* Pasos de "Cómo funciona" */
-.caja-info {
-    background-color: var(--blanco);
-    border: 1px solid var(--borde);
-    border-top: 4px solid var(--azul);
-    border-radius: var(--radio);
-    padding: 28px 24px;
-    box-shadow: var(--sombra-suave);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.caja-info:nth-child(2) {
-    border-top-color: var(--naranja);
-}
-
-.caja-info:nth-child(3) {
-    border-top-color: var(--azul-brillante);
-}
-
-.caja-info:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--sombra-hover);
-}
-
-.numero-paso {
-    display: inline-block;
-    font-family: var(--fuente-titulo);
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: var(--azul);
-    background-color: var(--azul-claro);
-    padding: 3px 11px;
-    border-radius: 999px;
-    margin-bottom: 12px;
-}
-
-.caja-info:nth-child(2) .numero-paso {
-    color: var(--naranja);
-    background-color: var(--naranja-claro);
-}
-
-.caja-info h3 {
-    font-family: var(--fuente-titulo);
-    font-size: 25px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oscuro);
-    margin-bottom: 8px;
-}
-
-.caja-info p {
-    color: var(--gris);
-}
-
-/* Tarjetas de canchas */
-.tarjeta-cancha {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-}
-
-.tarjeta-cancha:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--sombra-hover);
-    border-color: #B4D3F8;
-}
-
-.marco-imagen-cancha {
-    position: relative;
-    overflow: hidden;
-    height: 215px;
-    background-color: var(--oscuro);
-}
-
-.imagen-cancha {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.35s ease;
-}
-
-.tarjeta-cancha:hover .imagen-cancha {
-    transform: scale(1.05);
-}
-
-.marco-imagen-cancha .insignia-futbol {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    margin-bottom: 0;
-    background: rgba(7, 12, 23, 0.85);
-    color: var(--blanco);
-    border: 1px solid rgba(0, 194, 255, 0.5);
-    backdrop-filter: blur(6px);
-}
-
-/* Carrusel único de canchas destacadas */
-.carrusel-contenedor {
-    position: relative;
-    max-width: 980px;
-    margin: 0 auto;
-}
-
-.carrusel-ventana {
-    overflow: hidden;
-    border-radius: var(--radio);
-    background-color: var(--blanco);
-    border: 1px solid var(--borde);
-    box-shadow: var(--sombra-hover);
-}
-
-.carrusel-pista {
-    display: flex;
-    will-change: transform;
-    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.carrusel-slide {
-    min-width: 100%;
-    display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    align-items: stretch;
-}
-
-.carrusel-imagen-marco {
-    position: relative;
-    min-height: 360px;
-    max-height: 410px;
-    overflow: hidden;
-    background-color: var(--oscuro);
-}
-
-.carrusel-imagen {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.carrusel-imagen-marco .insignia-futbol {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    margin-bottom: 0;
-    background: rgba(7, 12, 23, 0.85);
-    color: var(--blanco);
-    border: 1px solid rgba(0, 194, 255, 0.55);
-    backdrop-filter: blur(6px);
-}
-
-.carrusel-info {
-    padding: 36px 34px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: var(--blanco);
-}
-
-.carrusel-subtitulo {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--naranja);
-    margin-bottom: 8px;
-}
-
-.carrusel-info h3 {
-    font-family: var(--fuente-titulo);
-    font-size: 34px;
-    font-weight: 800;
-    line-height: 1.1;
-    text-transform: uppercase;
-    color: var(--oscuro);
-    margin-bottom: 10px;
-}
-
-.carrusel-info .precio {
-    font-size: 26px;
-    margin-top: 6px;
-    margin-bottom: 18px;
-}
-
-.carrusel-flecha {
-    position: absolute;
-    top: 46%;
-    transform: translateY(-50%);
+.btn-icono-barra {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(7, 12, 23, 0.78);
-    color: var(--blanco);
-    font-size: 26px;
-    line-height: 1;
-    cursor: pointer;
-    display: grid;
+    border: none;
+    background: transparent;
+    color: inherit;
+    border-radius: var(--radius-sm);
+    display: inline-grid;
     place-items: center;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    z-index: 4;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
 }
 
-.carrusel-flecha:hover {
-    background: var(--azul);
-    transform: translateY(-50%) scale(1.06);
+.btn-icono-barra:hover {
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
-.carrusel-anterior {
-    left: -22px;
+.topbar-clara .btn-icono-barra:hover {
+    background-color: rgba(0, 102, 238, 0.08);
 }
 
-.carrusel-siguiente {
-    right: -22px;
+.btn-icono-barra svg {
+    width: 21px;
+    height: 21px;
+}
+
+.btn-texto-barra {
+    min-height: 38px;
+    padding: 0 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.btn-texto-barra.naranja {
+    background-color: var(--orange);
+    color: #FFFFFF;
+}
+
+.topbar-clara .btn-texto-barra {
+    background-color: var(--surface);
+    color: var(--blue);
+}
+
+.punto-notif {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--orange);
+    box-shadow: 0 0 0 2px var(--navy);
+}
+
+/* ---------------- 3. BARRA INFERIOR FIJA CON INDICADOR DESLIZANTE ---------------- */
+.app-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: var(--app-max-w);
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow-nav);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 900;
+}
+
+.app-bottom-inner {
+    height: var(--bottomnav-h);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
+}
+
+.nav-indicador {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20%;
+    height: 3px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-indicador::after {
+    content: "";
+    width: 34px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background-color: var(--orange);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    min-height: 44px;
+}
+
+.nav-item svg {
+    width: 21px;
+    height: 21px;
+}
+
+.nav-item.activo {
+    color: var(--blue);
+    font-weight: 700;
+}
+
+.nav-item.activo svg {
+    animation: iconoRebote 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes iconoRebote {
+    0% { transform: scale(0.85); }
+    60% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+}
+
+/* ---------------- 4. AVISOS FLASH ANIMADOS ---------------- */
+.toast-zona {
+    position: fixed;
+    top: calc(var(--topbar-h) + 10px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: calc(var(--app-max-w) - 24px);
+    z-index: 950;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 13px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--shadow-card);
+    border: 1px solid transparent;
+    animation: toastEntra 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toastEntra {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.toast-exito {
+    background-color: var(--ok-bg);
+    color: var(--ok-text);
+    border-color: var(--ok-border);
+}
+
+.toast-error {
+    background-color: var(--err-bg);
+    color: var(--err-text);
+    border-color: var(--err-border);
+}
+
+.toast-info {
+    background-color: var(--blue-soft);
+    color: var(--blue);
+    border-color: var(--blue-line);
+}
+
+.toast-cerrar {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 18px;
+    line-height: 1;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+/* ---------------- 5. INICIO CON VIDA (4 ELEMENTOS) ---------------- */
+
+/* 5.1 Hero compacto con degradado azul y líneas de cancha SVG animadas */
+.hero-inicio {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: #FFFFFF;
+    padding: 18px var(--pad-x) 22px;
+    border-radius: 0 0 22px 22px;
+    box-shadow: var(--shadow-card);
+}
+
+.hero-patron-svg {
+    position: absolute;
+    inset: -14px;
+    width: calc(100% + 28px);
+    height: calc(100% + 28px);
+    opacity: 0.14;
+    pointer-events: none;
+    animation: heroDeriva 18s ease-in-out infinite alternate;
+}
+
+@keyframes heroDeriva {
+    from { transform: translate3d(-8px, -4px, 0); }
+    to { transform: translate3d(8px, 5px, 0); }
+}
+
+.hero-contenido {
+    position: relative;
+    z-index: 2;
+    animation: heroTextoEntra 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes heroTextoEntra {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-acento-linea {
+    width: 34px;
+    height: 3.5px;
+    border-radius: 999px;
+    background-color: var(--orange);
+    margin-bottom: 10px;
+}
+
+.hero-inicio h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.2;
+}
+
+.hero-inicio p {
+    font-size: 13px;
+    color: #DCE9FF;
+    margin-top: 4px;
+}
+
+/* 5.2 Selector de deportes coloreado por disciplina */
+.grid-deportes-inicio {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.deporte-tile {
+    border-radius: var(--radius);
+    padding: 13px 8px 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1.5px solid transparent;
+    text-align: center;
+    min-height: 86px;
+}
+
+.deporte-tile svg {
+    width: 26px;
+    height: 26px;
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.deporte-tile:hover svg,
+.deporte-tile:active svg {
+    transform: translateY(-2px) scale(1.1);
+}
+
+.deporte-tile span {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.deporte-tile.deporte-futbol {
+    background-color: var(--sport-futbol-bg);
+    color: var(--sport-futbol);
+    border-color: #C5DCFF;
+}
+
+.deporte-tile.deporte-baloncesto {
+    background-color: var(--sport-baloncesto-bg);
+    color: var(--sport-baloncesto);
+    border-color: #FDD4B5;
+}
+
+.deporte-tile.deporte-voleibol {
+    background-color: var(--sport-voleibol-bg);
+    color: var(--sport-voleibol);
+    border-color: #BAE3FA;
+}
+
+/* 5.3 Carrusel de canchas destacadas con scroll-snap, peek, Ken Burns e indicadores */
+.carrusel-destacadas {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    touch-action: pan-x pan-y;
+    padding: 4px var(--pad-x) 8px;
+    margin: 0 calc(var(--pad-x) * -1);
+    scrollbar-width: none;
+}
+
+.carrusel-destacadas::-webkit-scrollbar {
+    display: none;
+}
+
+.destacada-slide {
+    flex: 0 0 82%;
+    height: 196px;
+    scroll-snap-align: start;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    background-color: var(--navy);
+    box-shadow: var(--shadow-card);
+    transform: scale(0.96);
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.destacada-slide.activa {
+    transform: scale(1);
+}
+
+.destacada-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1);
+}
+
+.destacada-slide.activa img {
+    animation: kenBurns 14s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+    from { transform: scale(1); }
+    to { transform: scale(1.07); }
+}
+
+.destacada-capa {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(7, 13, 26, 0.08) 28%, rgba(7, 13, 26, 0.88) 100%);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.destacada-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.destacada-bottom strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.destacada-bottom-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.destacada-dir {
+    font-size: 12px;
+    color: #DCE6F5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chip-precio-naranja {
+    background-color: var(--orange);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
 }
 
 .carrusel-puntos {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.carrusel-punto {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    border: none;
-    background-color: #C3D0E2;
-    cursor: pointer;
-    transition: width 0.3s ease, background-color 0.3s ease;
-}
-
-.carrusel-punto.activo {
-    width: 30px;
-    background: linear-gradient(90deg, var(--azul), var(--azul-brillante));
-}
-
-.contenido-tarjeta {
-    padding: 22px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.contenido-tarjeta h3,
-.tarjeta-equipo h3 {
-    font-family: var(--fuente-titulo);
-    font-size: 26px;
-    font-weight: 800;
-    line-height: 1.15;
-    color: var(--oscuro);
-    margin-bottom: 8px;
-}
-
-.contenido-tarjeta .boton {
-    margin-top: auto;
-}
-
-.direccion,
-.dato-extra,
-.texto-izquierda,
-.descripcion-equipo,
-.correo-perfil {
-    color: var(--gris);
-    font-size: 14.5px;
-}
-
-.direccion {
-    margin-bottom: 12px;
-}
-
-.dato-extra {
-    margin-top: 5px;
-}
-
-.precio {
-    color: var(--oscuro);
-    font-size: 23px;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-    margin-bottom: 14px;
-}
-
-.precio span {
-    font-size: 13.5px;
-    font-weight: 500;
-    color: var(--gris);
-}
-
-/* Insignias deportivas */
-.insignias-equipo {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.insignia-futbol,
-.insignia-categoria,
-.insignia-propia,
-.etiqueta-rol {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-}
-
-.insignia-futbol {
-    background-color: var(--azul-claro);
-    color: var(--azul);
-    border: 1px solid #C2DDFB;
-    margin-bottom: 10px;
-    align-self: flex-start;
-}
-
-.insignias-equipo .insignia-futbol {
-    margin-bottom: 0;
-}
-
-.insignia-categoria,
-.etiqueta-rol {
-    background-color: var(--oscuro);
-    color: var(--blanco);
-}
-
-.etiqueta-rol {
-    margin-bottom: 10px;
-}
-
-.insignia-propia {
-    background: linear-gradient(135deg, var(--naranja), var(--dorado));
-    color: #0B1220;
-}
-
-/* Banner de bienvenida y paneles */
-.banner-usuario {
-    background: linear-gradient(90deg, #EAF3FF 0%, #FFF7EE 100%);
-    border-bottom: 1px solid var(--borde);
-    padding: 24px 0;
-}
-
-.contenido-banner-usuario,
-.acciones-banner,
-.encabezado-admin-cancha {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.banner-usuario h2 {
-    font-family: var(--fuente-titulo);
-    font-size: 30px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oscuro);
-}
-
-.panel-encabezado {
-    padding: 28px;
-    margin-bottom: 24px;
-    border-left: 5px solid var(--azul);
-}
-
-.panel-encabezado h1 {
-    font-family: var(--fuente-titulo);
-    font-size: 36px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oscuro);
-    margin-bottom: 6px;
-}
-
-.caja-panel {
-    padding: 26px;
-    margin-bottom: 22px;
-}
-
-.caja-panel h2 {
-    font-family: var(--fuente-titulo);
-    font-size: 27px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oscuro);
-    margin-bottom: 6px;
-}
-
-.caja-panel h3 {
-    color: var(--oscuro);
-    margin-bottom: 8px;
-}
-
-.texto-izquierda {
-    margin-top: 2px;
-    margin-bottom: 18px;
-}
-
-.caja-aviso {
-    background: linear-gradient(135deg, #091326 0%, #142B52 60%, #102446 100%);
-    color: var(--blanco);
-    border-radius: var(--radio);
-    border: 1px solid rgba(0, 194, 255, 0.25);
-    padding: 40px 28px;
-    text-align: center;
-    box-shadow: var(--sombra-hover);
-}
-
-.caja-aviso h2,
-.caja-aviso h3 {
-    font-family: var(--fuente-titulo);
-    font-size: 32px;
-    font-weight: 800;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    color: var(--blanco);
-}
-
-.caja-aviso p {
-    color: #BDD0EA;
-}
-
-.caja-aviso .boton-secundario {
-    background-color: rgba(255, 255, 255, 0.12);
-    color: var(--blanco);
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.caja-aviso .boton-secundario:hover {
-    background-color: var(--blanco);
-    color: var(--oscuro);
-}
-
-/* ---------------- 6. MENSAJES FLASH (ALERTAS) ---------------- */
-.zona-mensajes {
-    margin-top: 18px;
-}
-
-.alerta {
-    padding: 13px 18px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    font-weight: 700;
-    font-size: 14.5px;
-    box-shadow: 0 4px 12px rgba(10, 22, 46, 0.06);
-}
-
-.alerta-exito {
-    background-color: var(--verde-claro);
-    color: var(--verde-estado);
-    border-left: 5px solid var(--verde-estado);
-}
-
-.alerta-error {
-    background-color: #FDECEC;
-    color: #9A1E22;
-    border-left: 5px solid var(--rojo);
-}
-
-/* ---------------- 7. FORMULARIOS ---------------- */
-.tarjeta-formulario {
-    max-width: 500px;
-    margin: 24px auto;
-    padding: 34px 32px;
-    border-top: 4px solid var(--azul);
-}
-
-.tarjeta-formulario h1 {
-    font-family: var(--fuente-titulo);
-    font-size: 34px;
-    font-weight: 800;
-    text-transform: uppercase;
-    text-align: center;
-    color: var(--oscuro);
-    margin-bottom: 6px;
-}
-
-.texto-ayuda {
-    text-align: center;
-    color: var(--gris);
-    font-size: 14.5px;
-    margin-bottom: 24px;
-}
-
-.campo-formulario {
-    margin-bottom: 16px;
-}
-
-.campo-formulario label {
-    display: block;
-    font-weight: 700;
-    font-size: 13.5px;
-    color: var(--oscuro);
-    margin-bottom: 6px;
-}
-
-.campo-formulario input,
-.campo-formulario select,
-.campo-formulario textarea,
-.form-quiero-jugar select {
-    width: 100%;
-    padding: 11px 13px;
-    border: 1.5px solid #CED9EA;
-    border-radius: var(--radio-sm);
-    background-color: var(--blanco);
-    color: var(--texto);
-    font-family: inherit;
-    font-size: 15px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.campo-formulario input:focus,
-.campo-formulario select:focus,
-.campo-formulario textarea:focus,
-.form-quiero-jugar select:focus {
-    outline: none;
-    border-color: var(--azul);
-    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.16);
-}
-
-.nota-campo {
-    display: block;
-    margin-top: 6px;
-    font-size: 12.5px;
-    color: var(--gris);
-}
-
-/* Botón estético para subir imágenes */
-.subir-archivo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    border: 1.5px dashed #B5CBE8;
-    border-radius: var(--radio-sm);
-    background-color: #F8FBFF;
-    flex-wrap: wrap;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.subir-archivo:hover {
-    border-color: var(--azul);
-    background-color: var(--azul-claro);
-}
-
-.input-archivo-oculto {
-    display: none !important;
-}
-
-.boton-subir-foto {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0 !important;
-    padding: 8px 16px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
-    color: var(--blanco) !important;
-    font-size: 13.5px !important;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 119, 255, 0.22);
-    transition: transform 0.18s ease, filter 0.18s ease;
-}
-
-.boton-subir-foto:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.06);
-}
-
-.texto-archivo {
-    font-size: 13.5px;
-    color: var(--gris);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 240px;
-}
-
-.texto-archivo.archivo-cargado {
-    color: var(--oscuro);
-    font-weight: 700;
-}
-
-/* Selector múltiple de horarios en Panel Admin */
-.panel-horarios-multiples {
-    background-color: #F7FAFF;
-    border: 1px solid #CFDFF4;
-    border-left: 4px solid var(--azul);
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin: 14px 0 16px;
-}
-
-.cabecera-horarios-multi {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-}
-
-.cabecera-horarios-multi h4 {
-    font-family: var(--fuente-titulo);
-    font-size: 21px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oscuro);
-}
-
-.atajos-horarios {
-    display: flex;
     gap: 6px;
-    flex-wrap: wrap;
-}
-
-.boton-atajo {
-    background-color: var(--blanco);
-    color: var(--oscuro);
-    border: 1px solid var(--borde);
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-size: 12.5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.16s ease;
-}
-
-.boton-atajo:hover {
-    background-color: var(--azul);
-    border-color: var(--azul);
-    color: var(--blanco);
-}
-
-.cuadricula-horas {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-    gap: 8px;
-}
-
-.casilla-hora {
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-}
-
-.casilla-hora input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.casilla-hora span {
-    display: block;
-    text-align: center;
-    padding: 8px 6px;
-    border-radius: 9px;
-    border: 1.5px solid var(--borde);
-    background-color: var(--blanco);
-    color: var(--oscuro);
-    font-size: 13.5px;
-    font-weight: 700;
-    transition: all 0.16s ease;
-}
-
-.casilla-hora:hover span {
-    border-color: var(--azul);
-}
-
-.casilla-hora input:checked + span {
-    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
-    border-color: transparent;
-    color: var(--blanco);
-    box-shadow: 0 4px 10px rgba(0, 119, 255, 0.24);
-}
-
-.enlace-inferior {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 14px;
-    color: var(--gris);
-}
-
-.enlace-inferior a {
-    font-weight: 700;
-    color: var(--azul);
-}
-
-.enlace-inferior a:hover {
-    text-decoration: underline;
-}
-
-/* ---------------- 8. FILTROS, DETALLE DE CANCHA, HORARIOS Y RESERVAS ---------------- */
-.barra-filtros {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-}
-
-.filtro {
-    background-color: var(--blanco);
-    color: var(--oscuro);
-    padding: 8px 18px;
-    border-radius: 999px;
-    border: 1.5px solid var(--borde);
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-
-.filtro:hover,
-.filtro-activo {
-    background: linear-gradient(135deg, var(--azul), var(--azul-brillante));
-    color: var(--blanco);
-    border-color: transparent;
-    box-shadow: 0 4px 14px rgba(0, 119, 255, 0.28);
-}
-
-.enlace-volver {
-    display: inline-block;
-    font-weight: 700;
-    color: var(--oscuro);
-    margin-bottom: 18px;
-}
-
-.enlace-volver:hover {
-    color: var(--azul);
-}
-
-.detalle-cancha {
-    display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    background-color: var(--blanco);
-    border: 1px solid var(--borde);
-    border-radius: var(--radio);
-    overflow: hidden;
-    box-shadow: var(--sombra-suave);
-}
-
-.imagen-detalle {
-    width: 100%;
-    height: 100%;
-    min-height: 280px;
-    max-height: 390px;
-    object-fit: cover;
-    display: block;
-}
-
-.info-detalle {
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.info-detalle h1 {
-    font-family: var(--fuente-titulo);
-    font-size: 36px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oscuro);
-    margin-bottom: 10px;
-    line-height: 1.1;
-}
-
-.lista-horarios {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 14px;
-}
-
-.tarjeta-horario {
-    background-color: var(--blanco);
-    border: 1.5px solid var(--borde);
-    border-radius: 12px;
-    padding: 15px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    transition: all 0.18s ease;
-}
-
-.horario-libre {
-    border-left: 5px solid var(--azul);
-    background-color: #F8FBFF;
-    cursor: pointer;
-}
-
-.horario-libre:hover {
-    background-color: var(--azul-claro);
-    border-color: var(--azul);
-    transform: translateY(-2px);
-}
-
-.horario-ocupado {
-    background-color: #F2F4F7;
-    border-left: 5px solid #C2CBD6;
-    opacity: 0.72;
-}
-
-.etiqueta-disponible,
-.etiqueta-ocupado {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.etiqueta-disponible {
-    background-color: var(--verde-claro);
-    color: var(--verde-estado);
-}
-
-.etiqueta-ocupado {
-    background-color: #FDECEC;
-    color: #9A1E22;
-}
-
-.formulario-reserva,
-.formulario-horario {
-    display: flex;
-    align-items: flex-end;
-    gap: 14px;
-    flex-wrap: wrap;
-}
-
-.formulario-horario {
-    background-color: var(--fondo);
-    border: 1px solid var(--borde);
-    padding: 16px;
-    border-radius: 12px;
-    margin: 14px 0 18px;
-}
-
-.formulario-reserva .campo-formulario,
-.formulario-horario .campo-formulario {
-    margin-bottom: 0;
-    flex: 1;
-    min-width: 175px;
-}
-
-.lista-reservas {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.tarjeta-reserva {
-    padding: 20px 22px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    border-left: 5px solid var(--azul);
-}
-
-.tarjeta-reserva-admin {
-    background-color: var(--fondo);
-}
-
-.datos-reserva {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.datos-reserva h3 {
-    font-family: var(--fuente-titulo);
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--oscuro);
-}
-
-.enlace-titulo {
-    color: var(--oscuro);
-}
-
-.enlace-titulo:hover {
-    color: var(--azul);
-}
-
-.acciones-reserva {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-.botones-accion {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.badge-estado {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 12.5px;
-    font-weight: 800;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-}
-
-.estado-pendiente {
-    background-color: #FEF3C7;
-    color: #92400E;
-}
-
-.estado-confirmada,
-.estado-aceptada {
-    background-color: var(--verde-claro);
-    color: var(--verde-estado);
-}
-
-.estado-rechazada {
-    background-color: #FEE2E2;
-    color: #991B1B;
-}
-
-/* ---------------- 9. PANEL ADMIN: CANCHAS Y CHIPS ---------------- */
-.tarjeta-admin-cancha {
-    margin-bottom: 22px;
-}
-
-.info-admin-cancha {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
-}
-
-.panel-edicion-cancha {
-    background-color: var(--fondo);
-    border: 1px solid var(--borde);
-    border-left: 4px solid var(--naranja);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 14px 0 18px;
-}
-
-.panel-edicion-cancha h3 {
-    font-family: var(--fuente-titulo);
-    font-size: 22px;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-}
-
-.miniatura-cancha {
-    width: 160px;
-    height: 108px;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 1px solid var(--borde);
-}
-
-.chips-horarios {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     margin-top: 10px;
 }
 
-.chip-horario {
-    background-color: var(--azul-claro);
-    color: var(--oscuro);
-    border: 1px solid #C2DDFB;
-    padding: 6px 13px;
+.carrusel-punto {
+    width: 7px;
+    height: 7px;
     border-radius: 999px;
-    font-size: 13.5px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.boton-x {
-    background: none;
     border: none;
-    color: var(--rojo);
-    font-weight: 800;
+    background-color: #C7D4E6;
     cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
+    transition: width 240ms cubic-bezier(0.22, 1, 0.36, 1), background-color 200ms ease;
 }
 
-/* ---------------- 10. EQUIPOS Y BUSCAR RIVALES ---------------- */
-.tarjeta-equipo {
-    padding: 22px;
-    border-top: 4px solid var(--azul);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+.carrusel-punto.activo {
+    width: 24px;
+    background-color: var(--orange);
 }
 
-.tarjeta-equipo:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--sombra-hover);
-}
-
-.descripcion-equipo {
-    margin-top: 12px;
-    line-height: 1.55;
-}
-
-.tarjeta-partido {
+/* 5.4 Acceso secundario "Ver todas las canchas" con flecha animada */
+.acceso-todas {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: space-between;
-    border-top-color: var(--naranja);
-}
-
-.zona-accion-partido {
-    margin-top: 18px;
-    padding-top: 14px;
-    border-top: 1px solid #E6ECF5;
-}
-
-.form-quiero-jugar select {
-    margin-bottom: 6px;
-}
-
-.etiqueta-propia-suave,
-.aviso-confirmado {
-    display: block;
-    text-align: center;
-    background-color: var(--azul-claro);
-    color: var(--oscuro);
-    border: 1px solid #C2DDFB;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 13.5px;
+    padding: 13px 16px;
+    min-height: 48px;
+    border-radius: var(--radius);
+    background-color: var(--surface);
+    border: 1.5px solid var(--blue-line);
+    color: var(--navy);
+    font-size: 14px;
     font-weight: 700;
 }
 
-.aviso-confirmado {
-    background-color: var(--verde-claro);
-    color: var(--verde-estado);
-    border-color: #B7E7CE;
+.acceso-todas svg {
+    width: 18px;
+    height: 18px;
+    color: var(--blue);
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.texto-vacio {
-    color: var(--gris);
-    font-size: 15px;
-    padding: 20px;
-    text-align: center;
-    background-color: var(--fondo);
-    border: 1.5px dashed #C7D4E6;
-    border-radius: 12px;
-    margin-top: 8px;
+.acceso-todas:hover svg,
+.acceso-todas:active svg {
+    transform: translateX(4px);
 }
 
-/* ---------------- 11. PERFIL DE USUARIO ---------------- */
-.tarjeta-perfil {
-    max-width: 560px;
+/* ---------------- 6. BOTONES Y CONTROLES ---------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid transparent;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-.cabecera-perfil {
-    text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #E6ECF5;
+.btn-primario {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(242, 92, 5, 0.24);
 }
 
-.foto-perfil-grande,
-.avatar-grande-inicial {
-    width: 124px;
-    height: 124px;
-    border-radius: 50%;
-    border: 4px solid var(--azul-brillante);
-    box-shadow: 0 8px 22px rgba(0, 119, 255, 0.22);
-    margin: 0 auto 14px;
+.btn-primario:hover {
+    background: var(--orange-hover);
 }
 
-.foto-perfil-grande {
+.btn-azul {
+    background-color: var(--blue);
+    color: #FFFFFF;
+}
+
+.btn-borde {
+    background-color: var(--surface);
+    color: var(--navy);
+    border-color: var(--border-strong);
+}
+
+.btn-peligro {
+    background-color: var(--err-bg);
+    color: var(--err-text);
+    border-color: var(--err-border);
+}
+
+.btn-sm {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.btn-ancho {
+    width: 100%;
+}
+
+.btn.cargando {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.fila-botones {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.fila-botones > * {
+    flex: 1;
+}
+
+/* ---------------- 7. CONTROL SEGMENTADO CON PÍLDORA DESLIZANTE ---------------- */
+.segmentado {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    background-color: #E3EAF4;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    position: relative;
+    gap: 0;
+}
+
+.segmentado-pill {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    border-radius: 7px;
+    background-color: var(--surface);
+    box-shadow: 0 2px 6px rgba(13, 27, 52, 0.1);
+    transition: transform 230ms cubic-bezier(0.22, 1, 0.36, 1), width 230ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+.segmentado a {
+    position: relative;
+    z-index: 2;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    border-radius: 7px;
+    padding: 0 6px;
+}
+
+.segmentado a.activo {
+    color: var(--navy);
+    font-weight: 700;
+}
+
+.badge-contador {
+    background-color: var(--orange);
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 800;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 5px;
+    border-radius: 999px;
+    display: inline-grid;
+    place-items: center;
+}
+
+/* ---------------- 8. ETIQUETAS POR DEPORTE, NIVEL Y ESTADO ---------------- */
+.etiqueta {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.etiqueta-futbol {
+    background-color: var(--sport-futbol-bg);
+    color: var(--sport-futbol);
+}
+
+.etiqueta-baloncesto {
+    background-color: var(--sport-baloncesto-bg);
+    color: var(--sport-baloncesto);
+}
+
+.etiqueta-voleibol {
+    background-color: var(--sport-voleibol-bg);
+    color: var(--sport-voleibol);
+}
+
+.etiqueta-nivel-recreativo {
+    background-color: var(--sky-soft);
+    color: #0369A1;
+}
+
+.etiqueta-nivel-intermedio {
+    background-color: var(--blue-soft);
+    color: #0050C2;
+}
+
+.etiqueta-nivel-competitivo {
+    background-color: var(--orange-soft);
+    color: #C2410C;
+}
+
+.etiqueta-azul {
+    background-color: var(--blue-soft);
+    color: var(--blue);
+}
+
+.etiqueta-gris {
+    background-color: var(--blk-bg);
+    color: var(--blk-text);
+}
+
+/* Estados semánticos */
+.estado-disponible,
+.estado-confirmada,
+.estado-aceptada {
+    background-color: var(--ok-bg);
+    color: var(--ok-text);
+}
+
+.estado-pendiente {
+    background-color: var(--warn-bg);
+    color: var(--warn-text);
+}
+
+.estado-cancelada,
+.estado-rechazada,
+.estado-ocupado {
+    background-color: var(--err-bg);
+    color: var(--err-text);
+}
+
+.estado-bloqueado {
+    background-color: var(--blk-bg);
+    color: var(--blk-text);
+}
+
+/* ---------------- 9. LISTAS DE CANCHAS, PARTIDOS Y RESERVAS ---------------- */
+.lista-tarjetas-app {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px var(--pad-x) 14px;
+}
+
+.fila-cancha {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+}
+
+.fila-cancha-foto {
+    width: 76px;
+    height: 76px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
-    display: block;
+    flex-shrink: 0;
+    background-color: var(--blue-soft);
 }
 
-.avatar-grande-inicial {
-    background: linear-gradient(135deg, var(--oscuro), var(--azul));
-    color: var(--blanco);
-    font-family: var(--fuente-titulo);
-    font-size: 52px;
+.fila-cancha-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.fila-cancha-titulo {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fila-cancha-meta {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.fila-cancha-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.precio-destacado {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--orange);
+}
+
+.precio-destacado span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.btn-fav-mini {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg);
+    color: var(--muted);
+    display: inline-grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.btn-fav-mini.activo {
+    background-color: var(--orange-soft);
+    color: var(--orange);
+}
+
+.btn-fav-mini.pop svg {
+    animation: corazonPop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes corazonPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.32); }
+    100% { transform: scale(1); }
+}
+
+.btn-fav-mini svg {
+    width: 19px;
+    height: 19px;
+}
+
+/* Filas de partidos con franja lateral por deporte */
+.fila-registro {
+    padding: 13px 14px;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+}
+
+.fila-registro.franja-futbol { border-left: 4px solid var(--sport-futbol); }
+.fila-registro.franja-baloncesto { border-left: 4px solid var(--sport-baloncesto); }
+.fila-registro.franja-voleibol { border-left: 4px solid var(--sport-voleibol); }
+
+.fila-registro-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.fila-registro-titulo {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+/* Bloque tipo calendario en Mis reservas */
+.fila-reserva-layout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bloque-calendario {
+    width: 50px;
+    height: 54px;
+    border-radius: var(--radius-sm);
+    background-color: var(--blue-soft);
+    border: 1px solid var(--blue-line);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bloque-calendario .cal-mes {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--blue);
+    letter-spacing: 0.04em;
+}
+
+.bloque-calendario .cal-dia {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.05;
+}
+
+/* Confirmación animada de check dibujándose al crear una reserva */
+.banner-check-reserva {
+    margin: 12px var(--pad-x) 4px;
+    padding: 14px;
+    background-color: var(--ok-bg);
+    border: 1px solid var(--ok-border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.check-svg {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.check-circulo {
+    stroke: var(--ok-text);
+    stroke-width: 2.4;
+    fill: none;
+    stroke-dasharray: 126;
+    stroke-dashoffset: 126;
+    animation: dibujarCirculo 420ms ease-out forwards;
+}
+
+.check-marca {
+    stroke: var(--ok-text);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+    animation: dibujarCheck 280ms 260ms ease-out forwards;
+}
+
+@keyframes dibujarCirculo {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes dibujarCheck {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ---------------- 10. BUSCADOR Y CHIPS ---------------- */
+.barra-busqueda-filtros {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px var(--pad-x) 8px;
+}
+
+.input-busqueda-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-busqueda-wrap svg {
+    position: absolute;
+    left: 11px;
+    width: 17px;
+    height: 17px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.input-busqueda {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px 0 36px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+.input-busqueda:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+.btn-filtro-sheet {
+    height: 44px;
+    padding: 0 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.btn-filtro-sheet.activo {
+    border-color: var(--blue);
+    background-color: var(--blue-soft);
+    color: var(--blue);
+}
+
+.btn-filtro-sheet svg {
+    width: 16px;
+    height: 16px;
+}
+
+.chips-scroll {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 4px var(--pad-x) 8px;
+    scrollbar-width: none;
+}
+
+.chips-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 0 13px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    color: var(--navy);
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chip.activo {
+    background-color: var(--navy);
+    border-color: var(--navy);
+    color: #FFFFFF;
+}
+
+.chip.activo-futbol {
+    background-color: var(--sport-futbol);
+    border-color: var(--sport-futbol);
+    color: #FFFFFF;
+}
+
+.chip.activo-baloncesto {
+    background-color: var(--sport-baloncesto);
+    border-color: var(--sport-baloncesto);
+    color: #FFFFFF;
+}
+
+.chip.activo-voleibol {
+    background-color: var(--sport-voleibol);
+    border-color: var(--sport-voleibol);
+    color: #FFFFFF;
+}
+
+.chip.activo-favoritas {
+    background-color: var(--orange);
+    border-color: var(--orange);
+    color: #FFFFFF;
+}
+
+.barra-subresultados {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px var(--pad-x) 4px;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
+/* ---------------- 11. DETALLE DE CANCHA Y HORARIOS ---------------- */
+.detalle-foto {
+    width: 100%;
+    height: 215px;
+    object-fit: cover;
+    background-color: var(--navy);
+}
+
+.panel-blanco {
+    background-color: var(--surface);
+    padding: 16px var(--pad-x);
+    border-bottom: 1px solid var(--border);
+}
+
+.chips-caracteristicas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.selector-fechas {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin: 10px 0 12px;
+    scrollbar-width: none;
+}
+
+.selector-fechas::-webkit-scrollbar {
+    display: none;
+}
+
+.chip-fecha {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 0 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.chip-fecha.activo {
+    background-color: var(--navy);
+    border-color: var(--navy);
+    color: #FFFFFF;
+}
+
+.grid-horas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* Disponibles en verde, seleccionado en azul, ocupados en rojo suave, bloqueados en gris */
+.btn-hora {
+    min-height: 44px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--ok-border);
+    background-color: var(--ok-bg);
+    color: var(--ok-text);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-hora.seleccionado {
+    background-color: var(--blue);
+    border-color: var(--blue);
+    color: #FFFFFF;
+    box-shadow: 0 3px 10px rgba(0, 102, 238, 0.25);
+}
+
+.btn-hora.ocupado {
+    background-color: var(--err-bg);
+    border-color: var(--err-border);
+    color: var(--err-text);
+    opacity: 0.65;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+.btn-hora.bloqueado {
+    background-color: var(--blk-bg);
+    border-color: var(--blk-border);
+    color: var(--blk-text);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.resumen-precio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background-color: var(--blue-soft);
+    border: 1px solid var(--blue-line);
+    border-radius: var(--radius-sm);
+    margin: 12px 0;
+}
+
+/* ---------------- 12. PERFIL CON BANNER AZUL Y ANILLO NARANJA ---------------- */
+.perfil-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: #FFFFFF;
+    padding: 20px var(--pad-x) 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: 0 0 20px 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.avatar-perfil,
+.avatar-inicial {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3px solid var(--orange);
+    flex-shrink: 0;
+}
+
+.avatar-perfil {
+    object-fit: cover;
+}
+
+.avatar-inicial {
+    background-color: var(--navy-deep);
+    color: #FFFFFF;
+    font-size: 24px;
     font-weight: 800;
     display: grid;
     place-items: center;
 }
 
-.correo-perfil {
-    margin-bottom: 10px;
-}
-
-/* ---------------- 12. PIE DE PÁGINA CORPORATIVO ---------------- */
-.pie-pagina {
-    background: linear-gradient(180deg, #091120 0%, #050912 100%);
-    border-top: 3px solid transparent;
-    border-image: linear-gradient(90deg, var(--azul-brillante), var(--azul), var(--naranja), var(--dorado)) 1;
-    color: #CBD7EA;
-    padding: 52px 0 24px;
-}
-
-.pie-cuadricula {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
-    gap: 32px;
-    padding-bottom: 36px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-}
-
-.logo-pie {
-    height: 40px;
-    width: auto;
-    display: block;
-    margin-bottom: 14px;
-}
-
-.pie-descripcion {
-    font-size: 14px;
-    color: #8EA3C2;
-    max-width: 300px;
-    line-height: 1.65;
-}
-
-.pie-columna h4 {
-    font-family: var(--fuente-titulo);
-    font-size: 18px;
+.perfil-banner h1 {
+    font-size: 18.5px;
     font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--blanco);
-    margin-bottom: 14px;
+    color: #FFFFFF;
 }
 
-.pie-lista {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+.perfil-banner p {
+    font-size: 12.5px;
+    color: #DCE9FF;
 }
 
-.pie-lista a,
-.pie-lista li {
-    font-size: 14px;
-    color: #93A7C4;
+.lista-ajustes {
+    margin: 14px var(--pad-x);
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
 }
 
-.pie-lista a:hover {
-    color: var(--azul-brillante);
-}
-
-.pie-inferior {
-    padding-top: 22px;
+.ajuste-item {
+    width: 100%;
+    min-height: 56px;
+    padding: 12px 14px;
+    background-color: var(--surface);
+    border: none;
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 12px;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.ajuste-item:last-child {
+    border-bottom: none;
+}
+
+.ajuste-izq {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ajuste-icono {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.ajuste-icono.azul { background-color: var(--blue-soft); color: var(--blue); }
+.ajuste-icono.naranja { background-color: var(--orange-soft); color: var(--orange); }
+.ajuste-icono.celeste { background-color: var(--sky-soft); color: var(--sky); }
+.ajuste-icono.gris { background-color: var(--blk-bg); color: var(--navy); }
+.ajuste-icono.rojo { background-color: var(--err-bg); color: var(--err-text); }
+
+.ajuste-icono svg {
+    width: 18px;
+    height: 18px;
+}
+
+.ajuste-titulo {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.ajuste-sub {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.ajuste-item.peligro .ajuste-titulo {
+    color: var(--err-text);
+}
+
+/* ---------------- 13. PANELES INFERIORES CON ANIMACIÓN ---------------- */
+.sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(7, 13, 26, 0.48);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.sheet-backdrop.abierto {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.sheet-panel {
+    width: 100%;
+    max-width: var(--app-max-w);
+    max-height: 86vh;
+    background-color: var(--surface);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: var(--shadow-sheet);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transform: translateY(100%);
+    transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sheet-backdrop.abierto .sheet-panel {
+    transform: translateY(0);
+}
+
+.sheet-manija {
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background-color: var(--border-strong);
+    margin: 10px auto 4px;
+}
+
+.sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px var(--pad-x) 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sheet-header h2 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.sheet-header .btn-icono-barra {
+    color: var(--navy);
+}
+
+.sheet-body {
+    padding: 14px var(--pad-x) 20px;
+    overflow-y: auto;
+}
+
+/* ---------------- 14. ESTADOS VACÍOS CON SVG FLOTANTE Y SKELETON SHIMMER ---------------- */
+.estado-vacio {
+    padding: 36px 22px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.vacio-ilustracion {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 12px;
+    animation: flotarSuave 3.8s ease-in-out infinite;
+}
+
+@keyframes flotarSuave {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.estado-vacio strong {
+    display: block;
+    font-size: 15px;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+
+/* Esqueletos de carga con shimmer */
+.skeleton-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.skeleton-linea {
+    height: 52px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, #EBF0F7 25%, #F6F9FD 50%, #EBF0F7 75%);
+    background-size: 200% 100%;
+    animation: shimmerCarga 1.3s linear infinite;
+}
+
+@keyframes shimmerCarga {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* ---------------- 15. FORMULARIOS, CHIPS Y MAPA ---------------- */
+.campo {
+    margin-bottom: 12px;
+}
+
+.campo label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 5px;
+}
+
+.campo label.casilla-pill {
+    display: flex;
+    margin-bottom: 0;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 11px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+.campo textarea {
+    min-height: 78px;
+    resize: vertical;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+.fila-dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.casillas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.casilla-pill {
+    min-height: 40px;
+    padding: 4px 8px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--surface);
+}
+
+.casilla-pill input {
+    width: auto;
+    min-height: auto;
+}
+
+.subir-foto-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.input-oculto {
+    display: none;
+}
+
+.btn-subir {
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: var(--radius-sm);
+    background-color: var(--blue-soft);
+    color: var(--blue);
     font-size: 13px;
-    color: #6F84A3;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
 }
 
-/* ---------------- 13. DISEÑO PARA CELULARES Y TABLETAS ---------------- */
-@media (max-width: 900px) {
-    .pie-cuadricula {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.mapa-iframe {
+    width: 100%;
+    height: 260px;
+    border: 0;
+    display: block;
+    background-color: var(--blue-soft);
 }
 
-@media (max-width: 768px) {
-    .barra-navegacion {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .menu {
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .portada {
-        padding: 52px 0 48px;
-    }
-
-    .logo-portada {
-        height: 64px;
-    }
-
-    .franja-metricas {
-        grid-template-columns: 1fr;
-        gap: 14px;
-    }
-
-    .cuadricula-dos,
-    .detalle-cancha,
-    .carrusel-slide {
-        grid-template-columns: 1fr;
-    }
-
-    .carrusel-imagen-marco {
-        min-height: 230px;
-        max-height: 260px;
-    }
-
-    .carrusel-info {
-        padding: 24px 20px;
-    }
-
-    .carrusel-anterior {
-        left: 10px;
-        top: 120px;
-    }
-
-    .carrusel-siguiente {
-        right: 10px;
-        top: 120px;
-    }
-
-    .tarjeta-formulario,
-    .panel-encabezado,
-    .caja-panel {
-        padding: 22px 18px;
-    }
-
-    .acciones-reserva {
-        align-items: flex-start;
-    }
-
-    .formulario-reserva button,
-    .formulario-horario button {
-        width: 100%;
-    }
-
-    .miniatura-cancha {
-        width: 100%;
-        height: 170px;
-    }
-
-    .imagen-detalle {
-        max-height: 260px;
-    }
+.chips-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
 }
 
-@media (max-width: 520px) {
-    .contenedor {
-        width: 94%;
+.chip-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.chip-item.bloqueado {
+    background-color: var(--blk-bg);
+    color: var(--blk-text);
+    border-color: var(--blk-border);
+}
+
+.btn-mini-inline {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    cursor: pointer;
+}
+
+/* ---------------- 15B. AGENDA DIARIA, TARIFAS, REPORTES Y RECORDATORIOS ---------------- */
+.barra-selector-cancha {
+    padding: 10px var(--pad-x) 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.barra-selector-cancha select {
+    flex: 1;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.tira-dias-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 8px 6px;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.tira-dias {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+    padding: 2px;
+}
+
+.tira-dias::-webkit-scrollbar {
+    display: none;
+}
+
+.dia-pill {
+    flex: 0 0 50px;
+    min-height: 52px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+}
+
+.dia-pill .d-abrev {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.dia-pill .d-num {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.dia-pill.activo {
+    background-color: var(--blue);
+    border-color: var(--blue);
+    color: #FFFFFF;
+}
+
+.dia-pill.activo .d-abrev {
+    color: #DCE9FF;
+}
+
+.btn-nav-dia {
+    width: 34px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--navy);
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    display: inline-grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Filas táctiles grandes de la agenda */
+.franja-agenda {
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border-strong);
+    padding: 12px 13px;
+    box-shadow: var(--shadow-card);
+}
+
+.franja-agenda.estado-libre { border-left-color: var(--ok-text); }
+.franja-agenda.estado-reservado { border-left-color: var(--blue); }
+.franja-agenda.estado-bloqueado { border-left-color: var(--blk-text); background-color: #F6F8FB; }
+.franja-agenda.estado-cancelado { border-left-color: var(--err-text); }
+
+.franja-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.franja-hora {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.pago-pills {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.pago-pill {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background-color: var(--surface);
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pago-pill.activo-pendiente { background-color: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+.pago-pill.activo-abonado { background-color: var(--blue-soft); border-color: var(--blue-line); color: var(--blue); }
+.pago-pill.activo-pagado { background-color: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-text); }
+
+/* Horarios jugador con precio por turno */
+.btn-hora-tarifa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    padding: 6px 4px;
+    min-height: 52px;
+}
+
+.btn-hora-tarifa small {
+    font-size: 10.5px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+/* Reportes: KPIs, barras apiladas y mapa de calor */
+.grid-kpis-reporte {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    padding: 10px var(--pad-x);
+}
+
+.kpi-box {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow-card);
+}
+
+.kpi-box span {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.kpi-box strong {
+    display: block;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-top: 3px;
+}
+
+.kpi-box.cobrado strong { color: var(--ok-text); }
+.kpi-box.pendiente strong { color: var(--warn-text); }
+
+.barra-fila {
+    display: grid;
+    grid-template-columns: 44px 1fr 78px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+    font-size: 12px;
+}
+
+.barra-pista {
+    height: 12px;
+    border-radius: 999px;
+    background-color: var(--bg);
+    overflow: hidden;
+    display: flex;
+}
+
+.barra-seg-cobrado { background-color: var(--ok-text); height: 100%; }
+.barra-seg-pendiente { background-color: var(--orange); height: 100%; }
+
+.mapa-calor-wrap {
+    overflow-x: auto;
+}
+
+.mapa-calor-tabla {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+    font-size: 10.5px;
+}
+
+.mapa-calor-tabla th {
+    color: var(--muted);
+    font-weight: 700;
+    text-align: center;
+    padding-bottom: 4px;
+}
+
+.mapa-calor-tabla td.h-lbl {
+    font-weight: 700;
+    color: var(--navy);
+    white-space: nowrap;
+    padding-right: 4px;
+}
+
+.celda-calor {
+    height: 22px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.calor-0 { background-color: #EDF2F8; color: #7E8CA0; }
+.calor-1 { background-color: #CFE3FF; color: #0B3B8C; }
+.calor-2 { background-color: #4A95FF; color: #FFFFFF; }
+.calor-3 { background-color: var(--orange); color: #FFFFFF; }
+
+.aviso-beta {
+    margin: 12px var(--pad-x) 0;
+    padding: 11px 14px;
+    border-radius: var(--radius);
+    background-color: var(--blue-soft);
+    border: 1px solid var(--blue-line);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.alerta-choques {
+    margin: 10px var(--pad-x) 0;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    background-color: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-text);
+    font-size: 13px;
+}
+
+.btn-whatsapp {
+    background-color: var(--ok-text);
+    color: #FFFFFF;
+}
+
+/* ---------------- 16. PREFERS-REDUCED-MOTION ---------------- */
+@media (prefers-reduced-motion: reduce) {
+    .hero-patron-svg,
+    .destacada-slide.activa img,
+    .vacio-ilustracion,
+    .skeleton-linea,
+    .app-screen,
+    .lista-stagger > *,
+    .nav-item.activo svg,
+    .toast,
+    .check-circulo,
+    .check-marca {
+        animation: none !important;
     }
 
-    .logo-img {
-        height: 36px;
+    .check-circulo,
+    .check-marca {
+        stroke-dashoffset: 0 !important;
     }
 
-    .menu a {
-        padding: 7px 10px;
-        font-size: 13px;
+    .carrusel-destacadas {
+        scroll-behavior: auto !important;
     }
 
-    .botones-portada {
-        flex-direction: column;
-    }
-
-    .botones-portada .boton {
-        width: 100%;
-    }
-
-    .tarjeta-reserva {
-        padding: 16px;
-    }
-
-    .pie-cuadricula {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .pie-inferior {
-        flex-direction: column;
-        text-align: center;
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
     }
 }

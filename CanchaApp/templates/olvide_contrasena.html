@@ -1,40 +1,36 @@
 {% extends "base.html" %}
 
 {% block titulo %}Recuperar contraseña - Ready Match{% endblock %}
+{% block topbar_clase %}topbar-clara{% endblock %}
+
+{% block volver %}
+    <a href="/login" class="btn-icono-barra" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}Recuperar contraseña{% endblock %}
+{% block header_accion %}{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="tarjeta-formulario">
-            <h1>Recuperar contraseña</h1>
-            <p class="texto-ayuda">
-                Escribe el correo con el que te registraste y te enviaremos un código de 6 dígitos.
-            </p>
+    <section class="seccion">
+        <p class="texto-apoyo" style="margin-bottom: 16px;">
+            Escribe tu correo registrado y te enviaremos un código de 6 dígitos.
+        </p>
 
-            <form method="POST" action="/olvide_contrasena">
-                <div class="campo-formulario">
-                    <label for="correo">Correo electrónico</label>
-                    <input
-                        type="email"
-                        id="correo"
-                        name="correo"
-                        placeholder="Ej: laura@correo.com"
-                        required
-                    >
-                </div>
+        <form method="POST" action="/olvide_contrasena">
+            {{ csrf_input() }}
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" placeholder="nombre@correo.com" required>
+            </div>
+            <button type="submit" class="btn btn-primario btn-ancho">Enviar código</button>
+        </form>
 
-                <button type="submit" class="boton boton-principal boton-ancho">
-                    Enviar código
-                </button>
-            </form>
-
-            <p class="enlace-inferior">
-                ¿Ya tienes un código? <a href="/restablecer_contrasena">Ingrésalo aquí</a>
-            </p>
-            <p class="enlace-inferior">
-                <a href="/login">← Volver a iniciar sesión</a>
-            </p>
-        </div>
-    </div>
-</section>
+        <p class="texto-apoyo" style="text-align: center; margin-top: 16px;">
+            ¿Ya tienes el código? <a href="/restablecer_contrasena" style="color: var(--blue); font-weight: 700;">Ingrésalo aquí</a>
+        </p>
+    </section>
 {% endblock %}

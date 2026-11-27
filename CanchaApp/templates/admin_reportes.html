@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block titulo %}Reportes - Ready Match{% endblock %}
+{% block encabezado_titulo %}Reportes{% endblock %}
+
+{% block contenido %}
+    <!-- Filtros de cancha y periodo -->
+    <form method="GET" action="/administrador/reportes" class="seccion-compacta" style="background: var(--surface); border-bottom: 1px solid var(--border);">
+        <input type="hidden" name="modo" value="{{ modo }}">
+
+        {% set segmentado_opciones = [
+            {"etiqueta": "Por mes", "url": url_for('admin.ver_reportes_admin', modo='mes', cancha_id=cancha_id_sel or None), "activo": modo == "mes", "contador": 0},
+            {"etiqueta": "Por día", "url": url_for('admin.ver_reportes_admin', modo='dia', cancha_id=cancha_id_sel or None), "activo": modo == "dia", "contador": 0}
+        ] %}
+        <div class="segmentado" role="tablist" style="margin-bottom: 10px;">
+            <div class="segmentado-pill" aria-hidden="true"></div>
+            {% for op in segmentado_opciones %}
+            <a href="{{ op.url }}" class="{% if op.activo %}activo{% endif %}" role="tab">{{ op.etiqueta }}</a>
+            {% endfor %}
+        </div>
+
+        <div class="fila-dos">
+            {% if mis_canchas | length > 1 %}
+            <div class="campo" style="margin-bottom: 0;">
+                <label for="rep_cancha">Cancha</label>
+                <select id="rep_cancha" name="cancha_id" onchange="this.form.submit()">
+                    <option value="">Todas mis canchas</option>
+                    {% for c in mis_canchas %}
+                        <option value="{{ c.id }}" {% if cancha_id_sel == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="campo" style="margin-bottom: 0;">
+                <label for="rep_periodo">{{ 'Día' if modo == 'dia' else 'Mes' }}</label>
+                <input
+                    type="{{ 'date' if modo == 'dia' else 'month' }}"
+                    id="rep_periodo"
+                    name="periodo"
+                    value="{{ periodo }}"
+                    onchange="this.form.submit()"
+                >
+            </div>
+        </div>
+    </form>
+
+    <!-- Tarjetas de resumen: Alquileres, Generado, Cobrado y Pendiente -->
+    <section class="grid-kpis-reporte">
+        <div class="kpi-box">
+            <span>Alquileres</span>
+            <strong>{{ reporte.total_alquileres }}</strong>
+        </div>
+        <div class="kpi-box">
+            <span>Total generado</span>
+            <strong>{{ reporte.total_ingresos | precio_cop }}</strong>
+        </div>
+        <div class="kpi-box cobrado">
+            <span>Cobrado</span>
+            <strong>{{ reporte.total_cobrado | precio_cop }}</strong>
+        </div>
+        <div class="kpi-box pendiente">
+            <span>Pendiente por cobrar</span>
+            <strong>{{ reporte.total_pendiente | precio_cop }}</strong>
+        </div>
+    </section>
+
+    <!-- Exportar Excel y PDF -->
+    <section class="seccion-compacta" style="padding-top: 2px;">
+        <div class="fila-botones" style="margin-top: 0;">
+            <a
+                href="{{ url_for('admin.exportar_reporte_excel', modo=modo, periodo=periodo, cancha_id=cancha_id_sel or None) }}"
+                class="btn btn-borde btn-sm"
+            >
+                Exportar Excel
+            </a>
+            <a
+                href="{{ url_for('admin.exportar_reporte_pdf', modo=modo, periodo=periodo, cancha_id=cancha_id_sel or None) }}"
+                class="btn btn-primario btn-sm"
+            >
+                Exportar PDF
+            </a>
+        </div>
+    </section>
+
+    <!-- Gráfica CSS pura de cobrado vs pendiente -->
+    <section class="seccion-compacta">
+        <div class="fila-registro">
+            <div class="fila-encabezado">
+                <h2 class="subtitulo">Ganancias ({{ 'por hora' if modo == 'dia' else 'por día' }})</h2>
+                <span class="texto-apoyo">Verde: cobrado · Naranja: pendiente</span>
+            </div>
+            {% if reporte.serie %}
+                {% for item in reporte.serie %}
+                <div class="barra-fila">
+                    <strong>{{ item.etiqueta }}</strong>
+                    <div class="barra-pista">
+                        <div class="barra-seg-cobrado" style="width: {{ item.pct_cobrado }}%;"></div>
+                        <div class="barra-seg-pendiente" style="width: {{ item.pct_pendiente }}%;"></div>
+                    </div>
+                    <span style="text-align: right; font-weight: 700;">{{ item.total | precio_cop }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="texto-apoyo">Sin alquileres activos en este periodo.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Reporte mensual de horas muertas (mapa de calor día x hora) -->
+    <section class="seccion-compacta">
+        <div class="fila-registro">
+            <div class="fila-encabezado">
+                <h2 class="subtitulo">Horas muertas ({{ calor.mes }})</h2>
+                <span class="texto-apoyo">% ocupación</span>
+            </div>
+
+            <div class="mapa-calor-wrap">
+                <table class="mapa-calor-tabla">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            {% for d_ab in calor.dias_cabecera %}
+                                <th>{{ d_ab }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fila in calor.matriz %}
+                        <tr>
+                            <td class="h-lbl">{{ fila.hora }}</td>
+                            {% for celda in fila.celdas %}
+                            <td>
+                                <div class="celda-calor calor-{{ celda.nivel }}" title="{{ celda.abrev }} {{ fila.hora }}: {{ celda.pct }}%">
+                                    {{ celda.pct }}%
+                                </div>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);">
+                <span class="texto-apoyo" style="font-weight: 700; color: var(--navy);">Franjas con menor ocupación:</span>
+                <div class="chips-lista">
+                    {% for hm in calor.horas_muertas %}
+                        <span class="chip-item">{{ hm.dia_nombre[:3] }} {{ hm.hora }} ({{ hm.pct }}%)</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

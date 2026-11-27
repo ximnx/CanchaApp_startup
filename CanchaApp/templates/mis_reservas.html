@@ -1,64 +1,56 @@
 {% extends "base.html" %}
 
 {% block titulo %}Mis reservas - Ready Match{% endblock %}
+{% block encabezado_titulo %}Mis reservas{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="panel-encabezado">
-            <span class="etiqueta-rol">Jugador</span>
-            <h1>Mis reservas</h1>
-            <p>
-                Consulta el historial y estado actual de todas tus solicitudes de cancha.
-            </p>
+    {% if reserva_nueva %}
+    <div class="banner-check-reserva" role="status">
+        <svg class="check-svg" viewBox="0 0 44 44" aria-hidden="true">
+            <circle class="check-circulo" cx="22" cy="22" r="20"/>
+            <path class="check-marca" d="M13 22.5 L19.5 29 L31.5 16"/>
+        </svg>
+        <div>
+            <strong style="display: block; color: var(--ok-text); font-size: 14.5px;">Reserva confirmada</strong>
+            <span class="texto-apoyo" style="color: var(--ok-text);">Tu turno quedó apartado de inmediato. Puedes cancelar hasta {{ horas_min_cancelacion }} horas antes.</span>
         </div>
-
-        {% if reservas %}
-            <div class="lista-reservas">
-                {% for reserva in reservas %}
-                <article class="tarjeta-reserva">
-                    <div class="datos-reserva">
-                        <span class="insignia-futbol">{{ reserva.tipo_futbol }}</span>
-                        <h3>
-                            <a href="/cancha/{{ reserva.cancha_id }}" class="enlace-titulo">
-                                {{ reserva.nombre_cancha }}
-                            </a>
-                        </h3>
-                        <p class="direccion">{{ reserva.direccion_cancha }}</p>
-                        <p class="dato-extra">
-                            <strong>Fecha:</strong> {{ reserva.fecha }} &nbsp;|&nbsp;
-                            <strong>Hora:</strong> {{ reserva.hora }} (1 hora)
-                        </p>
-                        {% if reserva.nombre_reserva or reserva.identificacion %}
-                        <p class="dato-extra">
-                            <strong>Titular:</strong> {{ reserva.nombre_reserva }}
-                            {% if reserva.identificacion %}
-                                &nbsp;|&nbsp; <strong>Identificación:</strong> {{ reserva.identificacion }}
-                            {% endif %}
-                        </p>
-                        {% endif %}
-                        <p class="precio">{{ reserva.precio_cancha | precio_cop }} <span>/ hora</span></p>
-                    </div>
-
-                    <div class="estado-reserva">
-                        <span class="badge-estado estado-{{ reserva.estado }}">
-                            {{ reserva.estado | capitalize }}
-                        </span>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="caja-panel centrado">
-                <h3>Todavía no has solicitado ninguna reserva</h3>
-                <p class="texto-vacio">
-                    Explora las canchas disponibles, elige un horario y envía tu primera solicitud.
-                </p>
-                <div style="margin-top: 18px;">
-                    <a href="/canchas" class="boton boton-principal">Buscar canchas</a>
-                </div>
-            </div>
-        {% endif %}
     </div>
-</section>
+    {% endif %}
+
+    {% set segmentado_opciones = [
+        {"etiqueta": "Próximas", "url": "/mis_reservas?tab=proximas", "activo": tab_activo == "proximas", "contador": proximas | length if proximas else 0},
+        {"etiqueta": "Historial", "url": "/mis_reservas?tab=historial", "activo": tab_activo == "historial", "contador": 0}
+    ] %}
+    {% include "partials/segmentado.html" %}
+
+    {% set lista_actual = proximas if tab_activo == "proximas" else historial %}
+    {% set mostrar_cancelar = tab_activo == "proximas" %}
+
+    {% if lista_actual %}
+        <div class="lista-tarjetas-app lista-stagger">
+            {% for reserva in lista_actual %}
+                {% include "partials/fila_reserva.html" %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="estado-vacio">
+            <svg class="vacio-ilustracion" viewBox="0 0 64 64" fill="none" stroke="var(--blue)" stroke-width="2" aria-hidden="true">
+                <rect x="10" y="14" width="44" height="40" rx="8" fill="var(--blue-soft)"/>
+                <line x1="10" y1="26" x2="54" y2="26"/>
+                <line x1="22" y1="8" x2="22" y2="18" stroke="var(--orange)" stroke-width="2.6" stroke-linecap="round"/>
+                <line x1="42" y1="8" x2="42" y2="18" stroke="var(--orange)" stroke-width="2.6" stroke-linecap="round"/>
+                <polyline points="23 39 29 45 41 33" stroke="var(--ok-text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {% if tab_activo == "proximas" %}
+                <strong>No tienes reservas próximas</strong>
+                <p>Cuando reserves una cancha aparecerá aquí.</p>
+                <div style="margin-top: 14px;">
+                    <a href="/canchas" class="btn btn-primario btn-sm">Explorar canchas</a>
+                </div>
+            {% else %}
+                <strong>Sin historial todavía</strong>
+                <p>Aquí verás tus reservas pasadas, canceladas o rechazadas.</p>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

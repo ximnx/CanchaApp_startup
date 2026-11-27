@@ -1,0 +1,57 @@
+{# Parcial reutilizable: partido con franja lateral por deporte y nivel diferenciado #}
+{% set p = item.partido %}
+{% set deporte_p = p.deporte or 'Fútbol' %}
+{% set nivel_p = p.nivel or 'Intermedio' %}
+<article class="fila-registro franja-{{ deporte_p | clase_deporte }}">
+    <div class="fila-registro-top">
+        <div style="min-width: 0;">
+            <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px;">
+                <span class="etiqueta etiqueta-{{ deporte_p | clase_deporte }}">{{ deporte_p }}</span>
+                <span class="etiqueta etiqueta-nivel-{{ nivel_p | lower }}">{{ nivel_p }}</span>
+                <span class="etiqueta etiqueta-gris">{{ p.tipo_futbol }} · {{ p.categoria }}</span>
+            </div>
+            <span class="fila-registro-titulo">{{ p.nombre_equipo }}</span>
+        </div>
+        {% if item.rival_aceptado %}
+            <span class="etiqueta estado-confirmada">Confirmado</span>
+        {% else %}
+            <span class="etiqueta estado-pendiente">{{ p.hora }}</span>
+        {% endif %}
+    </div>
+
+    <p class="texto-apoyo" style="margin-top: 5px; color: var(--text); font-weight: 600;">
+        {{ p.fecha }} · {{ p.lugar }}
+    </p>
+    <p class="texto-apoyo" style="margin-top: 2px;">{{ p.descripcion }}</p>
+
+    {% if item.rival_aceptado %}
+        <p class="texto-apoyo" style="margin-top: 6px; color: var(--ok-text); font-weight: 700;">
+            Rival confirmado: {{ item.rival_aceptado }}
+        </p>
+    {% elif permitir_retar and session.get("usuario_id") and session.get("tipo_usuario") == "jugador" %}
+        {% set compatibles = [] %}
+        {% for eq in mis_equipos %}
+            {% if (eq.deporte or 'Fútbol') == deporte_p %}
+                {% set _ = compatibles.append(eq) %}
+            {% endif %}
+        {% endfor %}
+
+        {% if compatibles %}
+        <form method="POST" action="/rivales/solicitar/{{ p.id }}" style="margin-top: 10px; display: flex; gap: 8px;">
+            {{ csrf_input() }}
+            <select name="equipo_id" aria-label="Elegir equipo" required style="flex: 1; min-height: 38px; padding: 0 8px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface);">
+                {% for eq in compatibles %}
+                    <option value="{{ eq.id }}">{{ eq.nombre }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primario btn-sm">Jugar</button>
+        </form>
+        {% else %}
+        <p class="texto-apoyo" style="margin-top: 8px;">
+            Crea un equipo de {{ deporte_p }} en <a href="/equipos" style="color: var(--blue); font-weight: 700;">Perfil</a> para solicitar este partido.
+        </p>
+        {% endif %}
+    {% elif permitir_retar and not session.get("usuario_id") %}
+        <a href="/login" class="enlace-accion" style="margin-top: 4px;">Inicia sesión para solicitar</a>
+    {% endif %}
+</article>

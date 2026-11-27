@@ -1,60 +1,268 @@
 {% extends "base.html" %}
 
-{% block titulo %}Canchas disponibles - Ready Match{% endblock %}
+{% block titulo %}Canchas - Ready Match{% endblock %}
+{% block encabezado_titulo %}Canchas{% endblock %}
+
+{% block header_accion %}
+    <a
+        href="{{ url_for('canchas.ver_canchas', deporte=deporte_seleccionado or None, tipo=tipo_seleccionado or None, q=busqueda or None, tipo_cancha=tipo_cancha_sel or None, fecha=fecha_seleccionada or None, hora=hora_seleccionada or None, precio_min=precio_min or None, precio_max=precio_max or None, favoritas='1' if solo_favoritas else None, vista=None if vista_mapa else 'mapa') }}"
+        class="btn-texto-barra"
+    >
+        {{ 'Lista' if vista_mapa else 'Mapa' }}
+    </a>
+{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <h1 class="titulo-seccion">Canchas sintéticas disponibles</h1>
-        <p class="descripcion-seccion">
-            Selecciona una cancha para consultar sus características, precios y horarios disponibles.
-        </p>
+    <!-- Buscador + botón Filtros (abre panel inferior) -->
+    <form action="/canchas" method="GET" class="barra-busqueda-filtros">
+        {% if deporte_seleccionado %}<input type="hidden" name="deporte" value="{{ deporte_seleccionado }}">{% endif %}
+        {% if tipo_seleccionado %}<input type="hidden" name="tipo" value="{{ tipo_seleccionado }}">{% endif %}
+        {% if tipo_cancha_sel %}<input type="hidden" name="tipo_cancha" value="{{ tipo_cancha_sel }}">{% endif %}
+        {% if fecha_seleccionada %}<input type="hidden" name="fecha" value="{{ fecha_seleccionada }}">{% endif %}
+        {% if hora_seleccionada %}<input type="hidden" name="hora" value="{{ hora_seleccionada }}">{% endif %}
+        {% if precio_min %}<input type="hidden" name="precio_min" value="{{ precio_min }}">{% endif %}
+        {% if precio_max %}<input type="hidden" name="precio_max" value="{{ precio_max }}">{% endif %}
+        {% if solo_favoritas %}<input type="hidden" name="favoritas" value="1">{% endif %}
+        {% if vista_mapa %}<input type="hidden" name="vista" value="mapa">{% endif %}
 
-        <!-- Filtros por tipo de fútbol -->
-        <div class="barra-filtros">
-            <a href="/canchas" class="filtro {% if not tipo_seleccionado %}filtro-activo{% endif %}">
-                Todas
-            </a>
-            {% for tipo in tipos_futbol %}
-                <a href="/canchas?tipo={{ tipo }}" class="filtro {% if tipo_seleccionado == tipo %}filtro-activo{% endif %}">
-                    {{ tipo }}
-                </a>
-            {% endfor %}
+        <div class="input-busqueda-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"/>
+                <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+            </svg>
+            <input
+                type="search"
+                name="q"
+                value="{{ busqueda or '' }}"
+                placeholder="Buscar cancha o dirección..."
+                class="input-busqueda"
+                aria-label="Buscar cancha"
+            >
         </div>
 
-        {% if canchas %}
-            <div class="cuadricula">
-                {% for cancha in canchas %}
-                <article class="tarjeta-cancha">
-                    <div class="marco-imagen-cancha">
-                        <img
-                            src="{{ url_for('static', filename=cancha.imagen) }}"
-                            alt="{{ cancha.nombre }}"
-                            class="imagen-cancha"
-                        >
-                        <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
-                    </div>
+        <button
+            type="button"
+            class="btn-filtro-sheet {% if filtros_activos > 0 %}activo{% endif %}"
+            onclick="abrirSheet('sheetFiltrosCanchas')"
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="4" y1="7" x2="20" y2="7"/>
+                <line x1="7" y1="12" x2="17" y2="12"/>
+                <line x1="10" y1="17" x2="14" y2="17"/>
+            </svg>
+            <span>Filtros{% if filtros_activos > 0 %} ({{ filtros_activos }}){% endif %}</span>
+        </button>
+    </form>
 
-                    <div class="contenido-tarjeta">
-                        <h3>{{ cancha.nombre }}</h3>
-                        <p class="direccion">{{ cancha.direccion }}</p>
-                        <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
-                        <a href="/cancha/{{ cancha.id }}" class="boton boton-principal boton-ancho">
-                            Ver detalles y horarios
-                        </a>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="caja-aviso">
-                <h2>No encontramos canchas con ese filtro</h2>
-                <p>Prueba consultando todas las modalidades disponibles.</p>
-                <div style="margin-top: 18px;">
-                    <a href="/canchas" class="boton boton-naranja">Ver todas las canchas</a>
-                </div>
-            </div>
+    <!-- Chips rápidos: deportes en su color + Favoritas como filtro -->
+    <div class="chips-scroll" role="navigation" aria-label="Filtros rápidos">
+        <a
+            href="{{ url_for('canchas.ver_canchas', q=busqueda or None, vista='mapa' if vista_mapa else None) }}"
+            class="chip {% if not deporte_seleccionado and not solo_favoritas %}activo{% endif %}"
+        >
+            Todos
+        </a>
+        {% for dep in deportes %}
+        <a
+            href="{{ url_for('canchas.ver_canchas', deporte=dep.nombre, q=busqueda or None, favoritas='1' if solo_favoritas else None, vista='mapa' if vista_mapa else None) }}"
+            class="chip {% if deporte_seleccionado == dep.nombre %}activo-{{ dep.nombre | clase_deporte }}{% endif %}"
+        >
+            {{ dep.nombre }}
+        </a>
+        {% endfor %}
+        <a
+            href="{{ url_for('canchas.ver_canchas', deporte=deporte_seleccionado or None, q=busqueda or None, favoritas=None if solo_favoritas else '1', vista='mapa' if vista_mapa else None) }}"
+            class="chip {% if solo_favoritas %}activo-favoritas{% endif %}"
+        >
+            Favoritas
+        </a>
+    </div>
+
+    <div class="barra-subresultados">
+        <span>{{ canchas | length }} {{ 'resultado' if (canchas | length) == 1 else 'resultados' }}</span>
+        {% if filtros_activos > 0 or busqueda %}
+            <a href="/canchas" style="color: var(--blue); font-weight: 700;">Limpiar</a>
         {% endif %}
     </div>
-</section>
+
+    {% if canchas %}
+        {% if vista_mapa %}
+            <div>
+                <iframe
+                    id="iframeMapa"
+                    class="mapa-iframe"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Mapa de canchas"
+                    src="https://maps.google.com/maps?q={{ canchas[0].direccion | urlencode }}&output=embed"
+                ></iframe>
+                <div class="fila-registro" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="min-width: 0;">
+                        <strong id="mapaTitulo" class="fila-registro-titulo">{{ canchas[0].nombre }}</strong>
+                        <p id="mapaDir" class="texto-apoyo">{{ canchas[0].direccion }}</p>
+                    </div>
+                    <a id="mapaLink" href="/cancha/{{ canchas[0].id }}" class="btn btn-primario btn-sm">Reservar</a>
+                </div>
+                <div class="lista-filas">
+                    {% for cancha in canchas %}
+                    <button
+                        type="button"
+                        class="ajuste-item"
+                        data-id="{{ cancha.id }}"
+                        data-nombre="{{ cancha.nombre }}"
+                        data-dir="{{ cancha.direccion }}"
+                        onclick="verEnMapa(this)"
+                    >
+                        <div style="min-width: 0;">
+                            <span class="ajuste-titulo">{{ cancha.nombre }}</span>
+                            <span class="ajuste-sub">{{ cancha.deporte }} · {{ cancha.direccion }}</span>
+                        </div>
+                        <span class="precio-texto">{{ cancha.precio | precio_cop }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            <script>
+                function verEnMapa(btn) {
+                    var id = btn.getAttribute("data-id");
+                    var nombre = btn.getAttribute("data-nombre");
+                    var dir = btn.getAttribute("data-dir");
+                    document.getElementById("iframeMapa").src = "https://maps.google.com/maps?q=" + encodeURIComponent(dir) + "&output=embed";
+                    document.getElementById("mapaTitulo").textContent = nombre;
+                    document.getElementById("mapaDir").textContent = dir;
+                    document.getElementById("mapaLink").href = "/cancha/" + id;
+                }
+            </script>
+        {% else %}
+            <div class="lista-tarjetas-app lista-stagger">
+                {% for cancha in canchas %}
+                    {% include "partials/fila_cancha.html" %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="estado-vacio">
+            <svg class="vacio-ilustracion" viewBox="0 0 64 64" fill="none" stroke="var(--blue)" stroke-width="2" aria-hidden="true">
+                <circle cx="29" cy="29" r="16" fill="var(--blue-soft)"/>
+                <line x1="41" y1="41" x2="54" y2="54" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <strong>No encontramos canchas</strong>
+            <p>Prueba cambiando el deporte o quitando algún filtro.</p>
+            <div style="margin-top: 14px;">
+                <a href="/canchas" class="btn btn-borde btn-sm">Ver todas</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Panel inferior (bottom sheet) de filtros -->
+    <div id="sheetFiltrosCanchas" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Filtros de canchas">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Filtros</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetFiltrosCanchas')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <form action="/canchas" method="GET">
+                    {% if busqueda %}<input type="hidden" name="q" value="{{ busqueda }}">{% endif %}
+                    {% if vista_mapa %}<input type="hidden" name="vista" value="mapa">{% endif %}
+
+                    <div class="campo">
+                        <label for="sf_deporte">Deporte</label>
+                        <select id="sf_deporte" name="deporte" onchange="sincronizarModalidadesFiltro()">
+                            <option value="">Todos los deportes</option>
+                            {% for dep in deportes %}
+                                <option value="{{ dep.nombre }}" {% if deporte_seleccionado == dep.nombre %}selected{% endif %}>{{ dep.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo" id="grupoModalidadFiltro" {% if not deporte_seleccionado %}style="display: none;"{% endif %}>
+                        <label for="sf_modalidad">Modalidad</label>
+                        <select id="sf_modalidad" name="tipo">
+                            <option value="">Todas</option>
+                            {% for mod in modalidades_disponibles %}
+                                <option value="{{ mod }}" {% if tipo_seleccionado == mod %}selected{% endif %}>{{ mod }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="sf_tipo">Tipo de cancha</label>
+                        <select id="sf_tipo" name="tipo_cancha">
+                            <option value="">Cualquiera</option>
+                            {% for tc in tipos_cancha %}
+                                <option value="{{ tc }}" {% if tipo_cancha_sel == tc %}selected{% endif %}>{{ tc }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="fila-dos">
+                        <div class="campo">
+                            <label for="sf_pmin">Precio mínimo</label>
+                            <input type="number" id="sf_pmin" name="precio_min" min="10000" step="5000" value="{{ precio_min or '' }}" placeholder="Ej: 50000">
+                        </div>
+                        <div class="campo">
+                            <label for="sf_pmax">Precio máximo</label>
+                            <input type="number" id="sf_pmax" name="precio_max" min="10000" step="5000" value="{{ precio_max or '' }}" placeholder="Ej: 150000">
+                        </div>
+                    </div>
+
+                    <div class="fila-dos">
+                        <div class="campo">
+                            <label for="sf_fecha">Fecha</label>
+                            <input type="date" id="sf_fecha" name="fecha" min="{{ fecha_hoy }}" value="{{ fecha_seleccionada or '' }}">
+                        </div>
+                        <div class="campo">
+                            <label for="sf_hora">Hora</label>
+                            <select id="sf_hora" name="hora">
+                                <option value="">Cualquiera</option>
+                                {% for h in horas_disponibles %}
+                                    <option value="{{ h }}" {% if hora_seleccionada == h %}selected{% endif %}>{{ h }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label class="casilla-pill" style="justify-content: flex-start; padding: 0 12px;">
+                            <input type="checkbox" name="favoritas" value="1" {% if solo_favoritas %}checked{% endif %}>
+                            <span>Mostrar solo mis favoritas</span>
+                        </label>
+                    </div>
+
+                    <div class="fila-botones">
+                        <a href="/canchas" class="btn btn-borde">Limpiar</a>
+                        <button type="submit" class="btn btn-primario">Aplicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var MODS_FILTRO = {{ modalidades_por_deporte | tojson }};
+        var MOD_ACTUAL = {{ tipo_seleccionado | tojson }};
+
+        function sincronizarModalidadesFiltro() {
+            var dep = document.getElementById("sf_deporte").value;
+            var grupo = document.getElementById("grupoModalidadFiltro");
+            var sel = document.getElementById("sf_modalidad");
+            if (!dep || !MODS_FILTRO[dep]) {
+                grupo.style.display = "none";
+                sel.innerHTML = '<option value="">Todas</option>';
+                return;
+            }
+            grupo.style.display = "block";
+            sel.innerHTML = '<option value="">Todas</option>';
+            var lista = MODS_FILTRO[dep];
+            for (var i = 0; i < lista.length; i++) {
+                var opt = document.createElement("option");
+                opt.value = lista[i];
+                opt.textContent = lista[i];
+                if (lista[i] === MOD_ACTUAL) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        }
+    </script>
 {% endblock %}

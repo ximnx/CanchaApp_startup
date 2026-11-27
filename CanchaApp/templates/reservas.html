@@ -1,162 +1,219 @@
 {% extends "base.html" %}
 
-{% block titulo %}{{ cancha.nombre }} - Reservar en Ready Match{% endblock %}
+{% block titulo %}{{ cancha.nombre }} - Ready Match{% endblock %}
+
+{% block volver %}
+    <a href="/canchas" class="btn-icono-barra" aria-label="Volver a canchas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}{{ cancha.nombre }}{% endblock %}
+
+{% block header_accion %}
+    {% if session.get("usuario_id") %}
+    <form method="POST" action="/favoritos/{{ cancha.id }}">
+        {{ csrf_input() }}
+        <button type="submit" class="btn-icono-barra" aria-label="Favorita">
+            <svg viewBox="0 0 24 24" fill="{% if es_favorita %}var(--orange){% else %}none{% endif %}" stroke="{% if es_favorita %}var(--orange){% else %}currentColor{% endif %}" stroke-width="2" aria-hidden="true">
+                <path d="M12 21s-7-4.5-9.2-8.4C1.2 9.7 2.8 6 6.4 6c2 0 3.5 1.1 4.6 2.5C12.1 7.1 13.6 6 15.6 6c3.6 0 5.2 3.7 3.6 6.6C19 16.5 12 21 12 21z"/>
+            </svg>
+        </button>
+    </form>
+    {% endif %}
+{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <a href="/canchas" class="enlace-volver">&larr; Volver al listado de canchas</a>
+    <img src="{{ url_for('static', filename=cancha.imagen) }}" alt="{{ cancha.nombre }}" class="detalle-foto" width="430" height="215">
 
-        <!-- Ficha de la cancha -->
-        <div class="detalle-cancha">
-            <img
-                src="{{ url_for('static', filename=cancha.imagen) }}"
-                alt="{{ cancha.nombre }}"
-                class="imagen-detalle"
-            >
-
-            <div class="info-detalle">
-                <span class="insignia-futbol">{{ cancha.tipo_futbol }}</span>
-                <h1>{{ cancha.nombre }}</h1>
-                <p class="direccion"><strong>Ubicación:</strong> {{ cancha.direccion }}</p>
-                <p class="precio">{{ cancha.precio | precio_cop }} <span>/ hora</span></p>
-                <p class="dato-extra">
-                    <strong>Administrador:</strong> {{ cancha.nombre_administrador }}
-                </p>
-                <p class="dato-extra">
-                    <strong>Duración por turno:</strong> 1 hora
-                </p>
+    <section class="panel-blanco">
+        <div class="fila-registro-top">
+            <div>
+                <h1 class="titulo-pantalla">{{ cancha.nombre }}</h1>
+                <p class="texto-apoyo" style="margin-top: 3px;">{{ cancha.direccion }}</p>
             </div>
+            <span class="precio-destacado" style="font-size: 15.5px; text-align: right;">
+                {% if tiene_tarifas %}<span>Desde </span>{% endif %}{{ precio_desde | precio_cop }} <span>/ h</span>
+            </span>
         </div>
 
-        <!-- Horarios disponibles -->
-        <div class="caja-panel" style="margin-top: 28px;">
-            <h2>1. Horarios de esta cancha</h2>
-            <p class="texto-izquierda">
-                Haz clic en cualquier horario disponible para seleccionarlo automáticamente en el formulario de reserva.
-            </p>
+        <div class="chips-caracteristicas">
+            {% for dep_c in deportes_cancha %}
+                <span class="etiqueta etiqueta-{{ dep_c | clase_deporte }}">{{ dep_c }}</span>
+            {% endfor %}
+            <span class="etiqueta etiqueta-gris">{{ cancha.tipo_futbol }}</span>
+            <span class="etiqueta etiqueta-gris">{{ cancha.tipo_cancha or 'Sintética' }}</span>
+            {% for car in caracteristicas_lista %}
+                <span class="etiqueta etiqueta-gris">{{ car }}</span>
+            {% endfor %}
+        </div>
 
-            {% if horarios %}
-                <div class="lista-horarios">
-                    {% for horario in horarios %}
-                    <div
-                        class="tarjeta-horario {% if horario.ocupado %}horario-ocupado{% else %}horario-libre{% endif %}"
-                        {% if not horario.ocupado %}
-                        onclick="seleccionarHorario('{{ horario.fecha }}', '{{ horario.hora }}')"
-                        {% endif %}
-                    >
-                        <div>
-                            <strong>{{ horario.fecha }}</strong>
-                            <p>{{ horario.hora }} (1 hora)</p>
-                        </div>
+        {% if cancha.descripcion %}
+            <p style="margin-top: 10px;">{{ cancha.descripcion }}</p>
+        {% endif %}
 
-                        {% if horario.ocupado %}
-                            <span class="etiqueta-ocupado">{{ horario.texto_estado }}</span>
-                        {% else %}
-                            <span class="etiqueta-disponible">{{ horario.texto_estado }}</span>
-                        {% endif %}
+        <p class="texto-apoyo" style="margin-top: 8px;">
+            Administra: {{ cancha.nombre_administrador }}
+            {% if cancha.telefono %} · Cel: {{ cancha.telefono }}{% endif %} ·
+            <a
+                href="https://www.google.com/maps/search/?api=1&query={{ cancha.direccion | urlencode }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--blue); font-weight: 700;"
+            >
+                Ver en mapa
+            </a>
+        </p>
+    </section>
+
+    <!-- Selector ágil de fecha + horarios con tarifa exacta por turno -->
+    <section class="seccion">
+        <h2 class="subtitulo">Elige fecha y horario</h2>
+
+        <div class="tira-dias" style="margin: 10px 0 12px;">
+            {% for d in fechas_strip %}
+            <a href="/cancha/{{ cancha.id }}?fecha={{ d.iso }}" class="dia-pill {% if d.iso == fecha_seleccionada %}activo{% endif %}">
+                <span class="d-abrev">{{ d.abrev }}</span>
+                <span class="d-num">{{ d.dia }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if horarios_jugador %}
+            <div class="grid-horas" id="gridHorasTactil">
+                {% for h in horarios_jugador %}
+                <button
+                    type="button"
+                    class="btn-hora btn-hora-tarifa {% if not h.disponible %}ocupado{% endif %}"
+                    data-hora="{{ h.hora }}"
+                    data-precio="{{ h.precio }}"
+                    data-precio-fmt="{{ h.precio | precio_cop }}"
+                    {% if not h.disponible %}disabled{% endif %}
+                >
+                    <span>{{ h.hora }}</span>
+                    <small>{{ h.precio | precio_cop if h.disponible else 'No disp.' }}</small>
+                </button>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="estado-vacio" style="padding: 20px 10px;">
+                <strong>Sin horarios restantes para esta fecha</strong>
+                <p>Elige otro día en la tira superior.</p>
+            </div>
+        {% endif %}
+
+        {% if not session.get("usuario_id") %}
+            <a href="/login" class="btn btn-primario btn-ancho" style="margin-top: 8px;">Inicia sesión para reservar</a>
+        {% elif session.get("tipo_usuario") != "jugador" %}
+            <p class="texto-apoyo" style="margin-top: 8px;">Para reservar como jugador, ingresa con una cuenta de jugador.</p>
+        {% elif hay_libres %}
+            <form method="POST" action="/reservar" id="formReservaApp" style="margin-top: 14px;">
+                {{ csrf_input() }}
+                <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
+                <input type="hidden" name="fecha" value="{{ fecha_seleccionada }}">
+                <input type="hidden" name="hora" id="inputHoraReserva" value="">
+
+                <div class="fila-dos">
+                    <div class="campo">
+                        <label for="deporte_reserva">Deporte</label>
+                        <select id="deporte_reserva" name="deporte_reserva" onchange="actualizarModalidadesReserva()" required>
+                            {% for dep_c in deportes_cancha %}
+                                <option value="{{ dep_c }}">{{ dep_c }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    {% endfor %}
+                    <div class="campo">
+                        <label for="modalidad_reserva">Modalidad</label>
+                        <select id="modalidad_reserva" name="modalidad_reserva" required></select>
+                    </div>
                 </div>
-            {% else %}
-                <p class="texto-vacio">
-                    Esta cancha no tiene horarios próximos disponibles por el momento.
-                </p>
-            {% endif %}
-        </div>
 
-        <!-- Formulario de solicitud -->
-        <div class="caja-panel" style="margin-top: 24px;">
-            <h2>2. Solicitar reserva</h2>
+                <div class="campo">
+                    <label for="nombre_reserva">Nombre completo</label>
+                    <input type="text" id="nombre_reserva" name="nombre_reserva" value="{{ session.get('usuario_nombre', '') }}" minlength="3" required>
+                </div>
 
-            {% if not session.get("usuario_id") %}
-                <p class="texto-izquierda">
-                    Inicia sesión con tu cuenta de jugador para enviar una solicitud de reserva.
-                </p>
-                <a href="/login" class="boton boton-principal">Iniciar sesión para reservar</a>
-
-            {% elif session.get("tipo_usuario") != "jugador" %}
-                <p class="texto-izquierda">
-                    Estás conectado como administrador. Para solicitar una reserva, ingresa con una cuenta de jugador.
-                </p>
-
-            {% elif not fechas_disponibles %}
-                <p class="texto-vacio">
-                    No hay turnos disponibles para reservar en este momento.
-                </p>
-
-            {% else %}
-                <p class="texto-izquierda">
-                    Completa tus datos, elige la fecha y hora disponibles y envía tu solicitud al administrador de la cancha.
-                </p>
-
-                <form method="POST" action="/reservar" class="formulario-reserva-completo">
-                    <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
-
-                    <div class="cuadricula-dos">
-                        <div class="campo-formulario">
-                            <label for="nombre_reserva">Nombre completo</label>
-                            <input
-                                type="text"
-                                id="nombre_reserva"
-                                name="nombre_reserva"
-                                value="{{ session.get('usuario_nombre', '') }}"
-                                placeholder="Ej: Laura Gómez Martínez"
-                                minlength="3"
-                                required
-                            >
-                        </div>
-
-                        <div class="campo-formulario">
-                            <label for="identificacion">Número de identificación (C.C. / T.I.)</label>
-                            <input
-                                type="text"
-                                id="identificacion"
-                                name="identificacion"
-                                placeholder="Ej: 1020304050"
-                                minlength="5"
-                                maxlength="20"
-                                required
-                            >
-                        </div>
-
-                        <div class="campo-formulario">
-                            <label for="fecha">Fecha</label>
-                            <select id="fecha" name="fecha" required>
-                                {% for fecha in fechas_disponibles %}
-                                    <option value="{{ fecha }}">{{ fecha }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="campo-formulario">
-                            <label for="hora">Hora disponible (1 hora)</label>
-                            <select id="hora" name="hora" required>
-                                {% for hora in horas_en_cancha %}
-                                    <option value="{{ hora }}">{{ hora }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                <div class="fila-dos">
+                    <div class="campo">
+                        <label for="identificacion">Identificación</label>
+                        <input type="text" id="identificacion" name="identificacion" placeholder="C.C. / T.I." minlength="5" maxlength="20" required>
                     </div>
+                    <div class="campo">
+                        <label for="telefono_reserva">Celular (WhatsApp)</label>
+                        <input type="tel" id="telefono_reserva" name="telefono_reserva" value="{{ usuario_telefono }}" placeholder="3001234567" maxlength="15" required>
+                    </div>
+                </div>
 
-                    <button type="submit" class="boton boton-principal">
-                        Reservar cancha
-                    </button>
-                </form>
-            {% endif %}
-        </div>
-    </div>
-</section>
+                <div class="resumen-precio">
+                    <div>
+                        <span class="texto-apoyo" style="display: block;">Turno (confirmación inmediata)</span>
+                        <strong id="resumenTurno">{{ fecha_seleccionada }} · Elige una hora</strong>
+                    </div>
+                    <strong id="resumenPrecio" class="precio-destacado" style="font-size: 16px;">{{ precio_desde | precio_cop }}</strong>
+                </div>
 
-<script>
-    function seleccionarHorario(fecha, hora) {
-        var campoFecha = document.getElementById("fecha");
-        var campoHora = document.getElementById("hora");
-        if (campoFecha && campoHora) {
-            campoFecha.value = fecha;
-            campoHora.value = hora;
-            campoFecha.scrollIntoView({ behavior: "smooth", block: "center" });
+                <button type="submit" class="btn btn-primario btn-ancho">Confirmar reserva</button>
+            </form>
+        {% endif %}
+    </section>
+
+    <script>
+        var MODALIDADES_CANCHA = {{ modalidades_cancha | tojson }};
+        var MODALIDAD_INICIAL = {{ cancha.tipo_futbol | tojson }};
+
+        function actualizarModalidadesReserva() {
+            var selDep = document.getElementById("deporte_reserva");
+            var selMod = document.getElementById("modalidad_reserva");
+            if (!selDep || !selMod) return;
+            var lista = MODALIDADES_CANCHA[selDep.value] || [];
+            selMod.innerHTML = "";
+            for (var i = 0; i < lista.length; i++) {
+                var opt = document.createElement("option");
+                opt.value = lista[i];
+                opt.textContent = lista[i];
+                if (lista[i] === MODALIDAD_INICIAL) opt.selected = true;
+                selMod.appendChild(opt);
+            }
         }
-    }
-</script>
+        actualizarModalidadesReserva();
+
+        (function () {
+            var botones = document.querySelectorAll("#gridHorasTactil .btn-hora:not(:disabled)");
+            var inputHora = document.getElementById("inputHoraReserva");
+            var resumenTurno = document.getElementById("resumenTurno");
+            var resumenPrecio = document.getElementById("resumenPrecio");
+            var fechaSel = {{ fecha_seleccionada | tojson }};
+
+            function seleccionar(btn) {
+                for (var i = 0; i < botones.length; i++) botones[i].classList.remove("seleccionado");
+                btn.classList.add("seleccionado");
+                var hora = btn.getAttribute("data-hora");
+                var precioFmt = btn.getAttribute("data-precio-fmt");
+                if (inputHora) inputHora.value = hora;
+                if (resumenTurno) resumenTurno.textContent = fechaSel + " · " + hora;
+                if (resumenPrecio) resumenPrecio.textContent = precioFmt;
+            }
+
+            if (botones.length > 0) {
+                seleccionar(botones[0]);
+                for (var i = 0; i < botones.length; i++) {
+                    (function (b) {
+                        b.addEventListener("click", function () { seleccionar(b); });
+                    })(botones[i]);
+                }
+            }
+
+            var form = document.getElementById("formReservaApp");
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    if (!inputHora || !inputHora.value) {
+                        e.preventDefault();
+                        alert("Selecciona una hora disponible antes de confirmar.");
+                    }
+                });
+            }
+        })();
+    </script>
 {% endblock %}

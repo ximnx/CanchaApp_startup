@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block titulo %}Clientes - Ready Match{% endblock %}
+
+{% block volver %}
+    {% if cliente_detalle %}
+    <a href="/administrador/clientes" class="btn-icono-barra" aria-label="Volver a clientes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+    {% endif %}
+{% endblock %}
+
+{% block encabezado_titulo %}{{ cliente_detalle.nombre if cliente_detalle else 'Clientes' }}{% endblock %}
+
+{% block contenido %}
+    {% if cliente_detalle %}
+        <section class="panel-blanco">
+            <div class="fila-registro-top">
+                <div>
+                    <h1 class="titulo-pantalla">{{ cliente_detalle.nombre }}</h1>
+                    <p class="texto-apoyo" style="margin-top: 2px;">
+                        {{ 'Cel: ' + cliente_detalle.telefono if cliente_detalle.telefono else 'Sin celular registrado' }}
+                    </p>
+                </div>
+                <span class="etiqueta {{ 'etiqueta-azul' if cliente_detalle.es_cuenta else 'etiqueta-gris' }}">
+                    {{ 'Cuenta web' if cliente_detalle.es_cuenta else 'Agenda cancha' }}
+                </span>
+            </div>
+            <p class="texto-apoyo" style="margin-top: 8px;">
+                <strong>{{ cliente_detalle.partidos_jugados }}</strong> partidos jugados ·
+                <strong>{{ cliente_detalle.proximas }}</strong> próximos
+            </p>
+        </section>
+
+        <div class="lista-tarjetas-app lista-stagger">
+            {% for r in reservas_cliente %}
+            {% set est_vis = 'confirmada' if r.estado == 'pendiente' else r.estado %}
+            <article class="fila-registro">
+                <div class="fila-registro-top">
+                    <div>
+                        <span class="fila-registro-titulo">{{ r.nombre_cancha }}</span>
+                        <p class="texto-apoyo">{{ r.fecha }} · {{ r.hora }}</p>
+                    </div>
+                    <span class="etiqueta estado-{{ est_vis }}">{{ est_vis | capitalize }}</span>
+                </div>
+                <div style="display: flex; gap: 6px; margin-top: 6px; align-items: center;">
+                    <span class="precio-destacado" style="font-size: 13px;">{{ r.precio_aplicado | precio_cop }}</span>
+                    <span class="etiqueta estado-{{ 'confirmada' if r.estado_pago == 'pagado' else ('pendiente' if r.estado_pago == 'pendiente' else 'azul') }}">
+                        Pago: {{ (r.estado_pago or 'pendiente') | capitalize }}
+                    </span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <form action="/administrador/clientes" method="GET" class="barra-busqueda-filtros">
+            <div class="input-busqueda-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"/>
+                    <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+                </svg>
+                <input type="search" name="q" value="{{ busqueda }}" placeholder="Buscar por nombre o celular..." class="input-busqueda" aria-label="Buscar cliente">
+            </div>
+            <button type="submit" class="btn-filtro-sheet">Buscar</button>
+        </form>
+
+        {% if clientes %}
+            <div class="lista-tarjetas-app lista-stagger">
+                {% for cli in clientes %}
+                <a href="/administrador/clientes/detalle?clave={{ cli.clave | urlencode }}" class="fila-registro" style="display: block;">
+                    <div class="fila-registro-top">
+                        <div style="min-width: 0;">
+                            <span class="fila-registro-titulo">{{ cli.nombre }}</span>
+                            <p class="texto-apoyo" style="margin-top: 2px;">
+                                {{ cli.telefono if cli.telefono else 'Sin celular' }} · {{ 'Cuenta web' if cli.es_cuenta else 'Agenda cancha' }}
+                            </p>
+                        </div>
+                        <span class="etiqueta etiqueta-azul">{{ cli.partidos_jugados }} jugados</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="estado-vacio">
+                <svg class="vacio-ilustracion" viewBox="0 0 64 64" fill="none" stroke="var(--blue)" stroke-width="2" aria-hidden="true">
+                    <circle cx="32" cy="24" r="10" fill="var(--blue-soft)"/>
+                    <path d="M16 50c0-8.5 7.2-14 16-14s16 5.5 16 14" stroke="var(--orange)"/>
+                </svg>
+                <strong>Aún no hay clientes registrados</strong>
+                <p>Cuando se realicen reservas en tus canchas aparecerán ordenados por frecuencia.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}

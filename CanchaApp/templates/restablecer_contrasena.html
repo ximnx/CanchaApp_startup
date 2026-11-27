@@ -1,74 +1,44 @@
 {% extends "base.html" %}
 
 {% block titulo %}Restablecer contraseña - Ready Match{% endblock %}
+{% block topbar_clase %}topbar-clara{% endblock %}
+
+{% block volver %}
+    <a href="/olvide_contrasena" class="btn-icono-barra" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}Nueva contraseña{% endblock %}
+{% block header_accion %}{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="tarjeta-formulario">
-            <h1>Nueva contraseña</h1>
-            <p class="texto-ayuda">
-                Ingresa el código de 6 dígitos que recibiste en tu correo y elige tu nueva contraseña.
-            </p>
+    <section class="seccion">
+        <p class="texto-apoyo" style="margin-bottom: 16px;">
+            Ingresa el código de 6 dígitos que recibiste y define tu nueva contraseña.
+        </p>
 
-            <form method="POST" action="/restablecer_contrasena">
-                <div class="campo-formulario">
-                    <label for="correo">Correo electrónico</label>
-                    <input
-                        type="email"
-                        id="correo"
-                        name="correo"
-                        value="{{ correo }}"
-                        placeholder="Ej: laura@correo.com"
-                        required
-                    >
-                </div>
-
-                <div class="campo-formulario">
-                    <label for="codigo">Código de recuperación (6 dígitos)</label>
-                    <input
-                        type="text"
-                        id="codigo"
-                        name="codigo"
-                        placeholder="Ej: 482910"
-                        maxlength="6"
-                        required
-                    >
-                </div>
-
-                <div class="campo-formulario">
-                    <label for="nueva_contrasena">Nueva contraseña</label>
-                    <input
-                        type="password"
-                        id="nueva_contrasena"
-                        name="nueva_contrasena"
-                        placeholder="Mínimo 6 caracteres"
-                        minlength="6"
-                        required
-                    >
-                </div>
-
-                <div class="campo-formulario">
-                    <label for="confirmar_contrasena">Confirmar nueva contraseña</label>
-                    <input
-                        type="password"
-                        id="confirmar_contrasena"
-                        name="confirmar_contrasena"
-                        placeholder="Repite tu nueva contraseña"
-                        minlength="6"
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="boton boton-principal boton-ancho">
-                    Cambiar contraseña
-                </button>
-            </form>
-
-            <p class="enlace-inferior">
-                <a href="/olvide_contrasena">Solicitar un nuevo código</a>
-            </p>
-        </div>
-    </div>
-</section>
+        <form method="POST" action="/restablecer_contrasena">
+            {{ csrf_input() }}
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" value="{{ correo }}" required>
+            </div>
+            <div class="campo">
+                <label for="codigo">Código de recuperación</label>
+                <input type="text" id="codigo" name="codigo" maxlength="6" placeholder="6 dígitos" required>
+            </div>
+            <div class="campo">
+                <label for="nueva_contrasena">Nueva contraseña</label>
+                <input type="password" id="nueva_contrasena" name="nueva_contrasena" minlength="6" placeholder="Mínimo 6 caracteres" required>
+            </div>
+            <div class="campo">
+                <label for="confirmar_contrasena">Confirmar nueva contraseña</label>
+                <input type="password" id="confirmar_contrasena" name="confirmar_contrasena" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primario btn-ancho">Cambiar contraseña</button>
+        </form>
+    </section>
 {% endblock %}

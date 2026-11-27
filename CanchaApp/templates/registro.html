@@ -1,101 +1,81 @@
 {% extends "base.html" %}
 
-{% block titulo %}Registro - Ready Match{% endblock %}
+{% block titulo %}Crear cuenta - Ready Match{% endblock %}
+{% block topbar_clase %}topbar-clara{% endblock %}
+
+{% block volver %}
+    <a href="/login" class="btn-icono-barra" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}Crear cuenta{% endblock %}
+{% block header_accion %}{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="tarjeta-formulario">
-            <h1>Crear una cuenta</h1>
-            <p class="texto-ayuda">
-                Regístrate como jugador o como administrador de canchas sintéticas.
-            </p>
+    <section class="seccion">
+        <p class="texto-apoyo" style="margin-bottom: 16px;">
+            Regístrate como jugador o administrador de establecimientos.
+        </p>
 
-            <!-- method="POST" envía los datos de forma segura en el cuerpo de la petición -->
-            <form method="POST" action="/registro">
-                <div class="campo-formulario">
-                    <label for="nombre">Nombre completo</label>
-                    <input
-                        type="text"
-                        id="nombre"
-                        name="nombre"
-                        placeholder="Ej: Laura Gómez"
-                        required
-                    >
-                </div>
+        <form method="POST" action="/registro">
+            {{ csrf_input() }}
+            <div class="campo">
+                <label for="nombre">Nombre completo</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej: Laura Gómez" required>
+            </div>
 
-                <div class="campo-formulario">
-                    <label for="correo">Correo electrónico</label>
-                    <input
-                        type="email"
-                        id="correo"
-                        name="correo"
-                        placeholder="Ej: laura@correo.com"
-                        required
-                    >
-                </div>
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" placeholder="nombre@correo.com" required>
+            </div>
 
-                <div class="campo-formulario">
-                    <label for="contrasena">Contraseña</label>
-                    <input
-                        type="password"
-                        id="contrasena"
-                        name="contrasena"
-                        placeholder="Mínimo 6 caracteres"
-                        minlength="6"
-                        required
-                    >
-                </div>
+            <div class="campo">
+                <label for="telefono">Celular (opcional, recomendado para recordatorios)</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="Ej: 3001234567" maxlength="15">
+            </div>
 
-                <div class="campo-formulario">
-                    <label for="tipo_usuario">Tipo de usuario</label>
-                    <select id="tipo_usuario" name="tipo_usuario" onchange="mostrarCodigoAdmin()" required>
-                        <option value="jugador">Jugador (reservar canchas, crear equipo y buscar rivales)</option>
-                        <option value="administrador">Administrador de cancha (requiere código de autorización)</option>
-                    </select>
-                </div>
+            <div class="campo">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" placeholder="Mínimo 6 caracteres" minlength="6" required>
+            </div>
 
-                <!-- Este campo solo aparece cuando el usuario elige "Administrador de cancha" -->
-                <div class="campo-formulario" id="bloque-codigo-admin" style="display: none;">
-                    <label for="codigo_admin">Código de administrador</label>
-                    <input
-                        type="password"
-                        id="codigo_admin"
-                        name="codigo_admin"
-                        placeholder="Ingresa el código entregado por los dueños"
-                    >
-                    <small class="nota-campo">
-                        Este código lo entregan únicamente los dueños de Ready Match.
-                    </small>
-                </div>
+            <div class="campo">
+                <label for="tipo_usuario">Tipo de cuenta</label>
+                <select id="tipo_usuario" name="tipo_usuario" onchange="mostrarCodigoAdmin()" required>
+                    <option value="jugador">Jugador</option>
+                    <option value="administrador">Administrador (requiere código)</option>
+                </select>
+            </div>
 
-                <button type="submit" class="boton boton-principal boton-ancho">
-                    Registrarme
-                </button>
-            </form>
+            <div class="campo" id="bloque-codigo-admin" style="display: none;">
+                <label for="codigo_admin">Código de administrador</label>
+                <input type="password" id="codigo_admin" name="codigo_admin" placeholder="Código entregado por Ready Match">
+            </div>
 
-            <p class="enlace-inferior">
-                ¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a>
-            </p>
-        </div>
-    </div>
-</section>
+            <button type="submit" class="btn btn-primario btn-ancho" style="margin-top: 6px;">Registrarme</button>
+        </form>
 
-<!-- JavaScript sencillo para mostrar u ocultar el campo del código de administrador -->
-<script>
-    function mostrarCodigoAdmin() {
-        var selector = document.getElementById("tipo_usuario");
-        var bloque = document.getElementById("bloque-codigo-admin");
-        var campoCodigo = document.getElementById("codigo_admin");
+        <p class="texto-apoyo" style="text-align: center; margin-top: 16px;">
+            ¿Ya tienes cuenta? <a href="/login" style="color: var(--blue); font-weight: 700;">Inicia sesión</a>
+        </p>
+    </section>
 
-        if (selector.value === "administrador") {
-            bloque.style.display = "block";
-            campoCodigo.required = true;
-        } else {
-            bloque.style.display = "none";
-            campoCodigo.required = false;
-            campoCodigo.value = "";
+    <script>
+        function mostrarCodigoAdmin() {
+            var selector = document.getElementById("tipo_usuario");
+            var bloque = document.getElementById("bloque-codigo-admin");
+            var campo = document.getElementById("codigo_admin");
+            if (selector.value === "administrador") {
+                bloque.style.display = "block";
+                campo.required = true;
+            } else {
+                bloque.style.display = "none";
+                campo.required = false;
+                campo.value = "";
+            }
         }
-    }
-</script>
+    </script>
 {% endblock %}

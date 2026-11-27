@@ -1,0 +1,18 @@
+# Entorno y secretos locales
+.env
+
+# Bases de datos y respaldos
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+backups/
+
+# Caché de Python y entorno virtual
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/

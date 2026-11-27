@@ -1,52 +1,45 @@
 {% extends "base.html" %}
 
 {% block titulo %}Iniciar sesión - Ready Match{% endblock %}
+{% block topbar_clase %}topbar-clara{% endblock %}
+
+{% block volver %}
+    <a href="/" class="btn-icono-barra" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+{% endblock %}
+
+{% block encabezado_titulo %}Iniciar sesión{% endblock %}
+{% block header_accion %}{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="tarjeta-formulario">
-            <h1>Iniciar sesión</h1>
-            <p class="texto-ayuda">
-                Ingresa con tu correo y contraseña para acceder a Ready Match.
-            </p>
+    <section class="seccion">
+        <p class="texto-apoyo" style="margin-bottom: 16px;">
+            Ingresa con tu correo y contraseña para acceder a Ready Match.
+        </p>
 
-            <form method="POST" action="/login">
-                <div class="campo-formulario">
-                    <label for="correo">Correo electrónico</label>
-                    <input
-                        type="email"
-                        id="correo"
-                        name="correo"
-                        placeholder="Ej: laura@correo.com"
-                        required
-                    >
-                </div>
+        <form method="POST" action="/login">
+            {{ csrf_input() }}
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" placeholder="nombre@correo.com" required>
+            </div>
 
-                <div class="campo-formulario">
-                    <label for="contrasena">Contraseña</label>
-                    <input
-                        type="password"
-                        id="contrasena"
-                        name="contrasena"
-                        placeholder="Escribe tu contraseña"
-                        required
-                    >
-                </div>
+            <div class="campo">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" placeholder="Tu contraseña" required>
+            </div>
 
-                <button type="submit" class="boton boton-principal boton-ancho">
-                    Ingresar
-                </button>
-            </form>
+            <button type="submit" class="btn btn-primario btn-ancho" style="margin-top: 6px;">Ingresar</button>
+        </form>
 
-            <p class="enlace-inferior">
-                <a href="/olvide_contrasena">¿Olvidaste tu contraseña?</a>
-            </p>
-
-            <p class="enlace-inferior">
-                ¿Aún no tienes cuenta? <a href="/registro">Regístrate gratis</a>
+        <div style="margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <a href="/olvide_contrasena" class="enlace-accion">¿Olvidaste tu contraseña?</a>
+            <p class="texto-apoyo">
+                ¿Aún no tienes cuenta? <a href="/registro" style="color: var(--blue); font-weight: 700;">Crear cuenta</a>
             </p>
         </div>
-    </div>
-</section>
+    </section>
 {% endblock %}

@@ -1,413 +1,740 @@
 {% extends "base.html" %}
 
-{% block titulo %}Panel de Administrador - Ready Match{% endblock %}
+{% block titulo %}{{ 'Mis canchas' if tab_activo == 'canchas' else 'Agenda' }} - Ready Match{% endblock %}
+{% block encabezado_titulo %}{{ 'Mis canchas' if tab_activo == 'canchas' else 'Agenda' }}{% endblock %}
+
+{% block header_accion %}
+    {% if tab_activo == "canchas" %}
+        <button type="button" class="btn-texto-barra naranja" onclick="abrirSheet('sheetNuevaCancha')">
+            + Nueva
+        </button>
+    {% else %}
+        <a href="/administrador/recordatorios" class="btn-texto-barra {% if recordatorios_pend > 0 %}naranja{% endif %}">
+            Recordatorios{% if recordatorios_pend > 0 %} ({{ recordatorios_pend }}){% endif %}
+        </a>
+    {% endif %}
+{% endblock %}
 
 {% block contenido %}
-<section class="seccion-gris">
-    <div class="contenedor">
-        <div class="panel-encabezado">
-            <span class="etiqueta-rol">Administrador de canchas</span>
-            <h1>Panel de Administración</h1>
-            <p>
-                Bienvenido, <strong>{{ session.get("usuario_nombre") }}</strong>.
-                Gestiona tus canchas sintéticas, configura horarios y administra las solicitudes de reserva.
-            </p>
-        </div>
+    {% if tab_activo == "agenda" %}
+        <!-- FASE 1, 2, 4, 5: AGENDA DIARIA UNIFICADA -->
+        {% if not cancha_activa %}
+            <div class="estado-vacio">
+                <svg class="vacio-ilustracion" viewBox="0 0 64 64" fill="none" stroke="var(--blue)" stroke-width="2" aria-hidden="true">
+                    <rect x="8" y="14" width="48" height="36" rx="6" fill="var(--blue-soft)"/>
+                    <line x1="32" y1="14" x2="32" y2="50"/>
+                    <circle cx="32" cy="32" r="7" stroke="var(--orange)"/>
+                </svg>
+                <strong>Registra tu primera cancha</strong>
+                <p>Cuando registres tu cancha aparecerá aquí su agenda diaria.</p>
+                <div style="margin-top: 14px;">
+                    <a href="/administrador?tab=canchas" class="btn btn-primario btn-sm">Ir a Canchas</a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Selector de cancha SOLO cuando el admin tiene más de una -->
+            {% if mis_canchas | length > 1 %}
+            <form method="GET" action="/administrador" class="barra-selector-cancha">
+                <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                <select name="cancha_id" aria-label="Elegir cancha" onchange="this.form.submit()">
+                    {% for c in mis_canchas %}
+                        <option value="{{ c.id }}" {% if c.id == cancha_activa.id %}selected{% endif %}>{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-borde btn-sm" onclick="abrirSheet('sheetReservaFija')">+ Fija</button>
+            </form>
+            {% else %}
+            <div class="barra-selector-cancha" style="justify-content: space-between;">
+                <strong class="subtitulo">{{ cancha_activa.nombre }}</strong>
+                <button type="button" class="btn btn-borde btn-sm" onclick="abrirSheet('sheetReservaFija')">+ Reserva fija</button>
+            </div>
+            {% endif %}
 
-        <!-- Solicitudes de reserva recibidas -->
-        <div class="caja-panel" style="margin-bottom: 28px;">
-            <h2>Solicitudes de reserva recibidas</h2>
-            <p class="texto-izquierda">
-                Revisa las solicitudes enviadas por los jugadores. El sistema evita confirmar dos reservas en el mismo horario.
-            </p>
-
-            {% if reservas_recibidas %}
-                <div class="lista-reservas">
-                    {% for reserva in reservas_recibidas %}
-                    <div class="tarjeta-reserva tarjeta-reserva-admin">
-                        <div class="datos-reserva">
-                            <h3>{{ reserva.nombre_cancha }}</h3>
-                            <p class="dato-extra">
-                                <strong>Titular:</strong> {{ reserva.nombre_reserva or reserva.nombre_jugador }}
-                                {% if reserva.identificacion %}
-                                    &nbsp;|&nbsp; <strong>Identificación:</strong> {{ reserva.identificacion }}
-                                {% endif %}
-                            </p>
-                            <p class="dato-extra">
-                                <strong>Cuenta:</strong> {{ reserva.nombre_jugador }} ({{ reserva.correo_jugador }})
-                            </p>
-                            <p class="dato-extra">
-                                <strong>Turno:</strong> {{ reserva.fecha }} — {{ reserva.hora }} (1 hora)
-                                &nbsp;|&nbsp; <strong>Precio:</strong> {{ reserva.precio_cancha | precio_cop }}
-                            </p>
-                        </div>
-
-                        <div class="acciones-reserva">
-                            <span class="badge-estado estado-{{ reserva.estado }}">
-                                {{ reserva.estado | capitalize }}
-                            </span>
-
-                            {% if reserva.estado == "pendiente" %}
-                                <div class="botones-accion">
-                                    <form method="POST" action="/administrador/reserva/{{ reserva.id }}">
-                                        <input type="hidden" name="accion" value="confirmar">
-                                        <button type="submit" class="boton boton-principal boton-pequeno">
-                                            Confirmar
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="/administrador/reserva/{{ reserva.id }}">
-                                        <input type="hidden" name="accion" value="rechazar">
-                                        <button type="submit" class="boton boton-peligro boton-pequeno">
-                                            Rechazar
-                                        </button>
-                                    </form>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+            <!-- Tira ágil de días con flechas -->
+            <div class="tira-dias-wrap">
+                <a href="/administrador?cancha_id={{ cancha_activa.id }}&fecha={{ fecha_ant }}" class="btn-nav-dia" aria-label="Día anterior">&lsaquo;</a>
+                <div class="tira-dias">
+                    {% for d in dias_strip %}
+                    <a
+                        href="/administrador?cancha_id={{ cancha_activa.id }}&fecha={{ d.iso }}"
+                        class="dia-pill {% if d.iso == fecha_sel %}activo{% endif %}"
+                    >
+                        <span class="d-abrev">{{ d.abrev }}</span>
+                        <span class="d-num">{{ d.dia }}</span>
+                    </a>
                     {% endfor %}
                 </div>
-            {% else %}
-                <p class="texto-vacio">
-                    Todavía no has recibido solicitudes de reserva para tus canchas.
+                <a href="/administrador?cancha_id={{ cancha_activa.id }}&fecha={{ fecha_sig }}" class="btn-nav-dia" aria-label="Día siguiente">&rsaquo;</a>
+            </div>
+
+            <!-- Confirmación si una reserva fija chocó con fechas ocupadas -->
+            {% if choques_fija %}
+            <div class="alerta-choques">
+                <strong>Fechas ocupadas en la reserva fija</strong>
+                <p style="margin-top: 4px;">
+                    {{ choques_fija.nombre_cliente }} ({{ choques_fija.dia_nombre }} · {{ choques_fija.hora }}) choca con:
+                    <strong>{{ choques_fija.choques | join(', ') }}</strong>.
                 </p>
+                <form method="POST" action="/administrador/fijas/crear" style="margin-top: 10px;">
+                    {{ csrf_input() }}
+                    <input type="hidden" name="cancha_id" value="{{ choques_fija.cancha_id }}">
+                    <input type="hidden" name="dia_semana" value="{{ choques_fija.dia_semana }}">
+                    <input type="hidden" name="hora" value="{{ choques_fija.hora }}">
+                    <input type="hidden" name="nombre_cliente" value="{{ choques_fija.nombre_cliente }}">
+                    <input type="hidden" name="telefono_cliente" value="{{ choques_fija.telefono_cliente }}">
+                    <input type="hidden" name="fecha_inicio" value="{{ choques_fija.fecha_inicio }}">
+                    <input type="hidden" name="omitir_choques" value="1">
+                    <button type="submit" class="btn btn-primario btn-sm">Crear fija omitiendo esas fechas</button>
+                </form>
+            </div>
             {% endif %}
-        </div>
 
-        <!-- Registrar nueva cancha -->
-        <div class="caja-panel" style="margin-bottom: 28px;">
-            <h2>Registrar nueva cancha</h2>
-            <p class="texto-izquierda">
-                Completa los datos de tu escenario deportivo. Solo tú podrás modificar su información y horarios.
-            </p>
-
-            <form method="POST" action="/administrador/agregar_cancha" enctype="multipart/form-data">
-                <div class="cuadricula-dos">
-                    <div class="campo-formulario">
-                        <label for="nombre">Nombre de la cancha</label>
-                        <input
-                            type="text"
-                            id="nombre"
-                            name="nombre"
-                            placeholder="Ej: Sintética Los Campeones"
-                            required
-                        >
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="direccion">Dirección</label>
-                        <input
-                            type="text"
-                            id="direccion"
-                            name="direccion"
-                            placeholder="Ej: Carrera 15 # 80-20, Bogotá"
-                            required
-                        >
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="precio">Precio por hora (en pesos, sin puntos)</label>
-                        <input
-                            type="number"
-                            id="precio"
-                            name="precio"
-                            min="1000"
-                            step="1000"
-                            placeholder="Ej: 100000"
-                            required
-                        >
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="tipo_futbol">Tipo de fútbol</label>
-                        <select id="tipo_futbol" name="tipo_futbol" required>
-                            {% for tipo in tipos_futbol %}
-                                <option value="{{ tipo }}">{{ tipo }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="imagen_predeterminada">Fotografía predeterminada</label>
-                        <select id="imagen_predeterminada" name="imagen_predeterminada">
-                            <option value="imagenes/cancha1.jpg">Cancha sintética de día</option>
-                            <option value="imagenes/cancha2.jpg">Cancha sintética iluminada de noche</option>
-                        </select>
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label>O sube tu propia foto (opcional)</label>
-                        <div class="subir-archivo">
-                            <label for="foto-nueva-cancha" class="boton-subir-foto">Seleccionar imagen</label>
-                            <input
-                                type="file"
-                                id="foto-nueva-cancha"
-                                name="foto"
-                                accept=".jpg,.jpeg,.png,.webp"
-                                class="input-archivo-oculto"
-                                onchange="mostrarNombreArchivo(this, 'nombre-foto-nueva')"
-                            >
-                            <span id="nombre-foto-nueva" class="texto-archivo">Ninguna imagen seleccionada</span>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="boton boton-principal">
-                    Guardar cancha
-                </button>
-            </form>
-        </div>
-
-        <!-- Mis canchas y horarios -->
-        <h2 class="titulo-subseccion">Mis canchas y horarios disponibles</h2>
-
-        {% if canchas_con_horarios %}
-            {% for item in canchas_con_horarios %}
-            <div class="caja-panel tarjeta-admin-cancha">
-                <div class="encabezado-admin-cancha">
-                    <div class="info-admin-cancha">
-                        <img
-                            src="{{ url_for('static', filename=item.cancha.imagen) }}"
-                            alt="{{ item.cancha.nombre }}"
-                            class="miniatura-cancha"
-                        >
+            <!-- Lista táctil de franjas del día -->
+            <div class="lista-tarjetas-app lista-stagger">
+                {% for f in franjas %}
+                <article class="franja-agenda estado-{{ f.estado }}">
+                    <div class="franja-top">
                         <div>
-                            <span class="insignia-futbol">{{ item.cancha.tipo_futbol }}</span>
-                            <h3>{{ item.cancha.nombre }}</h3>
-                            <p class="direccion">{{ item.cancha.direccion }}</p>
-                            <p class="precio">{{ item.cancha.precio | precio_cop }} <span>/ hora</span></p>
+                            <span class="franja-hora">{{ f.hora }}</span>
+                            <span class="texto-apoyo" style="margin-left: 6px;">{{ f.precio | precio_cop }}</span>
                         </div>
+
+                        {% if f.estado == "libre" %}
+                            <span class="etiqueta estado-disponible">Libre</span>
+                        {% elif f.estado == "reservado" %}
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                {% if f.reserva.reserva_fija_id %}
+                                    <span class="etiqueta etiqueta-azul">Fija</span>
+                                {% endif %}
+                                <span class="etiqueta estado-confirmada">Reservado</span>
+                            </div>
+                        {% elif f.estado == "bloqueado" %}
+                            <span class="etiqueta estado-bloqueado">Bloqueado</span>
+                        {% else %}
+                            <span class="etiqueta estado-cancelada">Cancelado · Libre</span>
+                        {% endif %}
                     </div>
 
-                    <div class="botones-accion">
-                        <button
-                            type="button"
-                            class="boton boton-secundario boton-pequeno"
-                            onclick="alternarEdicion({{ item.cancha.id }})"
-                        >
-                            Editar cancha
-                        </button>
-                        <form
-                            method="POST"
-                            action="/administrador/eliminar_cancha/{{ item.cancha.id }}"
-                            onsubmit="return confirm('¿Seguro que deseas eliminar esta cancha? También se borrarán sus horarios y reservas.');"
-                        >
-                            <button type="submit" class="boton boton-peligro boton-pequeno">
-                                Eliminar
+                    {% if f.estado == "reservado" %}
+                        {% set r = f.reserva %}
+                        {% set tel_cli = r.telefono_reserva or r.telefono_usuario %}
+                        {% set ep = r.estado_pago or 'pendiente' %}
+                        <p style="margin-top: 6px; font-weight: 700; color: var(--navy);">
+                            {{ r.nombre_reserva or r.nombre_usuario }}
+                            {% if tel_cli %}<span class="texto-apoyo" style="font-weight: 500;"> · {{ tel_cli }}</span>{% endif %}
+                        </p>
+                        <p class="texto-apoyo">
+                            {{ r.precio_aplicado | precio_cop }}
+                            {% if ep == 'abonado' %} · Abono: {{ r.monto_abonado | precio_cop }}{% endif %}
+                            {% if r.origen == 'web' %} · Reserva web{% else %} · Agendada{% endif %}
+                        </p>
+
+                        <!-- Cambio de estado de pago con un toque + botón Gestionar/Cancelar -->
+                        <div class="pago-pills">
+                            {% for st_pago, lbl_pago in [('pendiente', 'Pendiente'), ('abonado', 'Abonado'), ('pagado', 'Pagado')] %}
+                            <form method="POST" action="/administrador/pago/{{ r.id }}" style="display: inline;">
+                                {{ csrf_input() }}
+                                <input type="hidden" name="estado_pago" value="{{ st_pago }}">
+                                <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
+                                <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                                <button type="submit" class="pago-pill {% if ep == st_pago %}activo-{{ st_pago }}{% endif %}">
+                                    {{ lbl_pago }}
+                                </button>
+                            </form>
+                            {% endfor %}
+
+                            <button
+                                type="button"
+                                class="btn-mini-inline"
+                                style="margin-left: auto;"
+                                data-id="{{ r.id }}"
+                                data-cliente="{{ r.nombre_reserva or r.nombre_usuario }}"
+                                data-hora="{{ f.hora }}"
+                                data-precio="{{ r.precio_aplicado }}"
+                                data-pago="{{ ep }}"
+                                data-abono="{{ r.monto_abonado or 0 }}"
+                                onclick="abrirDetalleReserva(this)"
+                            >
+                                Gestionar
                             </button>
+                        </div>
+
+                    {% elif f.estado == "bloqueado" %}
+                        <div class="fila-botones" style="margin-top: 8px;">
+                            <form method="POST" action="/administrador/bloquear_turno">
+                                {{ csrf_input() }}
+                                <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
+                                <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                                <input type="hidden" name="hora" value="{{ f.hora }}">
+                                <button type="submit" class="btn btn-borde btn-sm btn-ancho">Desbloquear horario</button>
+                            </form>
+                        </div>
+
+                    {% else %}
+                        {% if f.estado == "cancelado" and f.cancelada %}
+                            <p class="texto-apoyo" style="margin-top: 4px;">
+                                Cancelada por {{ f.cancelada.cancelada_por_rol or 'usuario' }}
+                                {% if f.cancelada.motivo_cancelacion %} · {{ f.cancelada.motivo_cancelacion }}{% endif %}
+                            </p>
+                        {% endif %}
+                        <div class="fila-botones" style="margin-top: 8px;">
+                            <button
+                                type="button"
+                                class="btn btn-azul btn-sm"
+                                data-hora="{{ f.hora }}"
+                                data-precio="{{ f.precio | precio_cop }}"
+                                onclick="abrirAgendarManual(this)"
+                            >
+                                Agendar
+                            </button>
+                            <form method="POST" action="/administrador/bloquear_turno">
+                                {{ csrf_input() }}
+                                <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
+                                <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                                <input type="hidden" name="hora" value="{{ f.hora }}">
+                                <button type="submit" class="btn btn-borde btn-sm btn-ancho">Bloquear</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+
+            <!-- Datalist de autocompletado de clientes previos -->
+            <datalist id="listaClientesSugeridos">
+                {% for cli in clientes_sugeridos %}
+                    <option value="{{ cli.nombre }}">{{ cli.telefono }}</option>
+                {% endfor %}
+            </datalist>
+
+            <!-- Bottom sheet: Agendar turno manual (sin crear cuenta) -->
+            <div id="sheetAgendar" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Agendar turno">
+                <div class="sheet-panel">
+                    <div class="sheet-manija"></div>
+                    <div class="sheet-header">
+                        <h2 id="tituloSheetAgendar">Agendar turno</h2>
+                        <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetAgendar')" aria-label="Cerrar">&times;</button>
+                    </div>
+                    <div class="sheet-body">
+                        <form method="POST" action="/administrador/agendar">
+                            {{ csrf_input() }}
+                            <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
+                            <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                            <input type="hidden" name="hora" id="ag_hora" value="">
+
+                            <div class="campo">
+                                <label for="ag_nombre">A nombre de quién</label>
+                                <input type="text" id="ag_nombre" name="nombre_cliente" list="listaClientesSugeridos" placeholder="Escribe nombre o elige sugerencia" minlength="2" required oninput="autocompletarTelefono(this, 'ag_tel')">
+                            </div>
+
+                            <div class="campo">
+                                <label for="ag_tel">Celular (opcional, para recordatorio WhatsApp)</label>
+                                <input type="tel" id="ag_tel" name="telefono_cliente" placeholder="Ej: 3001234567" maxlength="15">
+                            </div>
+
+                            <div class="fila-dos">
+                                <div class="campo">
+                                    <label for="ag_pago">Estado de pago</label>
+                                    <select id="ag_pago" name="estado_pago">
+                                        <option value="pendiente">Pendiente</option>
+                                        <option value="abonado">Abonado</option>
+                                        <option value="pagado">Pagado</option>
+                                    </select>
+                                </div>
+                                <div class="campo">
+                                    <label for="ag_abono">Abono (si aplica)</label>
+                                    <input type="number" id="ag_abono" name="monto_abonado" min="0" step="5000" placeholder="Ej: 40000">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primario btn-ancho">Confirmar turno</button>
                         </form>
                     </div>
                 </div>
+            </div>
 
-                <!-- Formulario desplegable para editar esta cancha -->
-                <div id="editar-cancha-{{ item.cancha.id }}" class="panel-edicion-cancha" style="display: none;">
-                    <h3>Editar información de la cancha</h3>
-                    <form
-                        method="POST"
-                        action="/administrador/editar_cancha/{{ item.cancha.id }}"
-                        enctype="multipart/form-data"
-                    >
-                        <div class="cuadricula-dos">
-                            <div class="campo-formulario">
-                                <label>Nombre de la cancha</label>
-                                <input type="text" name="nombre" value="{{ item.cancha.nombre }}" required>
-                            </div>
+            <!-- Bottom sheet: Crear reserva fija semanal -->
+            <div id="sheetReservaFija" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Nueva reserva fija">
+                <div class="sheet-panel">
+                    <div class="sheet-manija"></div>
+                    <div class="sheet-header">
+                        <h2>Nueva reserva fija</h2>
+                        <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetReservaFija')" aria-label="Cerrar">&times;</button>
+                    </div>
+                    <div class="sheet-body">
+                        <p class="texto-apoyo" style="margin-bottom: 12px;">
+                            Aparta automáticamente este día y hora cada semana (ventana de 8 semanas).
+                        </p>
+                        <form method="POST" action="/administrador/fijas/crear">
+                            {{ csrf_input() }}
+                            <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
 
-                            <div class="campo-formulario">
-                                <label>Dirección</label>
-                                <input type="text" name="direccion" value="{{ item.cancha.direccion }}" required>
-                            </div>
-
-                            <div class="campo-formulario">
-                                <label>Precio por hora (sin puntos)</label>
-                                <input type="number" name="precio" value="{{ item.cancha.precio }}" min="1000" step="1000" required>
-                            </div>
-
-                            <div class="campo-formulario">
-                                <label>Tipo de fútbol</label>
-                                <select name="tipo_futbol" required>
-                                    {% for tipo in tipos_futbol %}
-                                        <option value="{{ tipo }}" {% if item.cancha.tipo_futbol == tipo %}selected{% endif %}>
-                                            {{ tipo }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="campo-formulario">
-                                <label>Fotografía</label>
-                                <select name="imagen_predeterminada">
-                                    <option value="mantener">Conservar fotografía actual</option>
-                                    <option value="imagenes/cancha1.jpg">Cancha sintética de día</option>
-                                    <option value="imagenes/cancha2.jpg">Cancha sintética iluminada de noche</option>
-                                </select>
-                            </div>
-
-                            <div class="campo-formulario">
-                                <label>O subir una foto nueva (opcional)</label>
-                                <div class="subir-archivo">
-                                    <label for="foto-editar-{{ item.cancha.id }}" class="boton-subir-foto">Seleccionar imagen</label>
-                                    <input
-                                        type="file"
-                                        id="foto-editar-{{ item.cancha.id }}"
-                                        name="foto"
-                                        accept=".jpg,.jpeg,.png,.webp"
-                                        class="input-archivo-oculto"
-                                        onchange="mostrarNombreArchivo(this, 'nombre-foto-editar-{{ item.cancha.id }}')"
-                                    >
-                                    <span id="nombre-foto-editar-{{ item.cancha.id }}" class="texto-archivo">Ninguna imagen seleccionada</span>
+                            <div class="fila-dos">
+                                <div class="campo">
+                                    <label for="rf_dia">Día de la semana</label>
+                                    <select id="rf_dia" name="dia_semana" required>
+                                        {% for idx, nom, _ in dias_semana %}
+                                            <option value="{{ idx }}">{{ nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="campo">
+                                    <label for="rf_hora">Hora</label>
+                                    <select id="rf_hora" name="hora" required>
+                                        {% for h in horas_disponibles %}
+                                            <option value="{{ h }}">{{ h }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="botones-accion">
-                            <button type="submit" class="boton boton-principal boton-pequeno">
-                                Guardar cambios
-                            </button>
-                            <button
-                                type="button"
-                                class="boton boton-secundario boton-pequeno"
-                                onclick="alternarEdicion({{ item.cancha.id }})"
-                            >
-                                Cancelar
-                            </button>
-                        </div>
-                    </form>
+                            <div class="campo">
+                                <label for="rf_nombre">Cliente o equipo</label>
+                                <input type="text" id="rf_nombre" name="nombre_cliente" list="listaClientesSugeridos" placeholder="Ej: Los de los Martes" minlength="2" required oninput="autocompletarTelefono(this, 'rf_tel')">
+                            </div>
+
+                            <div class="fila-dos">
+                                <div class="campo">
+                                    <label for="rf_tel">Celular (opcional)</label>
+                                    <input type="tel" id="rf_tel" name="telefono_cliente" placeholder="3001234567" maxlength="15">
+                                </div>
+                                <div class="campo">
+                                    <label for="rf_inicio">Desde</label>
+                                    <input type="date" id="rf_inicio" name="fecha_inicio" value="{{ fecha_sel }}" min="{{ fecha_hoy }}" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primario btn-ancho">Crear reserva fija</button>
+                        </form>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Opción 1: Agregar varios horarios de una vez -->
-                <div class="panel-horarios-multiples" id="multi-horarios-{{ item.cancha.id }}">
-                    <div class="cabecera-horarios-multi">
-                        <div>
-                            <h4>Agregar varios horarios a la vez</h4>
-                            <p class="nota-campo">Elige una fecha y marca todas las horas disponibles con un clic.</p>
-                        </div>
-                        <div class="atajos-horarios">
-                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'manana')">Mañana</button>
-                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'tarde')">Tarde</button>
-                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'noche')">Noche</button>
-                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'todas')">Todas</button>
-                            <button type="button" class="boton-atajo" onclick="seleccionarBloque({{ item.cancha.id }}, 'limpiar')">Limpiar</button>
-                        </div>
+            <!-- Bottom sheet: Gestionar pago / cancelar reserva desde Agenda -->
+            <div id="sheetDetalleReserva" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Gestionar reserva">
+                <div class="sheet-panel">
+                    <div class="sheet-manija"></div>
+                    <div class="sheet-header">
+                        <h2 id="detTitulo">Gestionar reserva</h2>
+                        <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetDetalleReserva')" aria-label="Cerrar">&times;</button>
                     </div>
+                    <div class="sheet-body">
+                        <form id="formPagoDetalle" method="POST" action="">
+                            {{ csrf_input() }}
+                            <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
+                            <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                            <div class="fila-dos">
+                                <div class="campo">
+                                    <label for="det_pago">Estado de pago</label>
+                                    <select id="det_pago" name="estado_pago">
+                                        <option value="pendiente">Pendiente</option>
+                                        <option value="abonado">Abonado</option>
+                                        <option value="pagado">Pagado</option>
+                                    </select>
+                                </div>
+                                <div class="campo">
+                                    <label for="det_abono">Valor abonado</label>
+                                    <input type="number" id="det_abono" name="monto_abonado" min="0" step="5000">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-azul btn-ancho">Guardar pago</button>
+                        </form>
 
-                    <form method="POST" action="/administrador/agregar_horarios_multiples">
-                        <input type="hidden" name="cancha_id" value="{{ item.cancha.id }}">
+                        <hr class="divisor" style="margin: 16px 0;">
 
-                        <div class="campo-formulario" style="max-width: 260px;">
-                            <label>Fecha para estos horarios</label>
-                            <input type="date" name="fecha" min="{{ fecha_hoy }}" required>
-                        </div>
-
-                        <div class="cuadricula-horas">
-                            {% for hora in horas_disponibles %}
-                            <label class="casilla-hora">
-                                <input type="checkbox" name="horas" value="{{ hora }}">
-                                <span>{{ hora }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-
-                        <button type="submit" class="boton boton-principal boton-pequeno" style="margin-top: 14px;">
-                            Agregar horarios seleccionados
-                        </button>
-                    </form>
+                        <form id="formCancelarDetalle" method="POST" action="" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva? El horario volverá a quedar libre.');">
+                            {{ csrf_input() }}
+                            <input type="hidden" name="cancha_id" value="{{ cancha_activa.id }}">
+                            <input type="hidden" name="fecha" value="{{ fecha_sel }}">
+                            <div class="campo">
+                                <label for="det_motivo">Motivo de cancelación (opcional)</label>
+                                <input type="text" id="det_motivo" name="motivo" placeholder="Ej: Lluvia, aviso del cliente..." maxlength="180">
+                            </div>
+                            <button type="submit" class="btn btn-peligro btn-ancho">Cancelar reserva</button>
+                        </form>
+                    </div>
                 </div>
+            </div>
+        {% endif %}
 
-                <!-- Opción 2: Agregar un solo horario (uno por uno) -->
-                <form method="POST" action="/administrador/agregar_horario" class="formulario-horario">
-                    <input type="hidden" name="cancha_id" value="{{ item.cancha.id }}">
-
-                    <div class="campo-formulario">
-                        <label>Agregar un horario individual — Fecha</label>
-                        <input type="date" name="fecha" min="{{ fecha_hoy }}" required>
+    {% else %}
+        <!-- TAB CANCHAS: DATOS, TELÉFONO, TARIFAS POR HORARIO Y RESERVAS FIJAS -->
+        {% if canchas_detalle %}
+            <div class="lista-tarjetas-app lista-stagger">
+                {% for item in canchas_detalle %}
+                {% set c = item.cancha %}
+                <article class="fila-registro">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <img src="{{ url_for('static', filename=c.imagen) }}" alt="{{ c.nombre }}" class="fila-cancha-foto" width="76" height="76" loading="lazy">
+                        <div style="flex: 1; min-width: 0;">
+                            <span class="etiqueta etiqueta-{{ (c.deporte or 'Fútbol') | clase_deporte }}" style="margin-bottom: 3px;">{{ item.deportes_ofrecidos | join(', ') }}</span>
+                            <h2 class="fila-cancha-titulo">{{ c.nombre }}</h2>
+                            <p class="fila-cancha-meta">{{ c.tipo_futbol }} · {{ c.direccion }}</p>
+                            <p class="precio-destacado" style="margin-top: 4px;">Base: {{ c.precio | precio_cop }} <span>/ h</span></p>
+                        </div>
                     </div>
 
-                    <div class="campo-formulario">
-                        <label>Hora (turno de 1 hora)</label>
-                        <select name="hora" required>
-                            {% for hora in horas_disponibles %}
-                                <option value="{{ hora }}">{{ hora }}</option>
-                            {% endfor %}
-                        </select>
+                    <!-- Tarifas por horario configuradas -->
+                    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);">
+                        <div class="fila-encabezado" style="margin-bottom: 6px;">
+                            <span class="texto-apoyo" style="font-weight: 700; color: var(--navy);">Tarifas por horario ({{ item.tarifas | length }})</span>
+                            <button type="button" class="btn-mini-inline" onclick="abrirSheet('sheetTarifa-{{ c.id }}')">+ Tarifa</button>
+                        </div>
+                        {% if item.tarifas %}
+                            <div class="chips-lista" style="margin-top: 4px;">
+                                {% for t in item.tarifas %}
+                                <div class="chip-item">
+                                    <span>{{ t.dias_texto }} {{ t.hora_inicio }}–{{ t.hora_fin }}: <strong>{{ t.precio | precio_cop }}</strong></span>
+                                    <form method="POST" action="/administrador/tarifas/eliminar/{{ t.id }}" style="display: inline;">
+                                        {{ csrf_input() }}
+                                        <button type="submit" class="btn-mini-inline" style="border: none; padding: 0 3px;" aria-label="Eliminar tarifa">&times;</button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="texto-apoyo">Se usa el precio base {{ c.precio | precio_cop }} para todos los horarios.</p>
+                        {% endif %}
                     </div>
 
-                    <button type="submit" class="boton boton-secundario">
-                        Agregar horario
-                    </button>
-                </form>
-
-                <!-- Horarios registrados -->
-                <div class="zona-horarios-admin">
-                    <strong>Horarios registrados ({{ item.horarios | length }}):</strong>
-
-                    {% if item.horarios %}
-                        <div class="chips-horarios">
-                            {% for horario in item.horarios %}
-                            <div class="chip-horario">
-                                <span>{{ horario.fecha }} — {{ horario.hora }}</span>
-                                <form method="POST" action="/administrador/eliminar_horario/{{ horario.id }}">
-                                    <button type="submit" class="boton-x" title="Eliminar horario">&times;</button>
+                    <!-- Reservas fijas activas de esta cancha -->
+                    {% if item.fijas %}
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                        <span class="texto-apoyo" style="font-weight: 700; color: var(--navy);">Reservas fijas activas ({{ item.fijas | length }})</span>
+                        <div class="chips-lista" style="margin-top: 5px;">
+                            {% for rf in item.fijas %}
+                            <div class="chip-item">
+                                <span>{{ rf.dia_nombre }} {{ rf.hora }} · {{ rf.nombre_cliente }}</span>
+                                <form method="POST" action="/administrador/fijas/finalizar/{{ rf.id }}" onsubmit="return confirm('¿Finalizar esta reserva fija y liberar sus turnos futuros?');" style="display: inline;">
+                                    {{ csrf_input() }}
+                                    <button type="submit" class="btn-mini-inline" style="color: var(--err-text);">Finalizar</button>
                                 </form>
                             </div>
                             {% endfor %}
                         </div>
-                    {% else %}
-                        <p class="texto-vacio">Aún no has agregado horarios para esta cancha.</p>
+                    </div>
                     {% endif %}
-                </div>
+
+                    <div class="fila-botones">
+                        <button type="button" class="btn btn-borde btn-sm" onclick="abrirSheet('sheetEditarCancha-{{ c.id }}')">Editar</button>
+                        <form method="POST" action="/administrador/eliminar_cancha/{{ c.id }}" onsubmit="return confirm('¿Eliminar esta cancha y todos sus datos?');">
+                            {{ csrf_input() }}
+                            <button type="submit" class="btn btn-peligro btn-sm btn-ancho">Eliminar</button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
             </div>
+
+            {% for item in canchas_detalle %}
+            {% set c = item.cancha %}
+            <!-- Bottom sheet: Agregar tarifa por horario -->
+            <div id="sheetTarifa-{{ c.id }}" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Nueva tarifa">
+                    <div class="sheet-panel">
+                        <div class="sheet-manija"></div>
+                        <div class="sheet-header">
+                            <h2>Tarifa · {{ c.nombre }}</h2>
+                            <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetTarifa-{{ c.id }}')" aria-label="Cerrar">&times;</button>
+                        </div>
+                        <div class="sheet-body" id="tarifa-form-{{ c.id }}">
+                            <div class="chips-lista" style="margin-top: 0; margin-bottom: 10px;">
+                                <button type="button" class="btn-mini-inline" onclick="marcarDias({{ c.id }}, [0,1,2,3,4])">Lun a Vie</button>
+                                <button type="button" class="btn-mini-inline" onclick="marcarDias({{ c.id }}, [5,6])">Sáb y Dom</button>
+                                <button type="button" class="btn-mini-inline" onclick="marcarDias({{ c.id }}, [0,1,2,3,4,5,6])">Todos</button>
+                            </div>
+                            <form method="POST" action="/administrador/tarifas/agregar">
+                                {{ csrf_input() }}
+                                <input type="hidden" name="cancha_id" value="{{ c.id }}">
+                                <div class="campo">
+                                    <label>Días de la semana</label>
+                                    <div class="casillas-grid">
+                                        {% for idx, _, ab in dias_semana %}
+                                        <label class="casilla-pill">
+                                            <input type="checkbox" name="dias_semana" value="{{ idx }}">
+                                            <span>{{ ab }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="fila-dos">
+                                    <div class="campo">
+                                        <label>Hora inicio</label>
+                                        <select name="hora_inicio" required>
+                                            {% for h in horas_disponibles %}<option value="{{ h }}">{{ h }}</option>{% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="campo">
+                                        <label>Hora fin (inclusive)</label>
+                                        <select name="hora_fin" required>
+                                            {% for h in horas_disponibles %}<option value="{{ h }}" {% if h == '22:00' %}selected{% endif %}>{{ h }}</option>{% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="campo">
+                                    <label>Precio por hora (COP)</label>
+                                    <input type="number" name="precio" min="1000" step="1000" placeholder="Ej: 110000" required>
+                                </div>
+                                <button type="submit" class="btn btn-primario btn-ancho">Guardar tarifa</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom sheet: Editar cancha -->
+                <div id="sheetEditarCancha-{{ c.id }}" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Editar cancha">
+                    <div class="sheet-panel">
+                        <div class="sheet-manija"></div>
+                        <div class="sheet-header">
+                            <h2>Editar cancha</h2>
+                            <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetEditarCancha-{{ c.id }}')" aria-label="Cerrar">&times;</button>
+                        </div>
+                        <div class="sheet-body">
+                            {% set dep_actual = c.deporte or 'Fútbol' %}
+                            <form method="POST" action="/administrador/editar_cancha/{{ c.id }}" enctype="multipart/form-data">
+                                {{ csrf_input() }}
+                                <div class="campo">
+                                    <label>Nombre</label>
+                                    <input type="text" name="nombre" value="{{ c.nombre }}" required>
+                                </div>
+                                <div class="campo">
+                                    <label>Dirección</label>
+                                    <input type="text" name="direccion" value="{{ c.direccion }}" required>
+                                </div>
+                                <div class="campo">
+                                    <label>Celular de contacto de la cancha (opcional)</label>
+                                    <input type="tel" name="telefono" value="{{ c.telefono or '' }}" placeholder="Ej: 3001234567" maxlength="15">
+                                </div>
+                                <div class="fila-dos">
+                                    <div class="campo">
+                                        <label>Deporte principal</label>
+                                        <select name="deporte" onchange="actualizarModsAdmin(this, 'mod-edit-{{ c.id }}')" required>
+                                            {% for dep in deportes_catalogo %}
+                                                <option value="{{ dep.nombre }}" {% if dep_actual == dep.nombre %}selected{% endif %}>{{ dep.nombre }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="campo">
+                                        <label>Modalidad</label>
+                                        <select id="mod-edit-{{ c.id }}" name="tipo_futbol" required>
+                                            {% for tipo in modalidades_por_deporte[dep_actual] %}
+                                                <option value="{{ tipo }}" {% if c.tipo_futbol == tipo %}selected{% endif %}>{{ tipo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="fila-dos">
+                                    <div class="campo">
+                                        <label>Tipo de cancha</label>
+                                        <select name="tipo_cancha">
+                                            {% for tc in tipos_cancha %}
+                                                <option value="{{ tc }}" {% if (c.tipo_cancha or 'Sintética') == tc %}selected{% endif %}>{{ tc }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="campo">
+                                        <label>Precio base / hora</label>
+                                        <input type="number" name="precio" value="{{ c.precio }}" min="1000" step="1000" required>
+                                    </div>
+                                </div>
+                                <div class="campo">
+                                    <label>Otros deportes disponibles</label>
+                                    <div class="casillas-grid">
+                                        {% for dep in deportes_catalogo %}
+                                        <label class="casilla-pill">
+                                            <input type="checkbox" name="deportes_extra" value="{{ dep.nombre }}" {% if dep.nombre in item.deportes_ofrecidos and dep.nombre != dep_actual %}checked{% endif %}>
+                                            <span>{{ dep.nombre }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="campo">
+                                    <label>Descripción</label>
+                                    <textarea name="descripcion">{{ c.descripcion or '' }}</textarea>
+                                </div>
+                                <div class="campo">
+                                    <label>Características (separadas por coma)</label>
+                                    <input type="text" name="caracteristicas" value="{{ c.caracteristicas or '' }}">
+                                </div>
+                                <div class="campo">
+                                    <label>Foto</label>
+                                    <select name="imagen_predeterminada" style="margin-bottom: 8px;">
+                                        <option value="mantener">Conservar actual</option>
+                                        <option value="imagenes/cancha1.jpg">Fútbol · Día</option>
+                                        <option value="imagenes/cancha2.jpg">Fútbol · Iluminada</option>
+                                        <option value="imagenes/baloncesto.jpg">Baloncesto</option>
+                                        <option value="imagenes/voleibol.jpg">Voleibol</option>
+                                    </select>
+                                    <div class="subir-foto-wrap">
+                                        <label for="foto-edit-{{ c.id }}" class="btn-subir">Subir foto</label>
+                                        <input type="file" id="foto-edit-{{ c.id }}" name="foto" accept=".jpg,.jpeg,.png,.webp" class="input-oculto" onchange="mostrarNombreArchivo(this, 'lbl-edit-{{ c.id }}')">
+                                        <span id="lbl-edit-{{ c.id }}" class="texto-apoyo">Sin cambios</span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primario btn-ancho">Guardar cambios</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
         {% else %}
-            <div class="caja-panel">
-                <p class="texto-vacio">
-                    Todavía no tienes canchas registradas. Usa el formulario superior para crear tu primera cancha.
-                </p>
+            <div class="estado-vacio">
+                <strong>No tienes canchas registradas</strong>
+                <p>Toca <strong>+ Nueva</strong> para agregar tu primer establecimiento.</p>
+                <div style="margin-top: 14px;">
+                    <button type="button" class="btn btn-primario btn-sm" onclick="abrirSheet('sheetNuevaCancha')">Registrar cancha</button>
+                </div>
             </div>
         {% endif %}
+    {% endif %}
+
+    <!-- Bottom sheet: Registrar nueva cancha -->
+    <div id="sheetNuevaCancha" class="sheet-backdrop" role="dialog" aria-modal="true" aria-label="Registrar cancha">
+        <div class="sheet-panel">
+            <div class="sheet-manija"></div>
+            <div class="sheet-header">
+                <h2>Nueva cancha</h2>
+                <button type="button" class="btn-icono-barra" onclick="cerrarSheet('sheetNuevaCancha')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <form method="POST" action="/administrador/agregar_cancha" enctype="multipart/form-data">
+                    {{ csrf_input() }}
+                    <div class="campo">
+                        <label for="nc_nombre">Nombre del establecimiento</label>
+                        <input type="text" id="nc_nombre" name="nombre" placeholder="Ej: Complejo Deportivo Central" required>
+                    </div>
+                    <div class="campo">
+                        <label for="nc_dir">Dirección</label>
+                        <input type="text" id="nc_dir" name="direccion" placeholder="Ej: Carrera 15 # 80-20" required>
+                    </div>
+                    <div class="campo">
+                        <label for="nc_tel">Celular de contacto (opcional)</label>
+                        <input type="tel" id="nc_tel" name="telefono" placeholder="Ej: 3001234567" maxlength="15">
+                    </div>
+                    <div class="fila-dos">
+                        <div class="campo">
+                            <label for="nc_dep">Deporte principal</label>
+                            <select id="nc_dep" name="deporte" onchange="actualizarModsAdmin(this, 'nc_mod')" required>
+                                {% for dep in deportes_catalogo %}
+                                    <option value="{{ dep.nombre }}">{{ dep.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="nc_mod">Modalidad</label>
+                            <select id="nc_mod" name="tipo_futbol" required>
+                                {% for tipo in tipos_futbol %}
+                                    <option value="{{ tipo }}">{{ tipo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fila-dos">
+                        <div class="campo">
+                            <label for="nc_tipo">Tipo de cancha</label>
+                            <select id="nc_tipo" name="tipo_cancha">
+                                {% for tc in tipos_cancha %}
+                                    <option value="{{ tc }}">{{ tc }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="nc_precio">Precio base / hora</label>
+                            <input type="number" id="nc_precio" name="precio" min="1000" step="1000" placeholder="Ej: 100000" required>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Otros deportes disponibles (opcional)</label>
+                        <div class="casillas-grid">
+                            {% for dep in deportes_catalogo %}
+                            <label class="casilla-pill">
+                                <input type="checkbox" name="deportes_extra" value="{{ dep.nombre }}">
+                                <span>{{ dep.nombre }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="nc_desc">Descripción (opcional)</label>
+                        <textarea id="nc_desc" name="descripcion"></textarea>
+                    </div>
+                    <div class="campo">
+                        <label for="nc_car">Características (separadas por coma)</label>
+                        <input type="text" id="nc_car" name="caracteristicas" placeholder="Iluminación LED, Parqueadero">
+                    </div>
+                    <div class="campo">
+                        <label for="nc_foto_pred">Foto</label>
+                        <select id="nc_foto_pred" name="imagen_predeterminada" style="margin-bottom: 8px;">
+                            <option value="auto">Automática según el deporte</option>
+                            <option value="imagenes/cancha1.jpg">Fútbol · Día</option>
+                            <option value="imagenes/cancha2.jpg">Fútbol · Iluminada</option>
+                            <option value="imagenes/baloncesto.jpg">Baloncesto</option>
+                            <option value="imagenes/voleibol.jpg">Voleibol</option>
+                        </select>
+                        <div class="subir-foto-wrap">
+                            <label for="foto-nueva-cancha" class="btn-subir">Subir foto propia</label>
+                            <input type="file" id="foto-nueva-cancha" name="foto" accept=".jpg,.jpeg,.png,.webp" class="input-oculto" onchange="mostrarNombreArchivo(this, 'lbl-nueva-cancha')">
+                            <span id="lbl-nueva-cancha" class="texto-apoyo">Ninguna imagen</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primario btn-ancho">Guardar cancha</button>
+                </form>
+            </div>
+        </div>
     </div>
-</section>
 
-<script>
-    function alternarEdicion(canchaId) {
-        var panel = document.getElementById("editar-cancha-" + canchaId);
-        if (!panel) return;
-        panel.style.display = panel.style.display === "none" ? "block" : "none";
-    }
+    <script>
+        var MODS_ADMIN = {{ modalidades_por_deporte | tojson }};
+        var CLIENTES_MAP = {};
+        {% for cli in clientes_sugeridos %}
+            CLIENTES_MAP[{{ cli.nombre | lower | tojson }}] = {{ cli.telefono | tojson }};
+        {% endfor %}
 
-    function mostrarNombreArchivo(input, idEtiqueta) {
-        var etiqueta = document.getElementById(idEtiqueta);
-        if (!etiqueta) return;
-        if (input.files && input.files.length > 0) {
-            etiqueta.textContent = input.files[0].name;
-            etiqueta.classList.add("archivo-cargado");
-        } else {
-            etiqueta.textContent = "Ninguna imagen seleccionada";
-            etiqueta.classList.remove("archivo-cargado");
-        }
-    }
-
-    function seleccionarBloque(canchaId, bloque) {
-        var contenedor = document.getElementById("multi-horarios-" + canchaId);
-        if (!contenedor) return;
-
-        var casillas = contenedor.querySelectorAll('input[type="checkbox"][name="horas"]');
-        var rangos = {
-            manana: ["07:00", "08:00", "09:00", "10:00", "11:00", "12:00"],
-            tarde: ["13:00", "14:00", "15:00", "16:00", "17:00"],
-            noche: ["18:00", "19:00", "20:00", "21:00", "22:00"]
-        };
-
-        for (var i = 0; i < casillas.length; i++) {
-            var hora = casillas[i].value;
-            if (bloque === "todas") {
-                casillas[i].checked = true;
-            } else if (bloque === "limpiar") {
-                casillas[i].checked = false;
-            } else {
-                casillas[i].checked = rangos[bloque].indexOf(hora) !== -1;
+        function autocompletarTelefono(inputNombre, idTel) {
+            var clave = (inputNombre.value || "").trim().toLowerCase();
+            var campoTel = document.getElementById(idTel);
+            if (campoTel && CLIENTES_MAP[clave]) {
+                campoTel.value = CLIENTES_MAP[clave];
             }
         }
-    }
-</script>
+
+        function abrirAgendarManual(btn) {
+            var hora = btn.getAttribute("data-hora");
+            var precio = btn.getAttribute("data-precio");
+            document.getElementById("ag_hora").value = hora;
+            document.getElementById("tituloSheetAgendar").textContent = "Agendar · " + hora + " (" + precio + ")";
+            abrirSheet("sheetAgendar");
+        }
+
+        function abrirDetalleReserva(btn) {
+            var id = btn.getAttribute("data-id");
+            document.getElementById("detTitulo").textContent = btn.getAttribute("data-cliente") + " · " + btn.getAttribute("data-hora");
+            document.getElementById("formPagoDetalle").action = "/administrador/pago/" + id;
+            document.getElementById("formCancelarDetalle").action = "/administrador/cancelar_reserva/" + id;
+            document.getElementById("det_pago").value = btn.getAttribute("data-pago");
+            document.getElementById("det_abono").value = btn.getAttribute("data-abono");
+            abrirSheet("sheetDetalleReserva");
+        }
+
+        function actualizarModsAdmin(selectDep, idSelectMod) {
+            var selMod = document.getElementById(idSelectMod);
+            if (!selectDep || !selMod) return;
+            var lista = MODS_ADMIN[selectDep.value] || [];
+            selMod.innerHTML = "";
+            for (var i = 0; i < lista.length; i++) {
+                var opt = document.createElement("option");
+                opt.value = lista[i];
+                opt.textContent = lista[i];
+                selMod.appendChild(opt);
+            }
+        }
+
+        function marcarDias(canchaId, listaDias) {
+            var cont = document.getElementById("tarifa-form-" + canchaId);
+            if (!cont) return;
+            var checks = cont.querySelectorAll('input[name="dias_semana"]');
+            for (var i = 0; i < checks.length; i++) {
+                checks[i].checked = listaDias.indexOf(parseInt(checks[i].value, 10)) !== -1;
+            }
+        }
+    </script>
 {% endblock %}
