@@ -1,13 +1,29 @@
-"""Conexión SQLite y migraciones seguras e idempotentes de Ready Match."""
+"""Conexión SQLite protegida y migraciones consolidadas, seguras e idempotentes de Ready Match."""
 
 from datetime import timedelta
+import os
 import sqlite3
 
 from config import MESES_GRATIS_BETA, RUTA_BD, hoy_colombia
 
 
-def obtener_conexion():
+def _verificar_bd_existe(ruta=RUTA_BD, permitir_crear=False):
+    """Impide crear una base vacía en silencio si el archivo esperado no existe."""
+    if os.path.exists(ruta):
+        return
+    if permitir_crear or os.environ.get("INICIALIZAR_BD", "0") == "1":
+        return
+    raise FileNotFoundError(
+        f"[Ready Match] No se encontró la base de datos en la ruta esperada: {ruta}\n"
+        "La aplicación se detuvo para evitar crear una base vacía por accidente.\n"
+        "Restaura una copia desde backups/ o inicia intencionalmente una base nueva con "
+        "INICIALIZAR_BD=1 python app.py."
+    )
+
+
+def obtener_conexion(permitir_crear=False):
     """Abre y devuelve una conexión SQLite con Row factory y llaves foráneas activas."""
+    _verificar_bd_existe(RUTA_BD, permitir_crear=permitir_crear)
     conexion = sqlite3.connect(RUTA_BD, timeout=15)
     conexion.row_factory = sqlite3.Row
     conexion.execute("PRAGMA foreign_keys = ON")
@@ -21,12 +37,15 @@ def _agregar_columna_si_falta(cursor, tabla, columna, definicion):
         cursor.execute(f"ALTER TABLE {tabla} ADD COLUMN {columna} {definicion}")
 
 
-def crear_tablas():
-    """Crea tablas nuevas y migra columnas faltantes de forma idempotente y no destructiva."""
-    conexion = obtener_conexion()
+def crear_tablas(permitir_crear=False):
+    """
+    Aplica las migraciones consolidadas (01 a 10) de forma no destructiva e idempotente.
+    Solo crea el archivo de base de datos si ya existe o si permitir_crear=True / INICIALIZAR_BD=1.
+    """
+    conexion = obtener_conexion(permitir_crear=permitir_crear)
     cursor = conexion.cursor()
 
-    # 1. Usuarios (jugadores y administradores)
+    # Migración 01: Usuarios (jugadores y administradores) + columnas de perfil y celular
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,7 +68,7 @@ def crear_tablas():
     _agregar_columna_si_falta(cursor, "usuarios", "deportes_favoritos", "TEXT NOT NULL DEFAULT ''")
     _agregar_columna_si_falta(cursor, "usuarios", "telefono", "TEXT NOT NULL DEFAULT ''")
 
-    # 2. Canchas / establecimientos deportivos (tipo_futbol se conserva intacta)
+    # Migración 02: Canchas / establecimientos deportivos (tipo_futbol se conserva intacta)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS canchas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +92,7 @@ def crear_tablas():
     _agregar_columna_si_falta(cursor, "canchas", "caracteristicas", "TEXT NOT NULL DEFAULT ''")
     _agregar_columna_si_falta(cursor, "canchas", "telefono", "TEXT NOT NULL DEFAULT ''")
 
-    # 2b. Deportes adicionales ofrecidos por un establecimiento
+    # Migración 03: Deportes adicionales, tarifas por horario y favoritos
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS cancha_deportes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,7 +127,7 @@ def crear_tablas():
         )
     """)
 
-    # 3. Horarios (conserva bloqueos y registros previos)
+    # Migración 04: Horarios y bloqueos de turnos
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS horarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,7 +140,7 @@ def crear_tablas():
     """)
     _agregar_columna_si_falta(cursor, "horarios", "bloqueado", "INTEGER NOT NULL DEFAULT 0")
 
-    # 4. Reservas (única fuente de verdad junto con horarios.bloqueado)
+    # Migración 05: Reservas, pagos, cancelaciones, índice anti-doble reserva y backfill de precio
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS reservas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -182,7 +201,7 @@ def crear_tablas():
         WHERE precio_aplicado = 0
     """)
 
-    # 5. Reservas fijas semanales y sus excepciones (Fase 5)
+    # Migración 06: Reservas fijas semanales y sus excepciones
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS reservas_fijas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -214,7 +233,7 @@ def crear_tablas():
         )
     """)
 
-    # 6. Suscripciones de administradores (Fase 8 — base técnica)
+    # Migración 07: Suscripciones de administradores (base técnica Plan Beta)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS suscripciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -226,7 +245,7 @@ def crear_tablas():
         )
     """)
 
-    # 7. Equipos e integrantes
+    # Migración 08: Equipos e integrantes
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS equipos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -251,7 +270,7 @@ def crear_tablas():
         )
     """)
 
-    # 8. Partidos, solicitudes y notificaciones
+    # Migración 09: Partidos, solicitudes y notificaciones
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS partidos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -293,7 +312,7 @@ def crear_tablas():
         )
     """)
 
-    # Garantizar suscripción beta inicial para administradores existentes sin registro
+    # Migración 10: Suscripción Beta inicial para administradores sin registro previo
     hoy = hoy_colombia()
     fin_beta = (hoy + timedelta(days=30 * MESES_GRATIS_BETA)).isoformat()
     admins = cursor.execute("SELECT id FROM usuarios WHERE tipo_usuario = 'administrador'").fetchall()
