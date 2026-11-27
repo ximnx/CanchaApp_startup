@@ -618,17 +618,6 @@ def alternar_bloqueo_turno(cancha_id, fecha_iso, hora_hm, administrador_id):
     return True, f"Horario {hora_hm} bloqueado."
 
 
-def obtener_horarios_de_cancha(cancha_id):
-    """Conserva compatibilidad para consultar registros de horarios/bloqueos."""
-    conexion = obtener_conexion()
-    filas = conexion.execute(
-        "SELECT * FROM horarios WHERE cancha_id = ? ORDER BY fecha ASC, hora ASC",
-        (cancha_id,),
-    ).fetchall()
-    conexion.close()
-    return filas
-
-
 # ---------------- RESERVAS ATÓMICAS, PAGOS Y CANCELACIONES (FASES 1 Y 2) ----------------
 
 def crear_reserva_atomica(
@@ -895,21 +884,3 @@ def obtener_reservas_por_usuario(usuario_id):
     conexion.close()
     return reservas
 
-
-def obtener_reserva_por_id(reserva_id):
-    """Busca una reserva junto con el administrador dueño de la cancha."""
-    conexion = obtener_conexion()
-    reserva = conexion.execute(
-        """
-        SELECT reservas.*, canchas.administrador_id AS administrador_id,
-               canchas.nombre AS nombre_cancha,
-               canchas.direccion AS direccion_cancha,
-               canchas.telefono AS telefono_cancha
-        FROM reservas
-        JOIN canchas ON reservas.cancha_id = canchas.id
-        WHERE reservas.id = ?
-        """,
-        (reserva_id,),
-    ).fetchone()
-    conexion.close()
-    return reserva

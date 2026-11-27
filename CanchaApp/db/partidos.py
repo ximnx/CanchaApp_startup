@@ -57,33 +57,6 @@ def crear_equipo(nombre, categoria, tipo_futbol, capitan_id, descripcion, deport
     return equipo_id
 
 
-def obtener_todos_los_equipos(categoria=None, deporte=None, tipo_futbol=None):
-    """Devuelve equipos filtrados opcionalmente por deporte, categoría y modalidad."""
-    conexion = obtener_conexion()
-    consulta = """
-        SELECT equipos.*, usuarios.nombre AS nombre_capitan
-        FROM equipos
-        JOIN usuarios ON equipos.capitan_id = usuarios.id
-        WHERE 1 = 1
-    """
-    parametros = []
-
-    if deporte:
-        consulta += " AND equipos.deporte = ?"
-        parametros.append(deporte)
-    if categoria:
-        consulta += " AND equipos.categoria = ?"
-        parametros.append(categoria)
-    if tipo_futbol:
-        consulta += " AND equipos.tipo_futbol = ?"
-        parametros.append(tipo_futbol)
-
-    consulta += " ORDER BY equipos.id DESC"
-    equipos = conexion.execute(consulta, parametros).fetchall()
-    conexion.close()
-    return equipos
-
-
 def obtener_equipos_por_capitan(capitan_id):
     """Devuelve los equipos donde el usuario es capitán."""
     conexion = obtener_conexion()

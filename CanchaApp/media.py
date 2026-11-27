@@ -36,13 +36,6 @@ def partes_fecha_calendario(fecha_iso):
         return "---", "--"
 
 
-def verificar_disponibilidad(ocupado, bloqueado=False):
-    """Devuelve la etiqueta de estado de un turno."""
-    if bloqueado:
-        return "Bloqueado"
-    return "Ocupado" if ocupado else "Disponible"
-
-
 def _firma_imagen_valida(archivo):
     """Comprueba los bytes de cabecera reales (JPEG, PNG o WEBP)."""
     posicion = archivo.stream.tell()

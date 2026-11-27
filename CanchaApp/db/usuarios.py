@@ -179,20 +179,3 @@ def obtener_ids_favoritos(usuario_id):
     conexion.close()
     return {fila["cancha_id"] for fila in filas}
 
-
-def obtener_canchas_favoritas(usuario_id):
-    """Devuelve los detalles de las canchas guardadas como favoritas."""
-    conexion = obtener_conexion()
-    canchas = conexion.execute(
-        """
-        SELECT canchas.*, usuarios.nombre AS nombre_administrador
-        FROM favoritos
-        JOIN canchas ON favoritos.cancha_id = canchas.id
-        JOIN usuarios ON canchas.administrador_id = usuarios.id
-        WHERE favoritos.usuario_id = ?
-        ORDER BY favoritos.id DESC
-        """,
-        (usuario_id,),
-    ).fetchall()
-    conexion.close()
-    return canchas
